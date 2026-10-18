@@ -3,13 +3,13 @@
 /* الهوية: ورق فاتح دافي، كروت بيضا، حبر غامق، زعفراني للأفعال، أخضر لـ«وصل».
    الحواف صلبة (حدود + حافة سفلية) بدل الظلال الضبابية. */
 @theme {
-  --color-paper: #f7f6e5;
+  --color-paper: #ffffff;
   --color-card: #ffffff;
-  --color-mist: #f4f3e8;
+  --color-mist: #f5f6f8;
   --color-ink: #1b2230;
   --color-ink-soft: #585a5c;
-  --color-line: #e8e5d2;
-  --color-line-strong: #d8d5c5;
+  --color-line: #e4e7ec;
+  --color-line-strong: #d3d8e0;
   --color-saffron: #f2a20c;
   --color-saffron-lip: #c27f00;
   --color-saffron-soft: #fff4dc;
@@ -211,11 +211,11 @@ body {
 
 /* ── الـ dock: شريط عايم شفاف فيه أيقونات الأقسام ─────────────────────── */
 .dock-surface {
-  background: rgb(255 255 255 / 0.68);
+  background: rgb(255 255 255 / 0.85);
   -webkit-backdrop-filter: blur(29px) saturate(1.2);
   backdrop-filter: blur(29px) saturate(1.2);
   border-radius: 14px;
-  box-shadow: 0 0 0 1px rgb(216 213 197 / 0.55);
+  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08), 0 8px 24px -4px rgb(0 0 0 / 0.06);
 }
 /* يتقفل ويتفتح بعرضه: 0fr ↔ 1fr */
 .dock-rail {

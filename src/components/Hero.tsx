@@ -1,5 +1,4 @@
 import { SIGNUP_URL } from "@/lib/links";
-import { HeroCards } from "./HeroCards";
 
 export function Hero() {
   return (
@@ -22,7 +21,6 @@ export function Hero() {
         </div>
         <p className="mt-5 text-[1.05rem] text-ink-soft">مع سلة وزد وشوبيفاي، أو أي موقع عندك.</p>
       </div>
-      <HeroCards />
     </section>
   );
 }
