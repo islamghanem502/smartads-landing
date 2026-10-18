@@ -5,7 +5,6 @@ import "@fontsource/zain/arabic-400.css";
 import "@fontsource/zain/arabic-700.css";
 import "@fontsource/zain/latin-400.css";
 import "@fontsource/zain/latin-700.css";
-import "@fontsource/aref-ruqaa/arabic-400.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

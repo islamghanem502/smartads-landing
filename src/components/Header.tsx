@@ -5,11 +5,7 @@ export function Logo() {
   return (
     <a href="/" className="flex items-center gap-2.5" aria-label="مسوّقك الذكي، الرئيسية">
       {/* علامة مؤقتة لحد ما نقرر الشعار */}
-      <span
-        className="grid size-9 place-items-center rounded-[11px] bg-saffron font-display text-lg font-bold text-ink"
-        style={{ boxShadow: "0 3px 0 var(--color-saffron-lip)" }}
-        aria-hidden
-      >
+      <span className="grid size-9 place-items-center rounded-[11px] bg-saffron font-display text-lg font-bold text-ink" aria-hidden>
         م
       </span>
       <span className="font-display text-[1.1rem] font-bold">مسوّقك الذكي</span>

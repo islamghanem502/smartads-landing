@@ -1,24 +1,27 @@
 @import "tailwindcss";
 
-/* الهوية: ورق فاتح دافي، كروت بيضا، حبر غامق، زعفراني للأفعال، أخضر لـ«وصل».
-   الحواف صلبة (حدود + حافة سفلية) بدل الظلال الضبابية. */
+/* الهوية: الهيرو غامق سادة (إسبريسو) والأقسام اللي بعده فاتحة.
+   زعفراني للأفعال والتمييز بس، ومن غير توهجات أو تدرّجات للزينة. */
 @theme {
   --color-paper: #ffffff;
   --color-card: #ffffff;
-  --color-mist: #f5f6f8;
-  --color-ink: #1b2230;
-  --color-ink-soft: #585a5c;
-  --color-line: #e4e7ec;
-  --color-line-strong: #d3d8e0;
+  --color-mist: #f6f6f4;
+  --color-ink: #16120e;
+  --color-ink-soft: #5c5650;
+  --color-line: #e8e5e0;
+  --color-line-strong: #d8d3cc;
   --color-saffron: #f2a20c;
-  --color-saffron-lip: #c27f00;
   --color-saffron-soft: #fff4dc;
-  --color-green: #1f6b57;
-  --color-green-soft: #e3f1ec;
+
+  /* الهيرو الغامق */
+  --color-night: #14110f;
+  --color-night-2: #1d1916;
+  --color-cream: #f4eee5;
+  --color-cream-soft: #b3a898;
+  --color-cream-faint: #8a8073;
 
   --font-display: "Alexandria Variable", system-ui, sans-serif;
   --font-body: "Zain", system-ui, sans-serif;
-  --font-hand: "Aref Ruqaa", serif;
 }
 
 html {
@@ -35,178 +38,137 @@ body {
 }
 
 :focus-visible {
-  outline: 3px solid var(--color-ink);
+  outline: 2px solid var(--color-saffron);
   outline-offset: 3px;
   border-radius: 10px;
 }
 
-/* ── الزر التقيل: حافة سفلية أغمق، وينضغط لتحت ───────────────────────── */
+/* ── الزراير: سادة ومتظبطة، من غير حواف تقيلة ─────────────────────────── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   font-family: var(--font-display);
-  font-weight: 700;
-  border-radius: 16px;
-  transition: transform 80ms ease, box-shadow 80ms ease, background-color 120ms ease;
-  user-select: none;
+  font-weight: 600;
+  border-radius: 14px;
   white-space: nowrap;
+  user-select: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
 }
 .btn:active {
-  transform: translateY(4px);
+  transform: translateY(1px);
 }
 .btn-primary {
   background: var(--color-saffron);
   color: var(--color-ink);
-  box-shadow: 0 4px 0 var(--color-saffron-lip);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 1px 2px rgb(0 0 0 / 0.18);
 }
 .btn-primary:hover {
-  background: #f7ad1f;
-}
-.btn-primary:active {
-  box-shadow: 0 0 0 var(--color-saffron-lip);
+  background: #f6b23a;
 }
 .btn-quiet {
   background: var(--color-card);
   color: var(--color-ink);
-  border: 2px solid var(--color-line-strong);
-  box-shadow: 0 4px 0 var(--color-line-strong);
+  border: 1px solid var(--color-line-strong);
 }
 .btn-quiet:hover {
   background: var(--color-mist);
 }
-.btn-quiet:active {
-  box-shadow: 0 0 0 var(--color-line-strong);
+.btn-ghost-dark {
+  background: transparent;
+  color: var(--color-cream);
+  border: 1px solid rgb(244 238 229 / 0.24);
+}
+.btn-ghost-dark:hover {
+  background: rgb(244 238 229 / 0.06);
+  border-color: rgb(244 238 229 / 0.4);
 }
 .btn-lg {
-  height: 3.5rem;
-  padding-inline: 1.75rem;
-  font-size: 1.125rem;
+  height: 3.4rem;
+  padding-inline: 1.6rem;
+  font-size: 1.05rem;
 }
 .btn-sm {
-  height: 2.375rem;
-  padding-inline: 1rem;
-  font-size: 0.9375rem;
+  height: 2.5rem;
+  padding-inline: 1.05rem;
+  font-size: 0.92rem;
   border-radius: 12px;
 }
 
-/* ── كروت الواجهة: نفس منطق الزر — حد وحافة صلبة ─────────────────────── */
-.ui-card {
-  background: var(--color-card);
-  border: 2px solid var(--color-line);
-  border-radius: 22px;
-  box-shadow: 0 6px 0 var(--color-line);
+/* ── الهيرو ──────────────────────────────────────────────────────────── */
+.hero-dark {
+  background: var(--color-night);
+  color: var(--color-cream);
 }
 
-/* ── لحظة الدخول الوحيدة في الصفحة ───────────────────────────────────── */
-@keyframes rise {
+/* تمييز بقلم: شريط زعفراني ورا نص الجملة، بيترسم من اليمين وقت الدخول */
+.hl {
+  background-image: linear-gradient(rgb(242 162 12 / 0.4), rgb(242 162 12 / 0.4));
+  background-repeat: no-repeat;
+  background-position: right 90%;
+  background-size: 100% 0.34em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  padding-inline: 0.06em;
+  animation: hl-in 900ms cubic-bezier(0.65, 0, 0.25, 1) 350ms both;
+}
+@keyframes hl-in {
   from {
-    opacity: 0;
-    transform: translateY(18px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-@keyframes tick {
-  0% {
-    background: var(--color-mist);
-    border-color: var(--color-line);
-  }
-  100% {
-    background: var(--color-green-soft);
-    border-color: #b9dccf;
-  }
-}
-@keyframes check-in {
-  from {
-    opacity: 0;
-    transform: scale(0.4);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-@keyframes draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-@keyframes fade {
-  to {
-    opacity: 1;
-  }
-}
-@keyframes ping {
-  0% {
-    transform: scale(1);
-    opacity: 0.55;
-  }
-  80%,
-  100% {
-    transform: scale(2.6);
-    opacity: 0;
+    background-size: 0% 0.34em;
   }
 }
 
-.rise {
-  opacity: 0;
-  animation: rise 600ms cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+/* اسم منصة جوه الجملة بلوجوها */
+.pchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32em;
+  padding: 0.02em 0.5em 0.06em;
+  margin-inline: 0.08em;
+  border-radius: 0.5em;
+  background: rgb(244 238 229 / 0.07);
+  border: 1px solid rgb(244 238 229 / 0.12);
+  color: var(--color-cream);
+  font-size: 0.92em;
+  line-height: 1.5;
+  white-space: nowrap;
+  vertical-align: 0.04em;
 }
-.reach {
-  animation: tick 300ms ease forwards;
-}
-.reach .reach-check {
-  opacity: 0;
-  animation: check-in 260ms cubic-bezier(0.3, 1.6, 0.5, 1) forwards;
-  animation-delay: inherit;
-}
-.sketch-path {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  animation: draw 700ms ease-out forwards;
-}
-.sketch-note {
-  opacity: 0;
-  animation: fade 400ms ease forwards;
-}
-.live-dot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: var(--color-green);
-  animation: ping 1.8s ease-out infinite;
+.pchip svg {
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .rise,
-  .sketch-note {
-    opacity: 1;
-    animation: none;
-  }
-  .reach {
-    animation: none;
-    background: var(--color-green-soft);
-    border-color: #b9dccf;
-  }
-  .reach .reach-check {
-    opacity: 1;
-    animation: none;
-  }
-  .sketch-path {
-    stroke-dashoffset: 0;
-    animation: none;
-  }
-  .live-dot::after {
-    animation: none;
-  }
-  .btn {
-    transition: none;
-  }
+/* ── الهيدر: لونه من اللي تحته (فاتح افتراضياً، غامق فوق الهيرو) ──────── */
+.site-header {
+  --hdr-bg: var(--color-paper);
+  background: linear-gradient(to bottom, var(--hdr-bg) 55%, transparent);
+  color: var(--color-ink);
+  transition: color 250ms ease;
+}
+.site-header .hdr-muted {
+  color: var(--color-ink-soft);
+}
+.site-header .hdr-muted:hover {
+  color: var(--color-ink);
+}
+html[data-top="dark"] .site-header {
+  --hdr-bg: var(--color-night);
+  color: var(--color-cream);
+}
+html[data-top="dark"] .site-header .hdr-muted {
+  color: var(--color-cream-soft);
+}
+html[data-top="dark"] .site-header .hdr-muted:hover {
+  color: var(--color-cream);
 }
 
 /* ── الـ dock: شريط عايم شفاف فيه أيقونات الأقسام ─────────────────────── */
@@ -215,13 +177,17 @@ body {
   -webkit-backdrop-filter: blur(29px) saturate(1.2);
   backdrop-filter: blur(29px) saturate(1.2);
   border-radius: 14px;
-  box-shadow: 0 0 0 1px rgb(0 0 0 / 0.08), 0 8px 24px -4px rgb(0 0 0 / 0.06);
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.08),
+    0 8px 24px -4px rgb(0 0 0 / 0.06);
 }
 /* يتقفل ويتفتح بعرضه: 0fr ↔ 1fr */
 .dock-rail {
   display: grid;
   grid-template-columns: 1fr;
-  transition: grid-template-columns 680ms cubic-bezier(0.65, 0, 0.2, 1), opacity 420ms ease;
+  transition:
+    grid-template-columns 680ms cubic-bezier(0.65, 0, 0.2, 1),
+    opacity 420ms ease;
 }
 /* clip على العرض بس، عشان التولتيب تحت يبان */
 .dock-rail > div {
@@ -237,7 +203,9 @@ body {
   display: grid;
   grid-template-columns: 0fr;
   opacity: 0;
-  transition: grid-template-columns 680ms cubic-bezier(0.65, 0, 0.2, 1), opacity 420ms ease;
+  transition:
+    grid-template-columns 680ms cubic-bezier(0.65, 0, 0.2, 1),
+    opacity 420ms ease;
 }
 .dock-peek > * {
   overflow-x: clip;
@@ -248,7 +216,9 @@ body {
   opacity: 1;
 }
 .dock-close {
-  transition: opacity 300ms ease, transform 300ms ease;
+  transition:
+    opacity 300ms ease,
+    transform 300ms ease;
 }
 [data-dock="closed"] .dock-close {
   opacity: 0;
@@ -265,7 +235,9 @@ body {
 .dock-tip {
   opacity: 0;
   transform: translate(50%, -4px);
-  transition: opacity 140ms ease, transform 140ms ease;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
 }
 .dock-item:hover .dock-tip,
 .dock-item:focus-visible .dock-tip {
@@ -273,7 +245,35 @@ body {
   transform: translate(50%, 0);
 }
 
+html[data-top="dark"] .dock-surface {
+  background: rgb(32 27 23 / 0.78);
+  box-shadow:
+    0 0 0 1px rgb(244 238 229 / 0.1),
+    0 12px 30px -12px rgb(0 0 0 / 0.6);
+}
+html[data-top="dark"] .dock-close {
+  background: rgb(244 238 229 / 0.1);
+  color: var(--color-cream-soft);
+}
+html[data-top="dark"] .dock-peek button {
+  color: var(--color-cream);
+}
+html[data-top="dark"] .dock-item > span:not(.dock-tip) {
+  color: var(--color-cream-soft);
+}
+html[data-top="dark"] .dock-item > span.bg-ink {
+  background: var(--color-cream);
+}
+html[data-top="dark"] .dock-tip {
+  background: var(--color-cream);
+  color: var(--color-night);
+}
+html[data-top="dark"] .dock-rail span.bg-line-strong {
+  background: rgb(244 238 229 / 0.14);
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .btn,
   .dock-rail,
   .dock-peek,
   .dock-close,
@@ -281,93 +281,7 @@ body {
   .dock-tip {
     transition: none;
   }
-}
-
-/* صف جديد على شاشة اللابتوب في المشهد */
-@keyframes scene-row-in {
-  from {
-    opacity: 0;
-    transform: translateY(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-.scene-row {
-  animation: scene-row-in 350ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
-}
-@media (prefers-reduced-motion: reduce) {
-  .scene-row {
+  .hl {
     animation: none;
   }
-}
-
-/* ── الهيرو الغامق ───────────────────────────────────────────────────── */
-.hero-dark {
-  background:
-    radial-gradient(55% 60% at 26% 62%, rgba(242, 162, 12, 0.13), rgba(242, 162, 12, 0) 70%),
-    radial-gradient(40% 45% at 92% 0%, rgba(120, 132, 255, 0.1), rgba(120, 132, 255, 0) 70%),
-    linear-gradient(180deg, #0b0f1a 0%, #0a0e18 100%);
-  color: #f6f4ee;
-}
-.btn-ghost-dark {
-  background: rgb(255 255 255 / 0.05);
-  color: #f6f4ee;
-  border: 2px solid rgb(255 255 255 / 0.14);
-  box-shadow: 0 4px 0 rgb(255 255 255 / 0.1);
-}
-.btn-ghost-dark:hover {
-  background: rgb(255 255 255 / 0.09);
-}
-.btn-ghost-dark:active {
-  box-shadow: 0 0 0 rgb(255 255 255 / 0.1);
-}
-
-/* الهيدر: لونه من اللي تحته (فاتح افتراضياً، غامق فوق الهيرو) */
-.site-header {
-  --hdr-bg: var(--color-paper);
-  background: linear-gradient(to bottom, var(--hdr-bg) 55%, transparent);
-  color: var(--color-ink);
-  transition: color 250ms ease;
-}
-.site-header .hdr-muted {
-  color: var(--color-ink-soft);
-}
-.site-header .hdr-muted:hover {
-  color: var(--color-ink);
-}
-html[data-top="dark"] .site-header {
-  --hdr-bg: #0b0f1a;
-  color: #f6f4ee;
-}
-html[data-top="dark"] .site-header .hdr-muted {
-  color: #a3abbc;
-}
-html[data-top="dark"] .site-header .hdr-muted:hover {
-  color: #f6f4ee;
-}
-html[data-top="dark"] .dock-surface {
-  background: rgb(22 27 40 / 0.72);
-  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 12px 30px -12px rgb(0 0 0 / 0.6);
-}
-html[data-top="dark"] .dock-close {
-  background: rgb(255 255 255 / 0.1);
-  color: #c9cfdb;
-}
-html[data-top="dark"] .dock-peek button {
-  color: #f6f4ee;
-}
-html[data-top="dark"] .dock-item > span:not(.dock-tip) {
-  color: #a3abbc;
-}
-html[data-top="dark"] .dock-item > span.bg-ink {
-  background: #f6f4ee;
-}
-html[data-top="dark"] .dock-tip {
-  background: #f6f4ee;
-  color: #0b0f1a;
-}
-html[data-top="dark"] .dock-rail span.bg-line-strong {
-  background: rgb(255 255 255 / 0.14);
 }
