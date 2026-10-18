@@ -1,4 +1,5 @@
 import { LOGIN_URL, SIGNUP_URL } from "@/lib/links";
+import { Dock } from "./Dock";
 
 export function Logo() {
   return (
@@ -11,38 +12,26 @@ export function Logo() {
       >
         م
       </span>
-      <span className="font-display text-[1.2rem] font-bold tracking-tight">مسوّقك الذكي</span>
+      <span className="font-display text-[1.1rem] font-bold">مسوّقك الذكي</span>
     </a>
   );
 }
 
-const NAV = [
-  { href: "#what", label: "وش نسوي" },
-  { href: "#how", label: "كيف نبدأ" },
-  { href: "#pricing", label: "الأسعار" },
-];
-
 export function Header() {
   return (
-    <header className="mx-auto flex max-w-[1200px] items-center justify-between px-4 py-5 sm:px-8">
-      <div className="flex items-center gap-10">
+    <>
+      <header className="fixed inset-x-0 top-0 z-40 flex h-[76px] items-center justify-between bg-gradient-to-b from-paper from-60% to-paper/0 px-4 sm:px-8">
         <Logo />
-        <nav className="hidden items-center gap-7 text-[0.975rem] text-ink-soft md:flex" aria-label="الأقسام">
-          {NAV.map((n) => (
-            <a key={n.href} href={n.href} className="transition-colors hover:text-ink">
-              {n.label}
-            </a>
-          ))}
-        </nav>
-      </div>
-      <div className="flex items-center gap-4">
-        <a href={LOGIN_URL} className="hidden text-[0.975rem] font-medium text-ink-soft hover:text-ink sm:inline">
-          دخول
-        </a>
-        <a href={SIGNUP_URL} className="btn btn-primary btn-sm">
-          ابدأ الحين
-        </a>
-      </div>
-    </header>
+        <div className="flex items-center gap-5">
+          <a href={LOGIN_URL} className="hidden font-display text-[0.92rem] text-ink-soft hover:text-ink sm:inline">
+            دخول
+          </a>
+          <a href={SIGNUP_URL} className="btn btn-primary btn-sm">
+            ابدأ الحين
+          </a>
+        </div>
+      </header>
+      <Dock />
+    </>
   );
 }

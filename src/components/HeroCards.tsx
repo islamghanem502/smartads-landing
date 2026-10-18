@@ -17,7 +17,7 @@ function Check() {
 
 function EventCard() {
   return (
-    <div className="ui-card rise w-full max-w-[350px] p-5" style={{ animationDelay: `${T.event}ms` }}>
+    <div className="ui-card rise w-full max-w-[350px] p-5 lg:justify-self-end" style={{ animationDelay: `${T.event}ms` }}>
       <div className="flex items-center justify-between text-[0.85rem] text-ink-soft">
         <span className="flex items-center gap-2">
           <span className="live-dot relative size-2 rounded-full bg-green" aria-hidden />
@@ -50,7 +50,7 @@ function EventCard() {
 
 function ApprovalCard() {
   return (
-    <div className="relative w-full max-w-[370px]">
+    <div className="relative w-full">
       <div className="ui-card rise p-5" style={{ animationDelay: `${T.approval}ms` }}>
         <span className="inline-block rounded-full bg-saffron-soft px-3 py-0.5 text-[0.8rem] font-medium text-[#8a5a00]">
           تنتظر موافقتك
@@ -83,21 +83,15 @@ function ApprovalCard() {
   );
 }
 
-/** اللمسة اليدوية: سهم وكلمة بخط الرقعة يشاوروا على «اعتمد». */
+/** اللمسة اليدوية: سهم وكلمة بخط الرقعة يشاوروا على «اعتمد» من تحت كارت الحدث. */
 function HandNote() {
   return (
-    <div className="pointer-events-none absolute hidden w-[150px] lg:block" style={{ right: -152, bottom: 24 }} aria-hidden>
-      <span
-        className="sketch-note block pe-2 text-center font-hand text-[1.55rem] leading-none text-ink"
-        style={{ animationDelay: `${T.sketch + 500}ms` }}
-      >
-        القرار لك
-      </span>
-      <svg viewBox="0 0 150 70" className="mt-1 w-[150px] text-ink" fill="none">
+    <div className="pointer-events-none absolute hidden w-[150px] lg:block" style={{ right: -150, bottom: -46 }} aria-hidden>
+      <svg viewBox="0 0 150 70" className="w-[150px] text-ink" fill="none">
         <path
           className="sketch-path"
           pathLength={1}
-          d="M112 6 C 104 34, 74 52, 22 50"
+          d="M128 60 C 112 30, 72 12, 22 14"
           stroke="currentColor"
           strokeWidth="2.2"
           strokeLinecap="round"
@@ -106,7 +100,7 @@ function HandNote() {
         <path
           className="sketch-path"
           pathLength={1}
-          d="M34 39 L 20 50 L 35 60"
+          d="M35 4 L 21 14 L 34 25"
           stroke="currentColor"
           strokeWidth="2.2"
           strokeLinecap="round"
@@ -114,13 +108,19 @@ function HandNote() {
           style={{ animationDelay: `${T.sketch + 550}ms` }}
         />
       </svg>
+      <span
+        className="sketch-note -mt-1 block ps-3 text-start font-hand text-[1.6rem] leading-none text-ink"
+        style={{ animationDelay: `${T.sketch + 500}ms` }}
+      >
+        القرار لك
+      </span>
     </div>
   );
 }
 
 function DecisionCard() {
   return (
-    <div className="ui-card rise w-full max-w-[340px] p-5" style={{ animationDelay: `${T.decision}ms` }}>
+    <div className="ui-card rise w-full p-5" style={{ animationDelay: `${T.decision}ms` }}>
       <p className="text-[0.85rem] text-ink-soft">قرار اليوم</p>
       <p className="mt-1.5 text-[1rem] leading-relaxed">
         وقفنا إعلان ما جاب تواصل من 3 أيام، ونقلنا ميزانيته للإعلان اللي شغال.
@@ -138,14 +138,16 @@ function DecisionCard() {
 
 export function HeroCards() {
   return (
-    <div className="flex flex-col items-center gap-5 lg:items-stretch lg:gap-0" role="img" aria-label="مثال من المنصة: حدث وصل لكل المنصات، حملة تنتظر موافقتك، وقرار اتخذناه في حملة">
-      <div className="lg:self-start lg:me-6">
-        <EventCard />
-      </div>
-      <div className="lg:-mt-6 lg:self-end">
+    <div
+      className="mx-auto mt-16 flex max-w-[1140px] flex-col items-center gap-5 lg:mt-20 lg:grid lg:grid-cols-3 lg:items-start lg:gap-7"
+      role="img"
+      aria-label="مثال من المنصة: حدث وصل لكل المنصات، حملة تنتظر موافقتك، وقرار اتخذناه في حملة"
+    >
+      <EventCard />
+      <div className="w-full max-w-[370px] lg:mt-12 lg:justify-self-center">
         <ApprovalCard />
       </div>
-      <div className="lg:mt-3 lg:self-start lg:ms-14">
+      <div className="w-full max-w-[350px] lg:mt-5 lg:justify-self-start">
         <DecisionCard />
       </div>
     </div>

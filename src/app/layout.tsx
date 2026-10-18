@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import "@fontsource-variable/readex-pro/index.css";
-import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
-import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
-import "@fontsource/ibm-plex-sans-arabic/arabic-600.css";
-import "@fontsource/ibm-plex-sans-arabic/latin-400.css";
+import "@fontsource-variable/alexandria/index.css";
+import "@fontsource/zain/arabic-400.css";
+import "@fontsource/zain/arabic-700.css";
+import "@fontsource/zain/latin-400.css";
+import "@fontsource/zain/latin-700.css";
 import "@fontsource/aref-ruqaa/arabic-400.css";
 import "./globals.css";
 
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#ffffff",
+  themeColor: "#f7f6e5",
 };
 
 // بكسل المنصة يشتغل بس لما نحدد رقمه (لما النسخة دي تحل محل الموقع الحالي).
