@@ -20,10 +20,10 @@ export function Logo() {
 export function Header() {
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 flex h-[76px] items-center justify-between bg-gradient-to-b from-paper from-60% to-paper/0 px-4 sm:px-8">
+      <header className="site-header fixed inset-x-0 top-0 z-40 flex h-[76px] items-center justify-between px-4 sm:px-8">
         <Logo />
         <div className="flex items-center gap-5">
-          <a href={LOGIN_URL} className="hidden font-display text-[0.92rem] text-ink-soft hover:text-ink sm:inline">
+          <a href={LOGIN_URL} className="hdr-muted hidden font-display text-[0.92rem] sm:inline">
             دخول
           </a>
           <a href={SIGNUP_URL} className="btn btn-primary btn-sm">

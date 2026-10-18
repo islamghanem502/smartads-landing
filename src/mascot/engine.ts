@@ -9,17 +9,17 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 const rot2 = (x: number, y: number, a: number) => [x * Math.cos(a) - y * Math.sin(a), x * Math.sin(a) + y * Math.cos(a)] as const;
 const rgba = (c: RGB, a: number) => `rgba(${c[0] | 0}, ${c[1] | 0}, ${c[2] | 0}, ${a})`;
 
-// الـ easings من الـ brief بأسماء GSAP:
-// out = 1 − (1 − t)^3 → power2.out · inOut = cubic → power2.inOut · back (c1 = 1.7) → back.out(1.7)
+// cubic out / cubic in-out / back (c1 = 1.7) بأسماء GSAP
 const OUT = "power2.out";
 const IN_OUT = "power2.inOut";
 const BACK = "back.out(1.7)";
 
 type Point = { x: number; y: number };
 type Target = Point | Element;
-type ParticleKind = "heart" | "star" | "spark" | "z";
+type ParticleKind = "heart" | "star" | "spark" | "text";
 type Particle = {
   kind: ParticleKind;
+  text?: string;
   x: number;
   y: number;
   vx: number;
@@ -33,7 +33,7 @@ type Particle = {
 };
 type SoundKind = "tap" | "hop" | "love" | "dizzy" | "error" | "greet" | "proud";
 
-const BLINKABLE: EyeShape[] = ["pill", "wide", "dot", "tired", "heart", "star"];
+const BLINKABLE: EyeShape[] = ["round", "wide", "dot", "tired", "heart", "star"];
 
 /** القيم اللي GSAP بيحرّكها (keyframes). باقي الحركة: متابعة أُسّية وزنبركات في update(). */
 type Fx = {
@@ -47,15 +47,19 @@ type Fx = {
   lidR: number;
   morph: number;
   pop: number;
-  hand: number;
+  wag: number;
   jaw: number;
-  smile: number;
-  blushBoost: number;
+  smile: number; // إضافة فوق ابتسامة الحالة
+  brow: number; // −1 متضايق … 1 مرفوع
+  browShow: number;
+  typing: number;
+  say: number;
+  sink: number;
   dance: number;
   wait: number;
 };
 
-const NEUTRAL: Partial<Fx> = { x: 0, y: 0, sx: 1, sy: 1, rot: 0, pop: 1, hand: 0, jaw: 0, smile: 0, blushBoost: 0 };
+const NEUTRAL: Partial<Fx> = { x: 0, y: 0, sx: 1, sy: 1, rot: 0, pop: 1, wag: 0, jaw: 0, smile: 0, brow: 0, browShow: 0, say: 0 };
 
 export type EmoteOptions = { sound?: boolean };
 
@@ -81,20 +85,21 @@ export class MascotEngine {
   private tilt = 0;
   private glow = STATES.idle.glowAmount;
   private tint = 0;
+  private smile = STATES.idle.smile;
   private tintRGB: [number, number, number] = [...STATES.idle.tint];
   private glowRGB: [number, number, number] = [...STATES.idle.glow];
-  private blush = STATES.idle.blush;
   private eyeScale = 1;
 
-  private fx: Fx = { x: 0, y: 0, sx: 1, sy: 1, rot: 0, roll: 0, lidL: 1, lidR: 1, morph: 1, pop: 1, hand: 0, jaw: 0, smile: 0, blushBoost: 0, dance: 0, wait: 0 };
+  private fx: Fx = { x: 0, y: 0, sx: 1, sy: 1, rot: 0, roll: 0, lidL: 1, lidR: 1, morph: 1, pop: 1, wag: 0, jaw: 0, smile: 0, brow: 0, browShow: 0, typing: 0, say: 0, sink: 0, dance: 0, wait: 0 };
   private prevFy = 0;
-  private eyeL: EyeShape = "pill";
-  private eyeR: EyeShape = "pill";
+  private eyeL: EyeShape = "round";
+  private eyeR: EyeShape = "round";
   private emoteEyes = false;
+  private sayText = "هلا!";
 
   // زنبركات
-  private cloth = { x: 0, v: 0 };
-  private clothLift = { x: 0, v: 0 };
+  private tail = { x: 0, v: 0 };
+  private tailLift = { x: 0, v: 0 };
   private jaw = { x: 0, v: 0 };
 
   private particles: Particle[] = [];
@@ -109,7 +114,7 @@ export class MascotEngine {
   private taps: number[] = [];
   private audio: AudioContext | null = null;
   private unlocked = false;
-  private pose = { cx: 0, groundY: 0, x: 0, y: 0, rot: 0, sx: 1, sy: 1, roll: 0 };
+  private pose = { cx: 0, cy: 0, rot: 0, sx: 1, sy: 1, roll: 0 };
   private io: IntersectionObserver | null = null;
   private mql: MediaQueryList | null = null;
 
@@ -178,130 +183,137 @@ export class MascotEngine {
 
     gsap.to(this.fx, { dance: name === "dance" && !this.reduced ? 1 : 0, duration: name === "dance" ? 0.3 : 0.5, ease: IN_OUT, overwrite: "auto" });
     gsap.to(this.fx, { wait: name === "thinking" && !this.reduced ? 1 : 0, duration: 0.4, ease: IN_OUT, overwrite: "auto" });
+    gsap.to(this.fx, { typing: name === "thinking" ? 1 : 0, duration: 0.35, ease: IN_OUT, overwrite: "auto" });
+    gsap.to(this.fx, { sink: name === "sleeping" ? 0.16 : 0, duration: 1.2, ease: IN_OUT, overwrite: "auto" });
 
     if (name === "error") this.triggerEmote("shake", { sound: true });
     if (name === "happy") this.triggerEmote("hop");
     if (name === "sleeping") {
       const z = () => {
-        this.spawn("z", 2, LOOK.ink, { fromSide: true });
+        this.spawn("text", 2, LOOK.ink, { text: "z", fromSide: true });
         this.stateCalls.push(gsap.delayedCall(2.6, z));
       };
-      this.stateCalls.push(gsap.delayedCall(0.8, z));
+      this.stateCalls.push(gsap.delayedCall(0.9, z));
     }
   }
 
   triggerEmote(name: EmoteName, opts: EmoteOptions = {}) {
     const tl = this.startEmote();
-    const m = this.reduced ? 0 : 1; // حركة كبيرة؟ بتتلغي مع «تقليل الحركة»
+    const m = this.reduced ? 0 : 1; // الحركة الكبيرة بتتلغي مع «تقليل الحركة»
     const play = (k: SoundKind) => opts.sound && this.play(k);
 
     switch (name) {
       case "hop":
         play("hop");
-        this.hop(tl, 0.2 * m);
+        this.hop(tl, 0.22 * m);
+        this.endEmote(tl, 0);
         break;
 
       case "celebrate":
         play("hop");
         tl.call(() => this.setEyes("happy", "happy", true));
-        this.hop(tl, 0.24 * m);
+        tl.to(this.fx, { smile: 0.6, duration: 0.2, ease: OUT }, 0);
+        this.hop(tl, 0.26 * m);
         tl.call(() => this.spawn("spark", 6, LOOK.star), [], 0.12);
-        tl.to(this.fx, { blushBoost: 0.4, duration: 0.25, ease: OUT }, 0);
-        this.endEmote(tl, 0.9);
+        this.endEmote(tl, 0.8);
         break;
 
       case "love":
         play("love");
-        tl.to(this.fx, { sy: 0.92, sx: 1.06, duration: 0.09, ease: OUT });
+        tl.to(this.fx, { sy: 0.93, sx: 1.06, duration: 0.09, ease: OUT });
         tl.call(() => this.setEyes("heart", "heart", true));
-        tl.to(this.fx, { blushBoost: 0.6, duration: 0.3, ease: OUT }, "<");
+        tl.to(this.fx, { smile: 0.6, duration: 0.3, ease: OUT }, "<");
         this.hop(tl, 0.12 * m);
         tl.call(() => this.spawn("heart", 4, LOOK.heart), [], 0.15);
-        this.endEmote(tl, 1.5);
+        this.endEmote(tl, 1.4);
         break;
 
       case "proud":
         play("proud");
         tl.to(this.fx, { sy: 0.94, sx: 1.05, duration: 0.08, ease: OUT });
         tl.call(() => this.setEyes("star", "star", true));
-        tl.to(this.fx, { sy: 1.04, sx: 0.97, rot: -0.14, duration: 0.35, ease: BACK });
+        tl.to(this.fx, { sy: 1.05, sx: 0.97, rot: -0.14, brow: 1, browShow: 1, smile: 0.5, duration: 0.35, ease: BACK });
         tl.call(() => this.spawn("star", 4, LOOK.star), [], "<");
-        this.endEmote(tl, 1.4);
+        this.endEmote(tl, 1.3);
         break;
 
       case "surprised":
         play("hop");
         tl.call(() => this.setEyes("dot", "dot", true));
-        tl.to(this.fx, { pop: 1.25, jaw: 0.55, duration: 0.12, ease: OUT });
-        this.hop(tl, 0.3 * m, "<");
+        tl.to(this.fx, { pop: 1.25, jaw: 0.6, brow: 1, browShow: 1, duration: 0.12, ease: OUT });
+        tl.call(() => this.spawn("text", 1, LOOK.star, { text: "!" }), [], 0.05);
+        this.hop(tl, 0.26 * m, "<");
         this.endEmote(tl, 0.8);
         break;
 
       case "yawn":
         tl.call(() => this.setEyes("tired", "tired", false));
         tl.to(this.fx, { sy: 1 + 0.12 * (m || 0.4), sx: 1 - 0.06 * (m || 0.4), jaw: 1, duration: 0.55, ease: IN_OUT });
-        tl.to(this.fx, { duration: 0.7 }); // hold
+        tl.to(this.fx, { duration: 0.7 });
         tl.call(() => this.setEyes("closed", "closed", true));
         tl.to(this.fx, { sy: 1, sx: 1, jaw: 0, duration: 0.45, ease: OUT });
-        tl.call(() => this.spawn("z", 2, LOOK.ink, { fromSide: true }));
-        this.endEmote(tl, 1.4);
+        tl.call(() => this.spawn("text", 2, LOOK.ink, { text: "z", fromSide: true }));
+        this.endEmote(tl, 1.3);
         break;
 
       case "wink":
         play("tap");
         tl.call(() => this.setEyes(this.eyeL, "happy", true));
-        tl.to(this.fx, { rot: 0.07, smile: 1, duration: 0.25, ease: BACK }, 0);
+        tl.to(this.fx, { rot: 0.08, smile: 0.6, brow: 0.5, browShow: 0.7, duration: 0.25, ease: BACK }, 0);
         tl.call(() => this.spawn("spark", 1, LOOK.star), [], 0.1);
         this.endEmote(tl, 0.55);
         break;
 
       case "annoyed":
-        tl.to(this.fx, { sy: 0.95, sx: 1.05, rot: -0.05, duration: 0.18, ease: OUT });
+        tl.to(this.fx, { sy: 0.95, sx: 1.05, rot: -0.05, brow: -1, browShow: 1, smile: -0.9, duration: 0.18, ease: OUT });
         tl.call(() => this.setEyes("line", "line", true), [], 0.05);
         this.endEmote(tl, 1.3);
         break;
 
-      case "dizzy": {
+      case "dizzy":
         play("dizzy");
         tl.call(() => this.setEyes("spiral", "spiral", true));
+        tl.to(this.fx, { jaw: 0.35, smile: -0.4, duration: 0.2 }, 0);
         if (m) {
           tl.to(this.fx, { sy: 0.9, sx: 1.08, duration: 0.1, ease: OUT });
-          tl.to(this.fx, { roll: Math.PI * 4, y: -0.12, sy: 1, sx: 1, duration: 1.3, ease: IN_OUT });
+          tl.to(this.fx, { roll: Math.PI * 4, sy: 1, sx: 1, duration: 1.3, ease: IN_OUT });
           tl.set(this.fx, { roll: 0 });
-          tl.to(this.fx, { y: 0, duration: 0.35, ease: BACK });
-          tl.to(this.fx, { rot: 0.08, duration: 0.25, ease: IN_OUT, yoyo: true, repeat: 3 });
+          tl.to(this.fx, { rot: 0.1, duration: 0.25, ease: IN_OUT, yoyo: true, repeat: 3 });
         } else {
           tl.to(this.fx, { duration: 1.6 });
         }
-        this.endEmote(tl, 0.5);
+        this.endEmote(tl, 0.4);
         break;
-      }
 
       case "wave":
+        // سلام الفقاعة: الذيل بيهز، وتقول «هلا!»
         play("greet");
         tl.call(() => this.setEyes("happy", "happy", true));
-        tl.to(this.fx, { hand: 1, smile: 1, duration: 0.18, ease: OUT });
+        tl.to(this.fx, { wag: 1, smile: 0.6, brow: 0.6, browShow: 0.8, duration: 0.2, ease: OUT });
+        tl.call(() => (this.sayText = "هلا!"), [], 0);
+        tl.to(this.fx, { say: 1, duration: 0.35, ease: BACK }, 0.05);
         tl.to(this.fx, { duration: 1.3 });
-        tl.to(this.fx, { hand: 0, smile: 0, duration: 0.3, ease: IN_OUT });
+        tl.to(this.fx, { wag: 0, say: 0, duration: 0.3, ease: IN_OUT });
         this.endEmote(tl, 0);
         break;
 
       case "shake":
         play("error");
+        tl.to(this.fx, { brow: -0.6, browShow: 1, duration: 0.15 }, 0);
         if (m) {
           tl.to(this.fx, { x: 0.08, duration: 0.05, ease: OUT })
             .to(this.fx, { x: -0.08, duration: 0.07, ease: IN_OUT })
             .to(this.fx, { x: 0.05, duration: 0.07, ease: IN_OUT })
             .to(this.fx, { x: 0, duration: 0.09, ease: OUT });
         }
-        this.endEmote(tl, 0.2);
+        this.endEmote(tl, 0.6);
         break;
     }
   }
 
   greet() {
     this.triggerEmote("wave", { sound: true });
-    if (!this.reduced) this.emoteTl?.add(this.hopTl(0.1), 0.05);
+    if (!this.reduced) this.emoteTl?.add(this.hopTl(0.12), 0.05);
   }
 
   /** يبص على نقطة في الصفحة (إحداثيات العميل). hold بالثواني؛ من غيره يفضل يبص عليها. */
@@ -326,7 +338,7 @@ export class MascotEngine {
   private startEmote() {
     if (this.emoteTl) {
       this.emoteTl.kill();
-      // لفّة اتقطعت في النص: نكمّلها لأقرب صفر من مكانها، من غير قفزة
+      // لفّة اتقطعت في النص: نكمّلها لأقرب صفر من مكانها
       const roll = this.fx.roll % (Math.PI * 2);
       this.fx.roll = roll > Math.PI ? roll - Math.PI * 2 : roll;
       gsap.to(this.fx, { roll: 0, duration: 0.3, ease: OUT });
@@ -347,17 +359,16 @@ export class MascotEngine {
     tl.to(this.fx, { ...NEUTRAL, duration: 0.35, ease: OUT });
   }
 
-  /** نطة: استعداد صغير، طلوع 150ms (out)، نزول 300ms (back)، وضغطة وقت الهبوط. */
+  /** نطة في الهوا: استعداد، طلوع 150ms (out)، رجوع 300ms (back)، وضغطة الرجوع على قد النطة. */
   private hopTl(h: number) {
     const tl = gsap.timeline();
     if (!h) return tl;
-    // الضغطة وقت الهبوط على قد النطة، والحجم ثابت تقريباً (sx·sy ≈ 1)
     const k = clamp(h / 0.2, 0.4, 1.3);
     tl.to(this.fx, { sy: 0.92, sx: 1.06, duration: 0.07, ease: OUT })
-      .to(this.fx, { y: -h, sy: 1.05, sx: 0.96, duration: 0.15, ease: OUT })
+      .to(this.fx, { y: -h, sy: 1.06, sx: 0.95, duration: 0.15, ease: OUT })
       .to(this.fx, { y: 0, sy: 1, sx: 1, duration: 0.3, ease: BACK })
-      .to(this.fx, { sy: 1 - 0.18 * k, sx: 1 + 0.14 * k, duration: 0.07, ease: OUT }, "-=0.2")
-      .to(this.fx, { sy: 1 + 0.08 * k, sx: 1 - 0.04 * k, duration: 0.13, ease: OUT })
+      .to(this.fx, { sy: 1 - 0.14 * k, sx: 1 + 0.11 * k, duration: 0.07, ease: OUT }, "-=0.2")
+      .to(this.fx, { sy: 1 + 0.06 * k, sx: 1 - 0.03 * k, duration: 0.13, ease: OUT })
       .to(this.fx, { sy: 1, sx: 1, duration: 0.17, ease: OUT });
     return tl;
   }
@@ -370,10 +381,10 @@ export class MascotEngine {
   private setEyes(l: EyeShape, r: EyeShape, soft = true) {
     this.eyeL = l;
     this.eyeR = r;
-    if (soft) gsap.fromTo(this.fx, { morph: 0.72 }, { morph: 1, duration: 0.3, ease: BACK, overwrite: "auto" });
+    if (soft) gsap.fromTo(this.fx, { morph: 0.7 }, { morph: 1, duration: 0.3, ease: BACK, overwrite: "auto" });
   }
 
-  // ── الرمش ────────────────────────────────────────────────────────────────
+  // ── مواعيد ورمش ──────────────────────────────────────────────────────────
 
   private later(delay: number, fn: () => void) {
     this.calls = this.calls.filter((c) => c.progress() < 1);
@@ -429,31 +440,24 @@ export class MascotEngine {
       this.triggerEmote("dizzy", { sound: true });
       return;
     }
-    // ضغطة: تتهرس (حجم ثابت تقريباً) + تعبير + صوت
+    // ضغطة: تتهرس (الحجم ثابت تقريباً) + تعبير + صوت
     this.play("tap");
     gsap
       .timeline()
-      .to(this.fx, { sy: 0.78, sx: 1.16, duration: 0.07, ease: OUT })
-      .to(this.fx, { sy: 1.1, sx: 0.95, duration: 0.13, ease: OUT })
+      .to(this.fx, { sy: 0.8, sx: 1.14, duration: 0.07, ease: OUT })
+      .to(this.fx, { sy: 1.08, sx: 0.95, duration: 0.13, ease: OUT })
       .to(this.fx, { sy: 1, sx: 1, duration: 0.17, ease: OUT });
-    const pick = (["wink", "love", "happy"] as const)[Math.floor(Math.random() * 3)];
-    if (pick === "happy") {
-      const tl = this.startEmote();
-      tl.call(() => this.setEyes("happy", "happy", true), [], 0.07);
-      tl.to(this.fx, { smile: 1, blushBoost: 0.35, duration: 0.2, ease: OUT }, 0.07);
-      this.endEmote(tl, 0.5);
-    } else {
-      this.later(0.2, () => this.triggerEmote(pick));
-    }
+    const pick = (["wink", "love", "surprised"] as const)[Math.floor(Math.random() * 3)];
+    this.later(0.18, () => this.triggerEmote(pick));
   };
 
   private hit(px: number, py: number) {
     const p = this.pose;
     const rx = LOOK.rx * this.R;
     const ry = LOOK.ry * this.R;
-    let [x, y] = rot2(px - (p.cx + p.x), py - (p.groundY + p.y), -p.rot);
+    let [x, y] = rot2(px - p.cx, py - p.cy, -p.rot);
     x /= p.sx;
-    y = y / p.sy + ry;
+    y /= p.sy;
     [x, y] = rot2(x, y, -p.roll);
     return Math.pow(Math.abs(x / rx), LOOK.n) + Math.pow(Math.abs(y / ry), LOOK.n) <= 1;
   }
@@ -469,7 +473,7 @@ export class MascotEngine {
           hop: [440, 680, 0.12, "sine"],
           love: [660, 990, 0.2, "sine"],
           proud: [540, 1080, 0.22, "triangle"],
-          greet: [600, 900, 0.16, "sine"],
+          greet: [620, 930, 0.16, "sine"],
           dizzy: [300, 900, 0.35, "triangle"],
           error: [240, 150, 0.2, "triangle"],
         } as const
@@ -493,27 +497,28 @@ export class MascotEngine {
 
   // ── جزيئات ────────────────────────────────────────────────────────────────
 
-  private spawn(kind: ParticleKind, count: number, color: string, opts: { fromSide?: boolean } = {}) {
+  private spawn(kind: ParticleKind, count: number, color: string, opts: { fromSide?: boolean; text?: string } = {}) {
     const R = this.R;
     const k = R / 72;
     for (let i = 0; i < count; i++) {
       this.later(i * 0.14, () => {
-          const p = this.pose;
-          const top = p.groundY + p.y - LOOK.ry * R * 2 * p.sy;
-          const side = opts.fromSide;
-          this.particles.push({
-            kind,
-            color,
-            x: p.cx + p.x + (side ? LOOK.rx * R * 0.55 + i * 0.12 * R : rand(-0.7, 0.7) * R),
-            y: top + (side ? 0.15 * R : rand(-0.05, 0.15) * R),
-            vx: (side ? rand(6, 14) : rand(-12, 12)) * k,
-            vy: -rand(26, 42) * k * (this.reduced ? 0.25 : 1),
-            age: 0,
-            life: rand(1.3, 1.8),
-            size: (kind === "z" ? rand(0.2, 0.26) : rand(0.13, 0.19)) * R,
-            rot: rand(-0.3, 0.3),
-            vr: rand(-0.6, 0.6),
-          });
+        const p = this.pose;
+        const top = p.cy - LOOK.ry * R * p.sy;
+        const side = opts.fromSide;
+        this.particles.push({
+          kind,
+          text: opts.text,
+          color,
+          x: p.cx + (side ? LOOK.rx * R * 0.6 + i * 0.12 * R : kind === "text" ? 0.55 * R : rand(-0.7, 0.7) * R),
+          y: top + (side ? 0.1 * R : rand(-0.05, 0.12) * R),
+          vx: (side ? rand(6, 14) : rand(-12, 12)) * k,
+          vy: -rand(26, 42) * k * (this.reduced ? 0.25 : 1),
+          age: 0,
+          life: rand(1.3, 1.8),
+          size: (kind === "text" ? rand(0.26, 0.32) : rand(0.13, 0.19)) * R,
+          rot: kind === "text" ? rand(-0.15, 0.15) : rand(-0.3, 0.3),
+          vr: kind === "text" ? 0 : rand(-0.6, 0.6),
+        });
       });
     }
   }
@@ -530,8 +535,7 @@ export class MascotEngine {
   private centerClient(): Point {
     const rect = this.canvas.getBoundingClientRect();
     const k = rect.width / this.size;
-    const cyCss = this.size / 2 + LOOK.drop * this.R;
-    return { x: rect.left + (this.size / 2) * k, y: rect.top + cyCss * k };
+    return { x: rect.left + this.pose.cx * k, y: rect.top + this.pose.cy * k };
   }
 
   private resolve(t: Target): Point {
@@ -571,7 +575,7 @@ export class MascotEngine {
     let tPitch = 0.5 * ly;
     if (this.state === "thinking") {
       tYaw = 0.3 + 0.1 * lx;
-      tPitch = 0.32;
+      tPitch = 0.3;
     }
     if (asleep) {
       tYaw = 0;
@@ -583,33 +587,32 @@ export class MascotEngine {
     this.prevYaw = this.yaw;
 
     // الوضع: ميلة بسيطة ناحية النظرة (أبطأ من العين)
-    this.tilt = approach(this.tilt, asleep ? 0.05 : 0.07 * lx, 0.0008, dt);
+    this.tilt = approach(this.tilt, asleep ? 0.06 : 0.08 * lx, 0.0008, dt);
 
-    // الألوان
+    // الألوان والابتسامة
     this.glow = approach(this.glow, look.glowAmount, 0.002, dt);
     this.tint = approach(this.tint, look.tintAmount, 0.002, dt);
-    this.blush = approach(this.blush, Math.min(1, look.blush + this.fx.blushBoost), 0.002, dt);
+    this.smile = approach(this.smile, look.smile, 0.002, dt);
     this.eyeScale = approach(this.eyeScale, look.eyeScale, 0.0025, dt);
     for (let i = 0; i < 3; i++) {
       this.tintRGB[i] = approach(this.tintRGB[i], look.tint[i], 0.002, dt);
       this.glowRGB[i] = approach(this.glowRGB[i], look.glow[i], 0.002, dt);
     }
 
-    // زنبركات: طرفين العصابة (k=60, c=9) بيتأخروا عن لفّة الراس وعن الطلوع والنزول
+    // زنبركات: الذيل (k=60, c=9) بيتأخر عن لفّة الراس وعن الطلوع والنزول
     const fyVel = (this.fx.y - this.prevFy) / dt;
     this.prevFy = this.fx.y;
     const spring = (s: { x: number; v: number }, target: number, k: number, c: number) => {
       s.v += (k * (target - s.x) - c * s.v) * dt;
       s.x += s.v * dt;
     };
-    spring(this.cloth, clamp(-yawVel * 0.35 - this.tilt * 2 - this.fx.rot * 2, -1, 1), 60, 9);
-    spring(this.clothLift, clamp(fyVel * 0.25, -1, 1), 60, 9);
+    spring(this.tail, clamp(-yawVel * 0.35 - this.tilt * 2 - this.fx.rot * 2, -1, 1), 60, 9);
+    spring(this.tailLift, clamp(fyVel * 0.25, -1, 1), 60, 9);
     // الفك: ω0 = 2π/0.25s, ζ = 0.6
     const w0 = (Math.PI * 2) / 0.25;
     this.jaw.v += (w0 * w0 * (this.fx.jaw - this.jaw.x) - 2 * 0.6 * w0 * this.jaw.v) * dt;
     this.jaw.x += this.jaw.v * dt;
 
-    // الجزيئات
     for (const p of this.particles) {
       p.age += dt;
       p.x += p.vx * dt;
@@ -628,20 +631,16 @@ export class MascotEngine {
     ctx.setTransform(this.dpr, 0, 0, this.dpr, 0, 0);
     ctx.clearRect(0, 0, size, size);
 
-    // ── تركيب الحركة: keyframes + تنفس + رقص + انتظار ──
-    let sxB: number;
-    let syB: number;
-    if (this.state === "sleeping") {
-      syB = 1 + 0.035 * Math.sin(1.8 * t);
-      sxB = 1 - 0.02 * Math.sin(1.8 * t);
-    } else {
-      // تنفس خفيف، والعرض متأخر عن الطول (مش متزامنين)
-      syB = 1 + 0.012 * Math.sin(2.1 * t);
-      sxB = 1 - 0.008 * Math.sin(2.1 * t + 0.6);
-    }
+    // ── تركيب الحركة: عوم + keyframes + رقص + انتظار ──
+    const asleep = this.state === "sleeping";
+    // عايمة: طلوع ونزول بطيء، والتنفس متأخر عنه (مش متزامنين)
+    const float = Math.sin(1.55 * t) * 0.045 * R * (asleep ? 0.5 : 1);
+    const breathe = asleep ? 0.03 : 0.012;
+    const syB = 1 + breathe * Math.sin(1.8 * t + 0.9);
+    const sxB = 1 - breathe * 0.6 * Math.sin(1.8 * t + 1.5);
     let dx = 0;
     let dy = 0;
-    let drot = 0;
+    let drot = Math.sin(0.9 * t + 0.4) * 0.025;
     let dsx = 1;
     let dsy = 1;
     if (fx.dance > 0.001) {
@@ -655,100 +654,105 @@ export class MascotEngine {
       dsy *= 1 - 0.06 * land * fx.dance;
     }
     if (fx.wait > 0.001) dy += -Math.abs(Math.sin(5.2 * t)) * 0.07 * R * fx.wait;
-    if (fx.hand > 0.001) drot += (-0.06 + 0.07 * Math.sin(Math.PI * 2 * 1.2 * t)) * fx.hand;
 
-    const cx = size / 2;
-    const groundY = size / 2 + LOOK.drop * R + ry;
-    const x = fx.x * R + dx;
-    const y = fx.y * R + dy;
+    const groundY = size * 0.88;
+    const hover = (LOOK.hover - fx.sink) * R;
+    const cx = size / 2 + fx.x * R + dx;
+    const cy = groundY - ry - hover + float + fx.y * R + dy;
     const sx = fx.sx * sxB * dsx;
     const sy = fx.sy * syB * dsy;
     const rot = this.tilt + fx.rot + drot;
     const roll = fx.roll;
-    this.pose = { cx, groundY, x, y, rot, sx, sy, roll };
-    const lift = clamp(-y / R, 0, 0.6);
+    this.pose = { cx, cy, rot, sx, sy, roll };
+    const height = clamp((groundY - (cy + ry)) / R, 0, 1.2);
 
-    // ── ظل التلامس (ناعم، مش drop shadow) ──
+    // ظل على الأرض: بيصغر ويبهت كل ما تعلى
     ctx.save();
-    ctx.translate(cx + x, groundY + 0.03 * R);
-    ctx.scale(1, 0.13);
-    const sr = rx * 0.95 * sx * (1 - lift * 0.45);
+    ctx.translate(cx, groundY);
+    ctx.scale(1, 0.14);
+    const sr = rx * 0.85 * (1 - height * 0.35);
     const sg = ctx.createRadialGradient(0, 0, 0, 0, 0, sr);
-    sg.addColorStop(0, `rgba(40, 28, 20, ${0.2 * (1 - lift)})`);
-    sg.addColorStop(1, "rgba(40, 28, 20, 0)");
+    sg.addColorStop(0, `rgba(0, 0, 0, ${0.32 * (1 - height * 0.55)})`);
+    sg.addColorStop(1, "rgba(0, 0, 0, 0)");
     ctx.fillStyle = sg;
     ctx.beginPath();
     ctx.arc(0, 0, sr, 0, Math.PI * 2);
     ctx.fill();
     ctx.restore();
 
-    // ── التوهج ورا الشخصية بلون الحالة ──
-    const gcy = groundY + y - ry * sy;
-    const gg = ctx.createRadialGradient(cx + x, gcy, 0, cx + x, gcy, 1.8 * R);
-    gg.addColorStop(0, rgba(this.glowRGB, this.glow * 0.55));
+    // توهج ورا الشخصية بلون الحالة
+    const gg = ctx.createRadialGradient(cx, cy, 0, cx, cy, 1.9 * R);
+    gg.addColorStop(0, rgba(this.glowRGB, this.glow * 0.5));
     gg.addColorStop(1, rgba(this.glowRGB, 0));
     ctx.fillStyle = gg;
     ctx.fillRect(0, 0, size, size);
 
-    // ── الجسم ──
     ctx.save();
-    ctx.translate(cx + x, groundY + y);
+    ctx.translate(cx, cy);
     ctx.rotate(rot);
     ctx.scale(sx, sy);
-    ctx.translate(0, -ry);
     ctx.rotate(roll);
     const world = rot + roll; // النور ثابت في العالم: نلف نقطه عكس لفّة الجسم
+    const fill = this.bodyFill(rx, ry, world);
 
-    const band = this.bandGeometry(rx, ry);
-    if (!band.knot.visible) this.drawTails(band, world);
-
+    // الجسم والذيل شكل واحد (اتحاد المسارين)، فاللون والظل واللمعة ماشيين عليهم سوا
     this.bodyPath(rx, ry);
-    const [l1x, l1y] = rot2(0.62 * rx, -0.88 * ry, -world);
-    const [l2x, l2y] = rot2(-0.78 * rx, 0.95 * ry, -world);
-    const bg = ctx.createLinearGradient(l1x, l1y, l2x, l2y);
-    bg.addColorStop(0, LOOK.bodyLight);
-    bg.addColorStop(1, LOOK.bodyDark);
-    ctx.fillStyle = bg;
+    this.tailPath(rx, ry);
+    ctx.fillStyle = fill;
     ctx.fill();
 
     ctx.save();
     ctx.clip();
-    // لون الحالة من تحت لفوق (مش إعادة دهان)
     if (this.tint > 0.005) {
       const tg = ctx.createLinearGradient(0, ry, 0, -ry);
-      tg.addColorStop(0, rgba(this.tintRGB, 0.72 * this.tint));
+      tg.addColorStop(0, rgba(this.tintRGB, 0.7 * this.tint));
       tg.addColorStop(1, rgba(this.tintRGB, 0));
       ctx.fillStyle = tg;
       ctx.fillRect(-rx * 1.3, -ry * 1.3, rx * 2.6, ry * 2.6);
     }
-    this.drawBand(band, world);
-    // ظل الحافة (بيغمّق العصابة كمان عند الأطراف)
+    // ظل الحافة
     ctx.save();
     ctx.scale(1, ry / rx);
-    const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, rx * 1.1);
+    const rg = ctx.createRadialGradient(0, 0, 0, 0, 0, rx * 1.08);
     rg.addColorStop(0, "rgba(0,0,0,0)");
-    rg.addColorStop(0.6, "rgba(0,0,0,0)");
+    rg.addColorStop(0.62, "rgba(0,0,0,0)");
     rg.addColorStop(1, LOOK.rim);
     ctx.fillStyle = rg;
     ctx.fillRect(-rx * 1.2, -rx * 1.2, rx * 2.4, rx * 2.4);
     ctx.restore();
-    // لمعة واحدة ناحية النور
-    const [hx, hy] = rot2(0.34 * rx, -0.46 * ry, -world);
-    const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 0.42 * R);
-    hg.addColorStop(0, "rgba(255,255,255,0.55)");
+    // لمعة: بقعة ناعمة + لمعة صغيرة حادة زي البلاستيك الطري
+    const [hx, hy] = rot2(0.36 * rx, -0.48 * ry, -world);
+    const hg = ctx.createRadialGradient(hx, hy, 0, hx, hy, 0.48 * R);
+    hg.addColorStop(0, "rgba(255,255,255,0.6)");
     hg.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = hg;
     ctx.fillRect(-rx, -ry, rx * 2, ry * 2);
+    const [sx2, sy2] = rot2(0.5 * rx, -0.55 * ry, -world);
+    ctx.save();
+    ctx.translate(sx2, sy2);
+    ctx.rotate(-world - 0.6);
+    ctx.fillStyle = "rgba(255,255,255,0.75)";
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 0.11 * R, 0.05 * R, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
 
-    this.drawBlush(rx, ry);
-    this.drawEyes(rx, ry);
-    this.drawMouth(rx, ry);
+    this.drawFace(rx, ry, world);
     ctx.restore(); // clip
-    if (band.knot.visible) this.drawTails(band, world);
-    if (fx.hand > 0.01) this.drawHand(rx, ry, world);
     ctx.restore(); // body
 
+    if (fx.say > 0.01) this.drawSay(cx, cy, rx, ry);
     this.drawParticles();
+  }
+
+  private bodyFill(rx: number, ry: number, world: number) {
+    const [l1x, l1y] = rot2(0.6 * rx, -0.9 * ry, -world);
+    const [l2x, l2y] = rot2(-0.7 * rx, 1.25 * ry, -world);
+    const g = this.ctx.createLinearGradient(l1x, l1y, l2x, l2y);
+    g.addColorStop(0, LOOK.bodyLight);
+    g.addColorStop(0.45, LOOK.bodyMid);
+    g.addColorStop(1, LOOK.bodyDark);
+    return g;
   }
 
   private bodyPath(rx: number, ry: number) {
@@ -766,6 +770,36 @@ export class MascotEngine {
     ctx.closePath();
   }
 
+  /** نقطة على حافة الجسم عند زاوية a (من المركز). */
+  private edge(a: number, rx: number, ry: number) {
+    const c = Math.cos(a);
+    const s = Math.sin(a);
+    const n = LOOK.n;
+    return [rx * Math.sign(c) * Math.pow(Math.abs(c), 2 / n), ry * Math.sign(s) * Math.pow(Math.abs(s), 2 / n)] as const;
+  }
+
+  /** ذيل الفقاعة: طالع من تحت شمال، بيتمرجح بزنبرك، ويهز في السلام. بيتضاف لمسار الجسم. */
+  private tailPath(rx: number, ry: number) {
+    const { ctx, R } = this;
+    const T = LOOK.tail;
+    const a = T.angle - this.yaw * 0.25;
+    const [b1x, b1y] = this.edge(a - T.spread, rx * 0.86, ry * 0.86);
+    const [b2x, b2y] = this.edge(a + T.spread, rx * 0.86, ry * 0.86);
+    const swing = this.tail.x * 0.45 + this.tailLift.x * 0.25 + Math.sin(this.t * 14) * 0.5 * this.fx.wag;
+    const dirA = a + 0.3 + swing;
+    const L = T.length * R;
+    const [mx, my] = this.edge(a, rx, ry);
+    const tip = [mx + Math.cos(dirA) * L, my + Math.sin(dirA) * L];
+    // جنب برّه مقعّر (الذيل ملفوف)، وجنب جوّه مستقيم تقريباً
+    const curl = T.curl * L;
+    const c1 = [mx + Math.cos(dirA) * L * 0.25 - Math.sin(dirA) * curl, my + Math.sin(dirA) * L * 0.25 + Math.cos(dirA) * curl];
+    const c2 = [mx + Math.cos(dirA) * L * 0.55 + Math.sin(dirA) * curl * 0.15, my + Math.sin(dirA) * L * 0.55 - Math.cos(dirA) * curl * 0.15];
+    ctx.moveTo(b1x, b1y);
+    ctx.quadraticCurveTo(c1[0], c1[1], tip[0], tip[1]);
+    ctx.quadraticCurveTo(c2[0], c2[1], b2x, b2y);
+    ctx.closePath();
+  }
+
   /** إسقاط ملمح على «الكرة»: (yaw, pitch) → (x, y) + تقصير + هل باين. */
   private feature(fYaw: number, fPitch: number, rx: number, ry: number) {
     const yw = fYaw + this.yaw;
@@ -779,124 +813,152 @@ export class MascotEngine {
     };
   }
 
-  private drawBlush(rx: number, ry: number) {
-    if (this.blush < 0.01) return;
-    const { ctx, R } = this;
-    const b = LOOK.blushSpot;
-    for (const s of [-1, 1]) {
-      const f = this.feature(s * b.yaw, b.pitch, rx, ry);
-      if (!f.visible) continue;
+  private drawFace(rx: number, ry: number, world: number) {
+    const { ctx, R, fx } = this;
+    const E = LOOK.eye;
+    const r = E.r * R * this.eyeScale * fx.pop;
+    const typing = fx.typing;
+
+    // العينين (بتختفي لما الفقاعة «بتكتب»)
+    if (typing < 0.99) {
+      for (const s of [-1, 1] as const) {
+        const f = this.feature(s * E.yaw, E.pitch, rx, ry);
+        if (!f.visible) continue;
+        ctx.save();
+        ctx.translate(f.x, f.y);
+        ctx.scale(f.kx * (1 - typing), f.ky * (1 - typing));
+        this.drawEye(s < 0 ? this.eyeL : this.eyeR, r, s < 0 ? fx.lidL : fx.lidR, s, world);
+        ctx.restore();
+
+        // الحاجب
+        if (fx.browShow > 0.01) {
+          const B = LOOK.brow;
+          const bf = this.feature(s * E.yaw * 1.05, E.pitch + B.lift + 0.06 * Math.max(0, fx.brow), rx, ry);
+          ctx.save();
+          ctx.globalAlpha = Math.min(1, fx.browShow);
+          ctx.translate(bf.x, bf.y);
+          ctx.scale(bf.kx, bf.ky);
+          // متضايق: الطرف الجوّاني لتحت · مرفوع: الطرف الجوّاني لفوق سنة
+          ctx.rotate(-s * 0.45 * Math.max(0, -fx.brow) + s * 0.12 * Math.max(0, fx.brow));
+          ctx.fillStyle = LOOK.ink;
+          ctx.beginPath();
+          ctx.roundRect((-B.w / 2) * R, (-B.h / 2) * R, B.w * R, B.h * R, (B.h / 2) * R);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    // «بتكتب…»: تلات نقط بتتنطط مكان العينين
+    if (typing > 0.01) {
+      const f = this.feature(0, E.pitch, rx, ry);
       ctx.save();
       ctx.translate(f.x, f.y);
-      ctx.scale(f.kx * (b.w / b.h), f.ky);
-      const r = b.h * R;
-      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-      g.addColorStop(0, rgba(LOOK.blush, 0.5 * this.blush));
-      g.addColorStop(1, rgba(LOOK.blush, 0));
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(0, 0, r, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.globalAlpha = typing;
+      ctx.fillStyle = LOOK.ink;
+      for (let i = 0; i < 3; i++) {
+        const bounce = Math.pow(Math.max(0, Math.sin(this.t * 6.5 - i * 0.75)), 2) * 0.09 * R;
+        ctx.beginPath();
+        ctx.arc((i - 1) * 0.2 * R, -bounce, 0.058 * R * (0.6 + 0.4 * typing), 0, Math.PI * 2);
+        ctx.fill();
+      }
       ctx.restore();
     }
+
+    this.drawMouth(rx, ry);
   }
 
-  private drawEyes(rx: number, ry: number) {
-    const { R, fx } = this;
-    const e = LOOK.eye;
-    const w = e.w * R * this.eyeScale * fx.pop;
-    const h = e.h * R * this.eyeScale * fx.pop * fx.morph;
-    for (const s of [-1, 1] as const) {
-      const f = this.feature(s * e.yaw, e.pitch, rx, ry);
-      if (!f.visible) continue;
-      const shape = s < 0 ? this.eyeL : this.eyeR;
-      const open = s < 0 ? fx.lidL : fx.lidR;
-      this.ctx.save();
-      this.ctx.translate(f.x, f.y);
-      this.ctx.scale(f.kx, f.ky);
-      this.drawEye(shape, w, h, open, s);
-      this.ctx.restore();
-    }
-  }
-
-  private drawEye(shape: EyeShape, w: number, h: number, open: number, side: -1 | 1) {
+  private drawEye(shape: EyeShape, r: number, open: number, side: -1 | 1, world: number) {
     const { ctx } = this;
+    const morph = this.fx.morph;
     ctx.fillStyle = LOOK.ink;
     ctx.strokeStyle = LOOK.ink;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
-    const pill = (pw: number, ph: number, dy = 0) => {
+    const glossy = (rr: number, ry: number) => {
       ctx.beginPath();
-      ctx.roundRect(-pw / 2, -ph / 2 + dy, pw, ph, Math.min(pw, ph) / 2);
+      ctx.ellipse(0, 0, rr, Math.max(ry, rr * 0.1), 0, 0, Math.PI * 2);
       ctx.fill();
+      if (ry > rr * 0.45) {
+        // لمعة العين ثابتة ناحية النور
+        const [gx, gy] = rot2(rr * 0.36, -rr * 0.38, -world);
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.beginPath();
+        ctx.arc(gx, gy * (ry / rr), rr * 0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.beginPath();
+        ctx.arc(-gx * 0.6, -gy * 0.5 * (ry / rr), rr * 0.13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = LOOK.ink;
+      }
     };
     switch (shape) {
-      case "pill":
-        pill(w, Math.max(h * open, w * 0.16));
+      case "round":
+        glossy(r, r * open * morph);
         break;
       case "wide":
-        pill(w * 1.12, Math.max(h * 1.22 * open, w * 0.16));
+        glossy(r * 1.16, r * 1.22 * open * morph);
         break;
-      case "dot": {
-        const r = w * 0.36;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, r, Math.max(r * open, r * 0.12), 0, 0, Math.PI * 2);
-        ctx.fill();
+      case "dot":
+        glossy(r * 0.62, r * 0.62 * open * morph);
         break;
-      }
       case "tired": {
-        const th = Math.max(h * 0.55 * open, w * 0.16);
         ctx.beginPath();
-        ctx.roundRect(-w / 2, h / 2 - th, w, th, [w * 0.12, w * 0.12, w / 2, w / 2]);
+        ctx.ellipse(0, 0, r, Math.max(r * open, r * 0.1), 0, 0, Math.PI);
+        ctx.closePath();
         ctx.fill();
         break;
       }
       case "line":
         ctx.save();
-        ctx.rotate(side * 0.16); // الطرف الداخلي لتحت = متضايق
-        pill(w * 1.18, h * 0.17, -h * 0.05);
+        ctx.rotate(side * 0.18);
+        ctx.beginPath();
+        ctx.roundRect(-r * 1.1, -r * 0.18, r * 2.2, r * 0.36, r * 0.18);
+        ctx.fill();
         ctx.restore();
         break;
       case "flat":
-        pill(w * 1.12, h * 0.15, h * 0.08);
+        ctx.beginPath();
+        ctx.roundRect(-r, -r * 0.15 + r * 0.2, r * 2, r * 0.3, r * 0.15);
+        ctx.fill();
         break;
       case "happy":
-        ctx.lineWidth = w * 0.3;
+        ctx.lineWidth = r * 0.55;
         ctx.beginPath();
-        ctx.arc(0, h * 0.18, w * 0.42, Math.PI * 1.12, Math.PI * 1.88);
+        ctx.arc(0, r * 0.38, r * 0.82 * morph, Math.PI * 1.15, Math.PI * 1.85);
         ctx.stroke();
         break;
       case "closed":
-        ctx.lineWidth = w * 0.24;
+        ctx.lineWidth = r * 0.42;
         ctx.beginPath();
-        ctx.arc(0, -h * 0.05, w * 0.42, Math.PI * 0.15, Math.PI * 0.85);
+        ctx.arc(0, -r * 0.15, r * 0.8, Math.PI * 0.15, Math.PI * 0.85);
         ctx.stroke();
         break;
       case "spiral": {
-        ctx.lineWidth = w * 0.13;
+        ctx.lineWidth = r * 0.24;
         ctx.beginPath();
-        const turns = 2.2;
         const spin = this.t * 7 * side;
         for (let i = 0; i <= 60; i++) {
           const k = i / 60;
-          const a = k * turns * Math.PI * 2 + spin;
-          const r = k * w * 0.55;
-          if (i === 0) ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r);
-          else ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+          const a = k * 2.2 * Math.PI * 2 + spin;
+          const rr = k * r * 1.05;
+          if (i === 0) ctx.moveTo(Math.cos(a) * rr, Math.sin(a) * rr);
+          else ctx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr);
         }
         ctx.stroke();
         break;
       }
       case "heart":
         ctx.fillStyle = LOOK.heart;
-        this.heartPath(w * 1.25 * Math.max(open, 0.25));
+        this.heartPath(r * 2.3 * Math.max(open, 0.25) * morph);
         ctx.fill();
         break;
       case "star":
         ctx.fillStyle = LOOK.star;
         ctx.strokeStyle = LOOK.star;
-        ctx.lineWidth = w * 0.12;
-        this.starPath(w * 0.72, 5, 0.46, this.t * 0.8 * side);
+        ctx.lineWidth = r * 0.22;
+        this.starPath(r * 1.25 * morph, 5, 0.46, this.t * 0.8 * side);
         ctx.fill();
         ctx.stroke();
         break;
@@ -904,187 +966,67 @@ export class MascotEngine {
   }
 
   private drawMouth(rx: number, ry: number) {
-    const { ctx, R, fx } = this;
-    const jaw = clamp(this.jaw.x, 0, 1.3);
-    if (jaw < 0.03 && fx.smile < 0.03) return;
+    const { ctx, R } = this;
     const f = this.feature(0, LOOK.mouth.pitch, rx, ry);
     if (!f.visible) return;
+    const jaw = clamp(this.jaw.x, 0, 1.3);
+    const smile = clamp(this.smile + this.fx.smile, -1, 1);
+    const w = LOOK.mouth.w * R;
     ctx.save();
     ctx.translate(f.x, f.y);
     ctx.scale(f.kx, f.ky);
-    if (jaw >= 0.03) {
-      ctx.fillStyle = LOOK.ink;
+    if (jaw > 0.04) {
+      // بُق مفتوح: نص دايرة لتحت بيكبر مع الفك
+      const h = 0.15 * R * jaw;
       ctx.beginPath();
-      ctx.ellipse(0, jaw * 0.04 * R, (0.06 + 0.035 * jaw) * R, 0.11 * R * jaw, 0, 0, Math.PI * 2);
+      ctx.moveTo(-w * (0.7 + 0.2 * jaw), 0);
+      ctx.quadraticCurveTo(0, -h * 0.25, w * (0.7 + 0.2 * jaw), 0);
+      ctx.quadraticCurveTo(w * 0.7, h * 1.4, 0, h * 1.4);
+      ctx.quadraticCurveTo(-w * 0.7, h * 1.4, -w * (0.7 + 0.2 * jaw), 0);
+      ctx.closePath();
+      ctx.fillStyle = LOOK.mouthInside;
       ctx.fill();
-    } else {
-      ctx.strokeStyle = `rgba(26, 20, 18, ${fx.smile})`;
-      ctx.lineWidth = 0.045 * R;
+      ctx.strokeStyle = LOOK.ink;
+      ctx.lineWidth = 0.035 * R;
+      ctx.lineJoin = "round";
+      ctx.stroke();
+    } else if (Math.abs(smile) > 0.04) {
+      ctx.strokeStyle = LOOK.ink;
+      ctx.lineWidth = 0.042 * R;
       ctx.lineCap = "round";
       ctx.beginPath();
-      ctx.arc(0, -0.04 * R, 0.08 * R, Math.PI * 0.2, Math.PI * 0.8);
+      ctx.moveTo(-w * 0.55, 0);
+      ctx.quadraticCurveTo(0, smile * 0.16 * R, w * 0.55, 0);
       ctx.stroke();
     }
     ctx.restore();
   }
 
-  /**
-   * العصابة: حلقة على الحجم عند ارتفاع ثابت. نص قطرها من ringR(y) = (1 − |y|^n)^(1/n)،
-   * ومتشافة من فوق شوية، وبتتبع 40% بس من ميلة الراس عشان ما تتقلبش.
-   */
-  private bandGeometry(rx: number, ry: number) {
-    const B = LOOK.band;
-    const ring = Math.pow(1 - Math.pow(Math.abs(B.height), LOOK.n), 1 / LOOK.n);
-    const a = ring * rx * 1.02;
-    const view = B.view - 0.4 * this.pitch;
-    const b = Math.max(0.04, ring * ry * Math.sin(view));
-    const frontY = -Math.sin(Math.asin(-B.height) + 0.4 * this.pitch) * ry;
-    const cy = frontY - b;
-    const th = B.thickness * this.R;
-    const k = B.knotYaw + this.yaw;
-    const knot = {
-      x: Math.sin(k) * a,
-      y: cy + Math.cos(k) * b + th / 2,
-      depth: Math.cos(k),
-      visible: Math.cos(k) > -0.15,
-    };
-    return { a, b, cy, th, knot };
-  }
-
-  private bandFill(x1: number, y1: number, x2: number, y2: number, world: number) {
-    const [p1x, p1y] = rot2(x1, y1, -world);
-    const [p2x, p2y] = rot2(x2, y2, -world);
-    const g = this.ctx.createLinearGradient(p1x, p1y, p2x, p2y);
-    g.addColorStop(0, LOOK.bandLight);
-    g.addColorStop(1, LOOK.bandDark);
-    return g;
-  }
-
-  private drawBand(band: ReturnType<MascotEngine["bandGeometry"]>, world: number) {
+  /** فقاعة صغيرة بيضا فوقها بكلمة («هلا!»). */
+  private drawSay(cx: number, cy: number, rx: number, ry: number) {
     const { ctx, R } = this;
-    const { a, b, cy, th, knot } = band;
-    ctx.beginPath();
-    ctx.ellipse(0, cy, a, b, 0, 0, Math.PI);
-    ctx.ellipse(0, cy + th, a, b, 0, Math.PI, 0, true);
-    ctx.closePath();
-    ctx.fillStyle = this.bandFill(a * 0.6, cy - th, -a, cy + th * 2, world);
-    ctx.fill();
-    // حافة سفلية أغمق سنة: سُمك من غير خط
-    ctx.beginPath();
-    ctx.ellipse(0, cy + th, a, b, 0, 0, Math.PI);
-    ctx.ellipse(0, cy + th * 0.82, a, b, 0, Math.PI, 0, true);
-    ctx.closePath();
-    ctx.fillStyle = "rgba(150, 70, 0, 0.18)";
-    ctx.fill();
-    if (knot.visible) {
-      const r = LOOK.band.knot * R;
-      const kx = Math.max(0.35, knot.depth);
-      ctx.save();
-      ctx.translate(knot.x, knot.y);
-      ctx.scale(kx, 1);
-      ctx.beginPath();
-      ctx.roundRect(-r, -r * 0.95, r * 2, r * 1.9, r * 0.7);
-      ctx.fillStyle = this.bandFill(r, -r, -r, r, world);
-      ctx.fill();
-      ctx.fillStyle = "rgba(150, 70, 0, 0.16)";
-      ctx.fill();
-      ctx.restore();
-    }
-  }
-
-  /** طرفين العصابة: شرايط قماش طرية من العقدة، آخرها مقصوص V، بتتمرجح بزنبرك وبتتنطط مع النطة. */
-  private drawTails(band: ReturnType<MascotEngine["bandGeometry"]>, world: number) {
-    const { ctx, R } = this;
-    const { knot } = band;
-    const swing = this.cloth.x;
-    const lift = this.clothLift.x;
-    const side = knot.x < 0 ? -1 : 1;
-    const persp = 0.7 + 0.3 * Math.abs(Math.sin(LOOK.band.knotYaw + this.yaw));
+    const k = this.fx.say;
+    const bx = cx + rx * 0.62;
+    const by = cy - ry * 1.18;
     ctx.save();
-    ctx.translate(knot.x, knot.y);
-    LOOK.band.tails.forEach((tail, i) => {
-      const L = tail.length * R * persp;
-      const w = tail.width * R;
-      // الزاوية من «لتحت»: موجبة = ناحية برّه
-      const ang = side * (tail.angle + swing * 0.5 * (i ? 1.25 : 1) - lift * 0.3);
-      const bend = side * (swing * 0.55 + Math.sin(this.t * 2.1 + i * 1.9) * 0.05);
-      // منحنى الشريط: نقطة نص بتتأخر عن الطرف (bend) فيتلوى
-      const p0 = [0, 0];
-      const p1 = [Math.sin(ang) * L * 0.5, Math.cos(ang) * L * 0.5];
-      const p2 = [Math.sin(ang + bend) * L, Math.cos(ang + bend) * L];
-      const at = (u: number) => {
-        const a = (1 - u) * (1 - u);
-        const b = 2 * (1 - u) * u;
-        const c = u * u;
-        const x = a * p0[0] + b * p1[0] + c * p2[0];
-        const y = a * p0[1] + b * p1[1] + c * p2[1];
-        const dx = 2 * (1 - u) * (p1[0] - p0[0]) + 2 * u * (p2[0] - p1[0]);
-        const dy = 2 * (1 - u) * (p1[1] - p0[1]) + 2 * u * (p2[1] - p1[1]);
-        const m = Math.hypot(dx, dy) || 1;
-        return { x, y, nx: -dy / m, ny: dx / m, tx: dx / m, ty: dy / m };
-      };
-      const N = 14;
-      const left: [number, number][] = [];
-      const right: [number, number][] = [];
-      for (let k = 0; k <= N; k++) {
-        const u = k / N;
-        const q = at(u);
-        const half = (w / 2) * (0.75 + 0.35 * u); // بيوسع شوية ناحية الطرف
-        left.push([q.x + q.nx * half, q.y + q.ny * half]);
-        right.push([q.x - q.nx * half, q.y - q.ny * half]);
-      }
-      const end = at(1);
-      const notch = [end.x - end.tx * w * 0.45, end.y - end.ty * w * 0.45];
-      ctx.beginPath();
-      ctx.moveTo(left[0][0], left[0][1]);
-      left.forEach(([x, y]) => ctx.lineTo(x, y));
-      ctx.lineTo(notch[0], notch[1]);
-      for (let k = right.length - 1; k >= 0; k--) ctx.lineTo(right[k][0], right[k][1]);
-      ctx.closePath();
-      ctx.lineJoin = "round";
-      ctx.fillStyle = this.bandFill(p2[0] + R * 0.2, p2[1] - R * 0.3, -R * 0.1, R * 0.15, world);
-      ctx.fill();
-      // الشريط اللي ورا أغمق سنة
-      if (i === 1) {
-        ctx.fillStyle = "rgba(150, 70, 0, 0.16)";
-        ctx.fill();
-      }
-    });
-    ctx.restore();
-  }
-
-  /** الإيد: كفّ صغير بيطلع على جنب الجسم ناحية النور ويسلّم (13 rad/s)، بظل ناعم تحته. */
-  private drawHand(rx: number, ry: number, world: number) {
-    const { ctx, R, fx } = this;
-    const k = fx.hand;
-    const hx = rx * (0.78 + 0.22 * k);
-    const hy = ry * (0.3 - 0.55 * k);
-    const w = LOOK.hand.w * R;
-    const h = LOOK.hand.h * R;
-    const a = 0.35 + (-0.25 + 0.38 * Math.sin(13 * this.t)) * k;
-    ctx.save();
-    ctx.globalAlpha = Math.min(1, k * 3);
-    // ظل التلامس على الجسم
-    ctx.save();
-    this.bodyPath(rx, ry);
-    ctx.clip();
-    const sg = ctx.createRadialGradient(hx - w * 0.5, hy + h * 0.5, 0, hx - w * 0.5, hy + h * 0.5, h * 1.5);
-    sg.addColorStop(0, "rgba(58, 38, 28, 0.2)");
-    sg.addColorStop(1, "rgba(58, 38, 28, 0)");
-    ctx.fillStyle = sg;
-    ctx.fillRect(hx - h * 2.5, hy - h * 1.5, h * 4, h * 4);
-    ctx.restore();
-    ctx.translate(hx, hy);
-    ctx.rotate(a);
+    ctx.translate(bx, by);
+    ctx.scale(k, k);
+    ctx.globalAlpha = Math.min(1, k * 1.5);
+    const w = 0.95 * R;
+    const h = 0.48 * R;
+    ctx.fillStyle = "#FFFFFF";
     ctx.beginPath();
-    ctx.ellipse(0, 0, w, h, 0, 0, Math.PI * 2);
-    const [l1x, l1y] = rot2(w, -h, -(world + a));
-    const [l2x, l2y] = rot2(-w, h, -(world + a));
-    const g = ctx.createLinearGradient(l1x, l1y, l2x, l2y);
-    g.addColorStop(0, LOOK.bodyLight);
-    g.addColorStop(1, LOOK.bodyDark);
-    ctx.fillStyle = g;
+    ctx.roundRect(-w / 2, -h / 2, w, h, h / 2);
+    ctx.moveTo(-w * 0.2, h / 2 - 2);
+    ctx.lineTo(-w * 0.34, h / 2 + 0.16 * R);
+    ctx.lineTo(-w * 0.02, h / 2 - 2);
     ctx.fill();
+    ctx.fillStyle = LOOK.ink;
+    ctx.font = `700 ${0.24 * R}px "Alexandria Variable", system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.direction = "rtl";
+    ctx.fillText(this.sayText, 0, 0.01 * R);
     ctx.restore();
   }
 
@@ -1095,7 +1037,7 @@ export class MascotEngine {
       const a = k < 0.2 ? k / 0.2 : 1 - (k - 0.2) / 0.8;
       const s = 1 + 0.4 * k;
       ctx.save();
-      ctx.globalAlpha = clamp(a, 0, 1) * (p.kind === "z" ? 0.7 : 1);
+      ctx.globalAlpha = clamp(a, 0, 1);
       ctx.translate(p.x, p.y);
       ctx.rotate(p.rot);
       ctx.scale(s, s);
@@ -1117,11 +1059,11 @@ export class MascotEngine {
           this.starPath(p.size * 0.6, 4, 0.3, 0);
           ctx.fill();
           break;
-        case "z":
-          ctx.font = `700 ${p.size}px "Alexandria Variable", system-ui, sans-serif`;
+        case "text":
+          ctx.font = `800 ${p.size}px "Alexandria Variable", system-ui, sans-serif`;
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.fillText("z", 0, 0);
+          ctx.fillText(p.text ?? "", 0, 0);
           break;
       }
       ctx.restore();

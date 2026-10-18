@@ -302,3 +302,72 @@ body {
     animation: none;
   }
 }
+
+/* ── الهيرو الغامق ───────────────────────────────────────────────────── */
+.hero-dark {
+  background:
+    radial-gradient(55% 60% at 26% 62%, rgba(242, 162, 12, 0.13), rgba(242, 162, 12, 0) 70%),
+    radial-gradient(40% 45% at 92% 0%, rgba(120, 132, 255, 0.1), rgba(120, 132, 255, 0) 70%),
+    linear-gradient(180deg, #0b0f1a 0%, #0a0e18 100%);
+  color: #f6f4ee;
+}
+.btn-ghost-dark {
+  background: rgb(255 255 255 / 0.05);
+  color: #f6f4ee;
+  border: 2px solid rgb(255 255 255 / 0.14);
+  box-shadow: 0 4px 0 rgb(255 255 255 / 0.1);
+}
+.btn-ghost-dark:hover {
+  background: rgb(255 255 255 / 0.09);
+}
+.btn-ghost-dark:active {
+  box-shadow: 0 0 0 rgb(255 255 255 / 0.1);
+}
+
+/* الهيدر: لونه من اللي تحته (فاتح افتراضياً، غامق فوق الهيرو) */
+.site-header {
+  --hdr-bg: var(--color-paper);
+  background: linear-gradient(to bottom, var(--hdr-bg) 55%, transparent);
+  color: var(--color-ink);
+  transition: color 250ms ease;
+}
+.site-header .hdr-muted {
+  color: var(--color-ink-soft);
+}
+.site-header .hdr-muted:hover {
+  color: var(--color-ink);
+}
+html[data-top="dark"] .site-header {
+  --hdr-bg: #0b0f1a;
+  color: #f6f4ee;
+}
+html[data-top="dark"] .site-header .hdr-muted {
+  color: #a3abbc;
+}
+html[data-top="dark"] .site-header .hdr-muted:hover {
+  color: #f6f4ee;
+}
+html[data-top="dark"] .dock-surface {
+  background: rgb(22 27 40 / 0.72);
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.09), 0 12px 30px -12px rgb(0 0 0 / 0.6);
+}
+html[data-top="dark"] .dock-close {
+  background: rgb(255 255 255 / 0.1);
+  color: #c9cfdb;
+}
+html[data-top="dark"] .dock-peek button {
+  color: #f6f4ee;
+}
+html[data-top="dark"] .dock-item > span:not(.dock-tip) {
+  color: #a3abbc;
+}
+html[data-top="dark"] .dock-item > span.bg-ink {
+  background: #f6f4ee;
+}
+html[data-top="dark"] .dock-tip {
+  background: #f6f4ee;
+  color: #0b0f1a;
+}
+html[data-top="dark"] .dock-rail span.bg-line-strong {
+  background: rgb(255 255 255 / 0.14);
+}

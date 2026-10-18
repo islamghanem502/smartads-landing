@@ -26,7 +26,7 @@ const PIXEL_ID = process.env.NEXT_PUBLIC_PIXEL_ID;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ar" dir="rtl">
+    <html lang="ar" dir="rtl" data-top="dark">
       <body>
         {PIXEL_ID ? (
           <Script src={`https://ilanakdhaki.com/api/pixel.js?id=${PIXEL_ID}`} strategy="afterInteractive" />
