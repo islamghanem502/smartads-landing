@@ -282,3 +282,23 @@ body {
     transition: none;
   }
 }
+
+/* صف جديد على شاشة اللابتوب في المشهد */
+@keyframes scene-row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.scene-row {
+  animation: scene-row-in 350ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-row {
+    animation: none;
+  }
+}
