@@ -11,3 +11,5 @@ npm run dev   # http://localhost:3200
 - `NEXT_PUBLIC_PIXEL_ID`: يشغّل بكسل المنصة (فاضي = مقفول).
 - `NEXT_PUBLIC_APP_URL`: رابط اللوحة (الافتراضي https://ilanakdhaki.com).
 - رسومات الكروت مبنية على محرك [hairline](https://github.com/lucasmarkes/hairline) (MIT)، منسوخ في `src/lib/hairline/core`. الرسومات نفسها في `src/lib/hairline/figures`.
+- شعارات المنصات من [Simple Icons](https://simpleicons.org) (CC0)، وشعار زد من zid.sa. كلها علامات تجارية لأصحابها.
+- `publish.ts` رسمة ملوّنة وتتحرك لحالها، فهي خارج قواعد hairline العشر عن قصد.
