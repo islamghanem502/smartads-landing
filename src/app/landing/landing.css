@@ -1,0 +1,75 @@
+/* هوية الشخصية: كحلي شبه أسود (#111318) وأبيض، وألوان المنصات نفسها هي اللي تلوّن الصفحة */
+html:has(.landing-root),
+html:has(.landing-root) body {
+  background: #111318;
+}
+
+.landing-root {
+  --night: #111318;
+  --night-2: #191c23;
+  --night-3: #22262f;
+  --line: rgb(255 255 255 / 0.08);
+  --fog: #a3a8b4;
+  --snow: #ffffff;
+  --card-ink: #111318;
+  --card-soft: #5c6170;
+  --card-line: #eceef2;
+  min-height: 100svh;
+  background: var(--night);
+  color: var(--snow);
+  font-family: "Rubik Variable", "IBM Plex Sans Arabic", system-ui, sans-serif;
+}
+
+.landing-root :focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+/* اللوحة والشخصية: خط القص في صورة الشخصية عند 10.16٪ من عرضها، فيركب بالضبط على حافة اللوحة اليمنى.
+   الأصابع تطلع 3.5٪ قدام الحافة، فاللوحة لها حشوة يمين تشيلها بعيد عن الكروت.
+   الجسم يلمس الحافة من 25٪ لين 96٪ من طول الصورة، واللوحة تبدأ عند 16٪ فتغطيه كله. */
+.mh-stage {
+  --pw: min(59vw, 15.5rem);
+  --m: calc(var(--pw) * 0.8);
+  width: calc(var(--pw) + var(--m) * 0.67);
+  padding-top: calc(var(--m) * 0.16);
+}
+.mh-panel {
+  width: var(--pw);
+  border-radius: 14px;
+  padding-right: calc(var(--m) * 0.045 + 6px);
+}
+.mh-mascot {
+  top: 0;
+  left: calc(var(--pw) - var(--m) * 0.1016);
+  width: var(--m);
+}
+/* على الجوال الفقاعة فوق الراس عشان ما تطلع برا الشاشة */
+.mh-hello {
+  left: 18%;
+  top: -9%;
+}
+
+@media (min-width: 640px) {
+  .mh-stage {
+    --pw: 20rem;
+    --m: 24rem;
+  }
+  .mh-panel {
+    border-radius: 20px;
+  }
+  .mh-hello {
+    left: 58%;
+    top: 12%;
+  }
+}
+
+@media (min-width: 1024px) {
+  .mh-stage {
+    --pw: 21rem;
+    --m: 30rem;
+  }
+  .mh-panel {
+    border-radius: 24px;
+  }
+}
