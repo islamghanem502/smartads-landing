@@ -112,10 +112,7 @@ export function MascotHero() {
             <span data-reveal data-a="line" className="block">بدون ما توظّف أحد.</span>
           </h1>
           <p data-reveal data-a="fade" className="mt-5 text-[1.0625rem] font-semibold leading-[1.7] text-white sm:text-[1.1875rem]">
-            أول وكالة تسويق في الوطن العربي يشغّلها الذكاء الاصطناعي.
-          </p>
-          <p data-reveal data-a="fade" className="mt-3 max-w-[31em] text-[1.0625rem] leading-[1.9] text-[#dfe2e8] sm:text-[1.125rem]">
-            اربط متجرك أو موقعك، وإحنا نطلق حملاتك، ونصمّم منشوراتك وفيديوهاتك وننشرها، ونرفع ظهورك في قوقل. كل يوم، وبدون إجازات.
+            أول وكالة تسويق في الوطن العربي يشغّلها الذكاء الاصطناعي
           </p>
           <div data-reveal data-a="fade" className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
             <motion.a

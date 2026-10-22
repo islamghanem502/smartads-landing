@@ -30,19 +30,23 @@ html:has(.landing-root) body {
 .mh {
   --m: clamp(14rem, 60vw, 22rem);
 }
+
 .mh-mascot {
   width: var(--m);
   margin-left: calc(var(--m) * -0.1016);
 }
+
 .mh-hello {
   left: 58%;
   top: 8%;
 }
+
 /* على الجوال والتابلت: سطر كامل العرض للشخصية بين الكلام والخدمات */
 .mh-bleed {
   direction: ltr;
   margin-inline: calc(50% - 50vw);
 }
+
 .mh-services {
   width: 100%;
   max-width: 36rem;
@@ -55,13 +59,16 @@ html:has(.landing-root) body {
     --m: clamp(28rem, 34vw, 36rem);
     --cl: max(2rem, calc((100vw - 78rem) / 2 + 2rem));
   }
+
   .mh-col {
     padding-left: max(0px, calc(var(--m) * 0.67 - var(--cl) + 1.5rem));
   }
+
   .mh-services {
     width: 25rem;
     margin-top: 0;
   }
+
   .mh-hello {
     left: 56%;
     top: 10%;
@@ -81,10 +88,12 @@ html:has(.landing-root) body {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.3);
   animation: chip-shift 6s ease-in-out infinite alternate;
 }
+
 @keyframes chip-shift {
   from {
     background-position: 0% 50%;
   }
+
   to {
     background-position: 100% 50%;
   }
