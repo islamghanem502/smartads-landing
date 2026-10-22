@@ -7,7 +7,7 @@ import { LOGIN_URL, SIGNUP_URL } from "@/lib/links";
 
 const LINKS = [
   { href: "#services", label: "خدماتنا" },
-  { href: "#how", label: "كيف نشتغل" },
+  { href: "#why", label: "ليش إحنا" },
   { href: "#pricing", label: "الأسعار" },
   { href: "#faq", label: "الأسئلة" },
 ];

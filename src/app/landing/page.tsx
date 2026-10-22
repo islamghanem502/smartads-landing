@@ -1,5 +1,7 @@
 import { LandingNav } from "@/components/landing/LandingNav";
 import { MascotHero } from "@/components/landing/MascotHero";
+import { Services } from "@/components/landing/Services";
+import { WhyUs } from "@/components/landing/WhyUs";
 
 export default function LandingPage() {
   return (
@@ -7,6 +9,8 @@ export default function LandingPage() {
       <LandingNav />
       <main>
         <MascotHero />
+        <Services />
+        <WhyUs />
       </main>
     </>
   );

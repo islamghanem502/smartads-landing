@@ -148,7 +148,7 @@ export function MascotHero() {
         </div>
 
         {/* الخدمات: يسار، وتبعد عن الشخصية بقدر ما تاخذ من الشاشة */}
-        <div id="services" className="mh-col scroll-mt-28">
+        <div className="mh-col">
           <Services />
         </div>
       </div>
