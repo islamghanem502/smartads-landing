@@ -25,78 +25,56 @@ html:has(.landing-root) body {
   outline-offset: 3px;
 }
 
-/* الشخصية واللوحة: الصورة معكوسة، فخط القص صار عند 89.84٪ من عرضها، ويركب بالضبط على حافة اللوحة اليسرى.
-   الأصابع تطلع 3.5٪ قدام الحافة، فاللوحة لها حشوة يسار تبعدها عن الكروت.
-   الجسم يلمس الحافة من 25٪ لين 96٪ من طول الصورة، واللوحة تبدأ عند 16٪ فتغطيه كله.
-   اليد اللي تسلّم توصل لين 22.9٪ من العرض، فالمسرح يحجز لها 67٪ من عرض الصورة على اليسار. */
-.mh-stage {
-  --pw: min(62vw, 16rem);
-  --m: calc(var(--pw) * 0.72);
-  width: calc(var(--pw) + var(--m) * 0.67);
-  padding-top: calc(var(--m) * 0.16);
-  padding-left: calc(var(--m) * 0.67);
-}
-.mh-panel {
-  width: var(--pw);
-  border-radius: 16px;
-  padding-left: calc(var(--m) * 0.035 + 7px);
+/* الشخصية تطلّ من حافة الشاشة اليسار: خط القص في صورتها عند 10.16٪ من عرضها، فنسحبها لليسار بنفس القدر
+   ويصير جسمها برا الشاشة. اليد اللي تسلّم توصل لين 77.1٪ من العرض، يعني تاخذ من الشاشة 67٪ من عرض الصورة. */
+.mh {
+  --m: clamp(14rem, 60vw, 22rem);
 }
 .mh-mascot {
-  top: 0;
-  left: calc(var(--m) * -0.2284);
   width: var(--m);
+  margin-left: calc(var(--m) * -0.1016);
 }
-/* على الجوال الفقاعة فوق الراس عشان ما تغطيه */
 .mh-hello {
-  left: 26%;
-  top: -12%;
+  left: 58%;
+  top: 8%;
+}
+/* على الجوال والتابلت: سطر كامل العرض للشخصية بين الكلام والخدمات */
+.mh-bleed {
+  direction: ltr;
+  margin-inline: calc(50% - 50vw);
+}
+.mh-services {
+  width: 100%;
+  max-width: 36rem;
+  margin-top: 1rem;
 }
 
-@media (min-width: 640px) {
-  .mh-stage {
-    --pw: 21rem;
-    --m: 24rem;
+/* الشاشة العريضة: الخدمات تبعد عن حافة الشاشة بقدر اللي تاخذه الشخصية، مهما كان عرض الشاشة */
+@media (min-width: 1280px) {
+  .mh {
+    --m: clamp(28rem, 34vw, 36rem);
+    --cl: max(2rem, calc((100vw - 78rem) / 2 + 2rem));
   }
-  .mh-panel {
-    border-radius: 24px;
+  .mh-col {
+    padding-left: max(0px, calc(var(--m) * 0.67 - var(--cl) + 1.5rem));
+  }
+  .mh-services {
+    width: 25rem;
+    margin-top: 0;
   }
   .mh-hello {
-    left: 14%;
-    top: 14%;
+    left: 56%;
+    top: 10%;
   }
 }
 
-@media (min-width: 1024px) {
-  .mh-stage {
-    --pw: 22rem;
-    --m: 29rem;
-  }
-  .mh-panel {
-    border-radius: 28px;
-  }
-  .mh-hello {
-    left: 21%;
-    top: 9%;
-  }
-}
-
-/* الكلام المهم: تدرّج ألوان انستقرام، يتحرك على مهله */
-.ig-text {
-  background: linear-gradient(90deg, #feda75, #fa7e1e 22%, #d62976 48%, #962fbf 74%, #4f5bd5);
-  background-size: 220% 100%;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  padding: 0 0.04em 0.12em;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-  animation: ig-shift 7s ease-in-out infinite alternate;
-}
-@keyframes ig-shift {
-  from {
-    background-position: 0% 50%;
-  }
-  to {
-    background-position: 100% 50%;
-  }
+/* الكلمة المهمة: ملصق أبيض مايل شوي، نفس لغة الأزرار والبلاطات */
+.mh-chip {
+  display: inline-block;
+  background: #ffffff;
+  color: var(--night);
+  border-radius: 0.28em;
+  padding: 0 0.24em 0.08em;
+  line-height: 1.12;
+  transform: rotate(-2deg);
 }
