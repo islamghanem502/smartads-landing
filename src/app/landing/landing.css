@@ -25,51 +25,78 @@ html:has(.landing-root) body {
   outline-offset: 3px;
 }
 
-/* اللوحة والشخصية: خط القص في صورة الشخصية عند 10.16٪ من عرضها، فيركب بالضبط على حافة اللوحة اليمنى.
-   الأصابع تطلع 3.5٪ قدام الحافة، فاللوحة لها حشوة يمين تشيلها بعيد عن الكروت.
-   الجسم يلمس الحافة من 25٪ لين 96٪ من طول الصورة، واللوحة تبدأ عند 16٪ فتغطيه كله. */
+/* الشخصية واللوحة: الصورة معكوسة، فخط القص صار عند 89.84٪ من عرضها، ويركب بالضبط على حافة اللوحة اليسرى.
+   الأصابع تطلع 3.5٪ قدام الحافة، فاللوحة لها حشوة يسار تبعدها عن الكروت.
+   الجسم يلمس الحافة من 25٪ لين 96٪ من طول الصورة، واللوحة تبدأ عند 16٪ فتغطيه كله.
+   اليد اللي تسلّم توصل لين 22.9٪ من العرض، فالمسرح يحجز لها 67٪ من عرض الصورة على اليسار. */
 .mh-stage {
-  --pw: min(59vw, 15.5rem);
-  --m: calc(var(--pw) * 0.8);
+  --pw: min(62vw, 16rem);
+  --m: calc(var(--pw) * 0.72);
   width: calc(var(--pw) + var(--m) * 0.67);
   padding-top: calc(var(--m) * 0.16);
+  padding-left: calc(var(--m) * 0.67);
 }
 .mh-panel {
   width: var(--pw);
-  border-radius: 14px;
-  padding-right: calc(var(--m) * 0.045 + 6px);
+  border-radius: 16px;
+  padding-left: calc(var(--m) * 0.035 + 7px);
 }
 .mh-mascot {
   top: 0;
-  left: calc(var(--pw) - var(--m) * 0.1016);
+  left: calc(var(--m) * -0.2284);
   width: var(--m);
 }
-/* على الجوال الفقاعة فوق الراس عشان ما تطلع برا الشاشة */
+/* على الجوال الفقاعة فوق الراس عشان ما تغطيه */
 .mh-hello {
-  left: 18%;
-  top: -9%;
+  left: 26%;
+  top: -12%;
 }
 
 @media (min-width: 640px) {
   .mh-stage {
-    --pw: 20rem;
+    --pw: 21rem;
     --m: 24rem;
   }
   .mh-panel {
-    border-radius: 20px;
+    border-radius: 24px;
   }
   .mh-hello {
-    left: 58%;
-    top: 12%;
+    left: 14%;
+    top: 14%;
   }
 }
 
 @media (min-width: 1024px) {
   .mh-stage {
-    --pw: 21rem;
-    --m: 30rem;
+    --pw: 22rem;
+    --m: 29rem;
   }
   .mh-panel {
-    border-radius: 24px;
+    border-radius: 28px;
+  }
+  .mh-hello {
+    left: 21%;
+    top: 9%;
+  }
+}
+
+/* الكلام المهم: تدرّج ألوان انستقرام، يتحرك على مهله */
+.ig-text {
+  background: linear-gradient(90deg, #feda75, #fa7e1e 22%, #d62976 48%, #962fbf 74%, #4f5bd5);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding: 0 0.04em 0.12em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation: ig-shift 7s ease-in-out infinite alternate;
+}
+@keyframes ig-shift {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 100% 50%;
   }
 }
