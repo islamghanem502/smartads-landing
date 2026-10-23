@@ -1,39 +1,32 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { gsap, reduced, useGSAP } from "@/lib/gsap";
 import { SIGNUP_URL } from "@/lib/links";
-import { Facebook, Google, Instagram, Meta, Salla, Snapchat, TikTok, Website, ZidMark } from "@/components/brand/logos";
+import { Google, Instagram, Meta, Salla, Snapchat, TikTok, WhatsApp, Website, ZidMark } from "@/components/brand/logos";
 
 type Svg = React.SVGProps<SVGSVGElement>;
-type Brand = { L: (p: Svg) => React.ReactElement; n: string };
+type Logo = (p: Svg) => React.ReactElement;
 
-/* كل خدمة بأقل كلام، والمنصات بشعاراتها بس. التفاصيل في قسم الخدمات تحت. */
-const SERVICES: { title: string; text: string; on: Brand[] }[] = [
-  {
-    title: "حملات إعلانية",
-    text: "نطلقها ونحسّنها كل يوم",
-    on: [{ L: Snapchat, n: "سناب شات" }, { L: TikTok, n: "تيك توك" }, { L: Meta, n: "ميتا" }, { L: Google, n: "قوقل" }],
-  },
-  {
-    title: "منشورات وفيديوهات",
-    text: "نصمّمها وننشرها لك",
-    on: [{ L: Instagram, n: "انستقرام" }, { L: TikTok, n: "تيك توك" }, { L: Facebook, n: "فيسبوك" }],
-  },
-  {
-    title: "سيو متجرك",
-    text: "نرفعك في نتائج قوقل",
-    on: [{ L: Google, n: "قوقل" }],
-  },
-];
-
-const STORES: Brand[] = [
+const STORES: { L: Logo; n: string }[] = [
   { L: Salla, n: "سلة" },
   { L: ZidMark, n: "زد" },
   { L: Website, n: "موقعك الخاص" },
 ];
+
+/* يوم شغل الشخصية: كل سطر خدمة من خدماتنا، بالمنصة اللي تمت عليها والنتيجة. أمثلة لمتجر عطور. */
+const DAY: { t: string; L: Logo; n: string; did: string; got: string }[] = [
+  { t: "٩:٠٢ ص", L: Snapchat, n: "سناب شات", did: "أطلقت حملة جديدة في سناب", got: "١٥٠ ريال باليوم" },
+  { t: "١٠:٣٠ ص", L: Instagram, n: "انستقرام", did: "نشرت ريلز في حسابك", got: "٢٬٤٠٠ مشاهدة" },
+  { t: "١٢:١٥ م", L: Google, n: "قوقل", did: "رفعت «عطر العود» في نتائج قوقل", got: "صار الثالث" },
+  { t: "٢:٤٠ م", L: Meta, n: "ميتا", did: "نقلت ٢٠٪ من الميزانية لميتا", got: "لأنه يبيع أكثر" },
+  { t: "٤:٠٥ م", L: TikTok, n: "تيك توك", did: "صمّمت فيديو إعلاني لتيك توك", got: "ينتظر موافقتك" },
+  { t: "٦:٠٠ م", L: Salla, n: "سلة", did: "جاك ١٤ طلب من الإعلانات", got: "٣٬٢٠٠ ريال" },
+  { t: "٩:٠٠ م", L: WhatsApp, n: "واتساب", did: "أرسلت لك تقرير اليوم", got: "على الواتساب" },
+];
+const SHOWN = 4;
 
 /** كلام يتلوّن بالتدرّج لما يمر عليه المؤشر، كلمة كلمة. */
 function Ink({ text }: { text: string }) {
@@ -50,37 +43,71 @@ function Ink({ text }: { text: string }) {
   );
 }
 
-function Services() {
+/** «شغلي اليوم»: سجل حي، كل كم ثانية ينزل سطر جديد من فوق. */
+function WorkFeed() {
+  const [head, setHead] = useState(SHOWN - 1);
+  const box = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (reduced()) return;
+    let on = false;
+    const io = new IntersectionObserver(([e]) => { on = e.isIntersecting; });
+    io.observe(box.current!);
+    const t = window.setInterval(() => { if (on && !document.hidden) setHead((h) => h + 1); }, 2800);
+    return () => { clearInterval(t); io.disconnect(); };
+  }, []);
+
+  // الأحدث فوق
+  const rows = Array.from({ length: SHOWN }, (_, i) => {
+    const k = head - i;
+    return { k, ...DAY[((k % DAY.length) + DAY.length) % DAY.length] };
+  });
+
   return (
-    <ul className="mh-services divide-y divide-white/10 border-y border-white/10">
-      {SERVICES.map((s) => (
-        <li key={s.title} data-a="service">
-          <a href="#services" className="group flex items-center justify-between gap-5 py-5 sm:py-6">
-            <div className="min-w-0">
-              <h3 className="text-[1.125rem] font-semibold text-white sm:text-[1.25rem]">
-                <span className="ink">{s.title}</span>
-              </h3>
-              <p className="mt-1 text-[0.9375rem] text-[#cfd3db]">{s.text}</p>
-            </div>
-            <ul className="flex shrink-0 gap-1.5 sm:gap-2" aria-label="المنصات">
-              {s.on.map(({ L, n }) => (
-                <li key={n} title={n} className="grid size-10 place-items-center rounded-[13px] bg-white transition-transform duration-300 group-hover:-translate-y-0.5 sm:size-12 sm:rounded-[15px]">
-                  <L className="size-5 sm:size-6" />
-                  <span className="sr-only">{n}</span>
-                </li>
-              ))}
-            </ul>
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div ref={box} data-a="feed" className="mh-feed rounded-[26px] bg-[var(--night-2)] p-4 ring-1 ring-[var(--line)] sm:p-5">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <p className="text-[1.0625rem] font-bold text-white">شغلي اليوم</p>
+        <span className="flex items-center gap-2 text-[0.8125rem] text-[#cfd3db]">
+          <span className="relative flex size-2">
+            <span className="absolute inset-0 animate-ping rounded-full bg-[#22c55e] opacity-60" />
+            <span className="relative size-2 rounded-full bg-[#22c55e]" />
+          </span>
+          يشتغل الحين
+        </span>
+      </div>
+      <ul className="mt-3 grid gap-2" aria-live="polite">
+        <AnimatePresence initial={false} mode="popLayout">
+          {rows.map((r) => (
+            <motion.li
+              key={r.k}
+              layout
+              initial={{ opacity: 0, y: -14, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              transition={{ duration: 0.5, ease: [0.32, 0.72, 0, 1] }}
+              className="flex items-center gap-3 rounded-[16px] bg-[var(--night)] p-2.5 pe-3"
+            >
+              <span title={r.n} className="grid size-10 shrink-0 place-items-center rounded-[12px] bg-white">
+                <r.L className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-[0.9375rem] font-semibold leading-snug text-white">{r.did}</span>
+                <span className="mt-0.5 block text-[0.8125rem] text-[#c9cdd6]">{r.got}</span>
+              </span>
+              <span className="shrink-0 self-start pt-0.5 text-[0.75rem] tabular-nums text-[#8e94a1]">{r.t}</span>
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </ul>
+      <p className="mt-3 px-1 text-[0.75rem] text-[#8e94a1]">مثال من يوم شغل في متجر عطور</p>
+    </div>
   );
 }
 
 /* الوجه مرسوم فوق الصورة (والصورة نفسها بدون عيون ولا فم)، فيقدر يرمش ويلحق المؤشر ويبتسم.
-   الأرقام بإحداثيات الصورة الأصلية 1920×1920. */
-const SMILE = "M672 609 Q753 662 782 630";
-const BIG_SMILE = "M664 602 Q752 694 790 624";
+   الأرقام بإحداثيات الصورة الأصلية 1920×1920، والفم منحنى مطابق لفمها الأصلي. */
+const SMILE = "M672 609.5 C702 632.1 745.3 655.7 782 630";
+const BIG_SMILE = "M664 603 C698 640 749 676 790 622";
 
 function Face() {
   const svg = useRef<SVGSVGElement>(null);
@@ -88,25 +115,27 @@ function Face() {
   useEffect(() => {
     const el = svg.current;
     if (!el || reduced()) return;
+    const face = el.querySelector<SVGGElement>("[data-face]")!;
     const eyes = el.querySelector<SVGGElement>("[data-eyes]")!;
     const mouth = el.querySelector<SVGPathElement>("[data-mouth]")!;
     const lids = el.querySelectorAll<SVGGElement>("[data-eye]");
-    const ex = gsap.quickTo(eyes, "x", { duration: 0.45, ease: "power3" });
-    const ey = gsap.quickTo(eyes, "y", { duration: 0.45, ease: "power3" });
-    const mx = gsap.quickTo(mouth, "x", { duration: 0.6, ease: "power3" });
+    // الوجه كله يتحرك مع النظرة، والعيون تتحرك شوي زيادة: كذا يبان إنه يلف راسه مو بس عيونه
+    const fx = gsap.quickTo(face, "x", { duration: 0.5, ease: "power3" });
+    const fy = gsap.quickTo(face, "y", { duration: 0.5, ease: "power3" });
+    const ex = gsap.quickTo(eyes, "x", { duration: 0.4, ease: "power3" });
+    const ey = gsap.quickTo(eyes, "y", { duration: 0.4, ease: "power3" });
 
-    // العيون تلحق المؤشر، على قد ما الشاشة تسمح
     const look = (e: PointerEvent) => {
       const r = el.getBoundingClientRect();
       if (!r.width) return;
       const dx = e.clientX - (r.left + r.width * 0.39), dy = e.clientY - (r.top + r.height * 0.3);
-      const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 320);
-      ex((dx / d) * 22 * k); ey((dy / d) * 14 * k); mx((dx / d) * 8 * k);
+      const d = Math.hypot(dx, dy) || 1, k = Math.min(1, d / 320), ux = dx / d, uy = dy / d;
+      fx(ux * 16 * k); fy(uy * 10 * k);
+      ex(ux * 7 * k); ey(uy * 5 * k);
     };
     // يبتسم أكثر لما المؤشر على زر الربط
     const smile = (e: Event) => {
-      const t = (e.target as Element).closest?.("[data-smile]");
-      if (!t) return;
+      if (!(e.target as Element).closest?.("[data-smile]")) return;
       gsap.to(mouth, { attr: { d: e.type === "pointerover" ? BIG_SMILE : SMILE }, duration: 0.35, ease: "power3.out" });
     };
     // يرمش كل كم ثانية، ومرات رمشتين ورا بعض
@@ -130,23 +159,31 @@ function Face() {
 
   return (
     <svg ref={svg} viewBox="0 0 1920 1920" aria-hidden className="pointer-events-none absolute inset-0 size-full">
-      <g data-eyes>
-        <g data-eye>
-          <ellipse cx="655.5" cy="535.5" rx="31" ry="31" fill="#151618" />
-          <ellipse cx="646" cy="524" rx="8" ry="6" fill="#ffffff" fillOpacity="0.35" />
+      <g data-face>
+        <g data-eyes>
+          <g data-eye>
+            <ellipse cx="655.5" cy="535.5" rx="31" ry="31" fill="#151618" />
+            <ellipse cx="646" cy="524" rx="8" ry="6" fill="#ffffff" fillOpacity="0.35" />
+          </g>
+          <g data-eye>
+            <ellipse cx="839.5" cy="581" rx="30" ry="30.5" fill="#151618" />
+            <ellipse cx="830" cy="570" rx="7.5" ry="5.5" fill="#ffffff" fillOpacity="0.35" />
+          </g>
         </g>
-        <g data-eye>
-          <ellipse cx="839.5" cy="581" rx="30" ry="30.5" fill="#151618" />
-          <ellipse cx="830" cy="570" rx="7.5" ry="5.5" fill="#ffffff" fillOpacity="0.35" />
-        </g>
+        <path data-mouth d={SMILE} fill="none" stroke="#151618" strokeWidth="18" strokeLinecap="round" />
       </g>
-      <path data-mouth d={SMILE} fill="none" stroke="#151618" strokeWidth="16" strokeLinecap="round" />
     </svg>
   );
 }
 
 /** الشخصية: خط القص في صورتها يركب على حافة الشاشة اليسار، فجسمها برا الشاشة وتطلّ لداخل. */
 function Mascot({ className = "" }: { className?: string }) {
+  const [line, setLine] = useState("هلا والله!");
+  useEffect(() => {
+    // بعد السلام، تأشّر على شغلها
+    const t = window.setTimeout(() => setLine("هذا شغلي اليوم"), 3600);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <div data-a="mascot" data-reveal className={`mh-mascot relative ${className}`}>
       <Image
@@ -166,7 +203,18 @@ function Mascot({ className = "" }: { className?: string }) {
         dir="rtl"
         className="mh-hello absolute whitespace-nowrap rounded-[16px] rounded-bl-[4px] bg-white px-4 py-2 text-[0.9375rem] font-semibold text-[var(--night)] sm:text-[1.0625rem]"
       >
-        هلا والله!
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span
+            key={line}
+            className="block"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.25 }}
+          >
+            {line}
+          </motion.span>
+        </AnimatePresence>
       </p>
     </div>
   );
@@ -181,7 +229,7 @@ export function MascotHero() {
     gsap.timeline({ defaults: { ease: "power3.out" } })
       .fromTo("[data-a=line]", { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.12 }, 0.1)
       .fromTo("[data-a=fade]", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, 0.4)
-      .fromTo("[data-a=service]", { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.1 }, 0.5)
+      .fromTo("[data-a=feed]", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.5)
       // تطلع من حافة الشاشة وتثبت
       .fromTo("[data-a=mascot]", { xPercent: -45, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.1, ease: "back.out(1.3)" }, 0.7)
       .fromTo("[data-a=hello]", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
@@ -192,7 +240,7 @@ export function MascotHero() {
       <div className="mx-auto grid min-h-[calc(100svh-9rem)] max-w-[78rem] items-center gap-x-12 px-4 pb-12 sm:px-6 lg:px-8 xl:grid-cols-[minmax(0,1fr)_auto]">
         {/* الكلام: يمين */}
         <div className="max-w-[35rem]">
-          <h1 className="text-[clamp(2.15rem,3.6vw,3.5rem)] font-bold leading-[1.3]">
+          <h1 className="mh-h1 font-bold leading-[1.3]">
             <span data-reveal data-a="line" className="block">
               <Ink text="وكالة تسويق" />{" "}
               <span className="mh-chip">كاملة</span>،
@@ -201,10 +249,10 @@ export function MascotHero() {
               <Ink text="بدون ما توظّف أحد." />
             </span>
           </h1>
-          <p data-reveal data-a="fade" className="mt-5 text-[1.0625rem] font-semibold leading-[1.7] text-white sm:text-[1.1875rem]">
+          <p data-reveal data-a="fade" className="mt-4 text-[1.0625rem] font-semibold leading-[1.7] text-white xl:text-[1.125rem]">
             <Ink text="يشغّلها الذكاء الاصطناعي، والأولى من نوعها في الوطن العربي" />
           </p>
-          <div data-reveal data-a="fade" className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
+          <div data-reveal data-a="fade" className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-4">
             <motion.a
               data-smile
               whileTap={{ scale: 0.97 }}
@@ -217,12 +265,12 @@ export function MascotHero() {
               شوف وش نسوي
             </a>
           </div>
-          <div data-reveal data-a="fade" className="mt-9">
+          <div data-reveal data-a="fade" className="mt-8">
             <p className="text-[0.9375rem] font-medium text-white">نشتغل مع متجرك على</p>
             <ul className="mt-3 flex flex-wrap gap-2.5">
               {STORES.map(({ L, n }) => (
-                <li key={n} className="flex h-12 items-center gap-2.5 rounded-full bg-white ps-3 pe-4 text-[0.9375rem] font-semibold text-[var(--card-ink)]">
-                  <span className="grid size-8 place-items-center rounded-full bg-[#f2f3f6]"><L className="size-5" /></span>
+                <li key={n} className="flex h-11 items-center gap-2.5 rounded-full bg-white ps-2.5 pe-4 text-[0.9375rem] font-semibold text-[var(--card-ink)]">
+                  <span className="grid size-7 place-items-center rounded-full bg-[#f2f3f6]"><L className="size-[1.1rem]" /></span>
                   {n}
                 </li>
               ))}
@@ -230,14 +278,14 @@ export function MascotHero() {
           </div>
         </div>
 
-        {/* الجوال والتابلت: الشخصية تطلّ من حافة الشاشة فوق الخدمات */}
+        {/* الجوال والتابلت: الشخصية تطلّ من حافة الشاشة فوق شغلها */}
         <div className="mh-bleed mt-12 xl:hidden">
           <Mascot />
         </div>
 
-        {/* الخدمات: يسار، وتبعد عن الشخصية بقدر ما تاخذ من الشاشة */}
+        {/* شغل اليوم: يسار، جنب يد الشخصية، ويبعد عنها بقدر ما تاخذ من الشاشة */}
         <div className="mh-col">
-          <Services />
+          <WorkFeed />
         </div>
       </div>
 

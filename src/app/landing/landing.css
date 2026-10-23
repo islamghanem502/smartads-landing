@@ -47,16 +47,20 @@ html:has(.landing-root) body {
   margin-inline: calc(50% - 50vw);
 }
 
-.mh-services {
+/* العنوان يصغر على قد عرض الشاشة وطولها، عشان شاشات اللابتوب القصيرة (1366×640) */
+.mh-h1 {
+  font-size: clamp(2.05rem, min(3.6vw, 6.6vh), 3.5rem);
+}
+
+.mh-feed {
   width: 100%;
-  max-width: 36rem;
-  margin-top: 1rem;
+  max-width: 34rem;
 }
 
 /* الشاشة العريضة: الخدمات تبعد عن حافة الشاشة بقدر اللي تاخذه الشخصية، مهما كان عرض الشاشة */
 @media (min-width: 1280px) {
   .mh {
-    --m: clamp(28rem, 34vw, 36rem);
+    --m: clamp(24rem, min(33vw, 72vh), 36rem);
     --cl: max(2rem, calc((100vw - 78rem) / 2 + 2rem));
   }
 
@@ -64,14 +68,14 @@ html:has(.landing-root) body {
     padding-left: max(0px, calc(var(--m) * 0.67 - var(--cl) + 1.5rem));
   }
 
-  .mh-services {
+  .mh-feed {
     width: 25rem;
-    margin-top: 0;
   }
 
+  /* فوق الراس، عشان ما تغطي كرت الشغل اللي جنب اليد */
   .mh-hello {
-    left: 56%;
-    top: 10%;
+    left: 30%;
+    top: -5%;
   }
 }
 
