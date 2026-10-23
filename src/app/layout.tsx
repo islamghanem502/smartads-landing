@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
-import "@fontsource-variable/noto-kufi-arabic/index.css";
 import "@fontsource/ibm-plex-sans-arabic/400.css";
 import "@fontsource/ibm-plex-sans-arabic/500.css";
 import "@fontsource/ibm-plex-sans-arabic/600.css";
-import "@fontsource/aref-ruqaa/arabic-700.css";
 import "./globals.css";
 
 export const metadata: Metadata = {

@@ -28,7 +28,7 @@ html:has(.landing-root) body {
 /* الشخصية تطلّ من حافة الشاشة اليسار: خط القص في صورتها عند 10.16٪ من عرضها، فنسحبها لليسار بنفس القدر
    ويصير جسمها برا الشاشة. اليد اللي تسلّم توصل لين 77.1٪ من العرض، يعني تاخذ من الشاشة 67٪ من عرض الصورة. */
 .mh {
-  --m: clamp(14rem, 60vw, 22rem);
+  --m: clamp(16rem, 78vw, 26rem);
 }
 
 .mh-mascot {
@@ -97,4 +97,23 @@ html:has(.landing-root) body {
   to {
     background-position: 100% 50%;
   }
+}
+
+/* كلام يتلوّن لما يمر عليه المؤشر: التدرّج يمسح الكلمة من اليمين، ويرجع أبيض لما يطلع */
+.ink {
+  display: inline-block;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+  background-image: linear-gradient(100deg, #7c5cff, #d946ef 45%, #ff6b6b 78%, #ffa94d), linear-gradient(#ffffff, #ffffff);
+  background-size: 0% 100%, 100% 100%;
+  background-position: right, right;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  transition: background-size 0.6s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.ink:hover,
+.group:hover .ink {
+  background-size: 100% 100%, 100% 100%;
 }
