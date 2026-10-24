@@ -5,7 +5,7 @@ import { motion } from "motion/react";
 import { gsap, reduced, useGSAP } from "@/lib/gsap";
 import { SIGNUP_URL } from "@/lib/links";
 import { Salla, Website, ZidMark } from "@/components/brand/logos";
-import { Mascot } from "./Mascot";
+import { Mascot, Presenter } from "./Mascot";
 import { ServiceTree } from "./ServiceTree";
 
 type Svg = React.SVGProps<SVGSVGElement>;
@@ -33,9 +33,10 @@ function Ink({ text }: { text: string }) {
 
 /*
  * التخطيط على حسب العرض الفعلي (يعني بعد الزوم):
- *   أقل من 640: الكلام، بعده الشخصية تطلّ من حافة الشاشة، بعدها الشجرة. من 640: الشخصية والشجرة جنب بعض تحت الكلام.
- *   من 1024: عمودين، الكلام يمين بعرضه، والشجرة في نص اللي باقي، وراس الشخصية هو جذر الشجرة.
- *   من 1180 (يعني 1366 على زوم 110٪): الشخصية كاملة تطلّ من حافة الشاشة جنب الشجرة، والشجرة تبعد عنها بقدر ما تاخذ.
+ *   الجوال: الكلام، بعده الشخصية تطلّ من حافة الشاشة، بعدها الشجرة وجذرها راس الشخصية.
+ *   من 640: تحت الكلام الشجرة، وجنبها الشخصية واقفة تقدّمها.
+ *   من 1024: عمودين، الكلام يمين بعرضه، والشجرة في نص اللي باقي.
+ *   من 1180 (يعني 1366 على زوم 110٪): ترجع الشخصية الواقفة جنب الشجرة.
  */
 export function MascotHero() {
   const ref = useRef<HTMLElement>(null);
@@ -49,14 +50,16 @@ export function MascotHero() {
       .fromTo("[data-a=tree]", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.45)
       // تطلع من حافة الشاشة وتثبت
       .fromTo("[data-a=mascot]", { xPercent: -45, opacity: 0 }, { xPercent: 0, opacity: 1, duration: 1.1, ease: "back.out(1.3)" }, 0.7)
+      // تدخل من جنب الشجرة وتمدّ يدها
+      .fromTo("[data-a=presenter]", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "back.out(1.4)" }, 0.75)
       .fromTo("[data-a=hello]", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
   }, { scope: ref });
 
   return (
     <section ref={ref} className="mh relative overflow-x-clip pt-24 lg:pt-28">
-      <div className="mh-grid mx-auto grid max-w-[78rem] items-center gap-x-10 px-4 pb-14 sm:px-6 sm:grid-cols-2 lg:min-h-[calc(100svh-9rem)] lg:grid-cols-[auto_minmax(0,1fr)] lg:px-8">
+      <div className="mh-grid mx-auto grid max-w-[78rem] items-center gap-x-10 px-4 pb-14 sm:px-6 lg:min-h-[calc(100svh-9rem)] lg:grid-cols-[auto_minmax(0,1fr)] lg:px-8">
         {/* الكلام: يمين */}
-        <div className="max-w-[34rem] sm:col-span-2 lg:col-span-1">
+        <div className="max-w-[34rem]">
           <h1 className="mh-h1 font-bold leading-[1.3]">
             <span data-reveal data-a="line" className="block">
               <Ink text="وكالة تسويق" />{" "}
@@ -95,20 +98,17 @@ export function MascotHero() {
           </div>
         </div>
 
-        {/* أقل من 1024: الشخصية تطلّ من حافة الشاشة، فوق الشجرة في الجوال وجنبها في التابلت */}
-        <div className="mh-bleed mt-12 sm:col-start-2 sm:row-start-2 lg:hidden">
+        {/* الجوال: الشخصية تطلّ من حافة الشاشة فوق الشجرة */}
+        <div className="mh-bleed mt-12 sm:hidden">
           <Mascot />
         </div>
 
         {/* الشجرة: يسار */}
-        <div className="mh-col mt-2 sm:col-start-1 sm:row-start-2 sm:mt-12 lg:col-start-2 lg:row-start-1 lg:mt-0">
+        {/* الشجرة، وجنبها الشخصية واقفة تأشّر عليها (ما عدا الجوال، وما بين 1024 و1180 لأن المكان ما يكفي) */}
+        <div className="mt-2 flex items-center justify-between gap-4 sm:mt-12 lg:mt-0 lg:justify-center">
           <ServiceTree />
+          <Presenter />
         </div>
-      </div>
-
-      {/* من 1180: الشخصية لاصقة في حافة الشاشة اليسار، في نص الهيرو */}
-      <div className="pointer-events-none absolute inset-y-0 left-0 hidden items-center pt-20 min-[1180px]:flex">
-        <Mascot />
       </div>
     </section>
   );

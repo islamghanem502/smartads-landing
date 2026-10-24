@@ -109,8 +109,8 @@ export function ServiceTree() {
     <div ref={box} data-a="tree" className="mh-tree relative lg:mx-auto">
       <div className="flex items-center gap-3">
         <span data-root className="relative grid size-12 shrink-0 place-items-center overflow-hidden rounded-full bg-[var(--night-3)] ring-1 ring-white/15">
-          <Image src="/landing/mascot-head.png" alt="" width={48} height={48} className="mt-1.5 size-11 object-contain min-[1180px]:hidden" />
-          <span className="hidden size-3 rounded-full bg-[linear-gradient(135deg,#7c5cff,#d946ef,#ff6b6b)] min-[1180px]:block" />
+          <Image src="/landing/mascot-head.png" alt="" width={48} height={48} className="mt-1.5 size-11 object-contain sm:max-lg:hidden min-[1180px]:hidden" />
+          <span className="hidden size-3 rounded-full bg-[linear-gradient(135deg,#7c5cff,#d946ef,#ff6b6b)] sm:max-lg:block min-[1180px]:block" />
         </span>
         <div>
           <p className="text-[1.0625rem] font-bold text-white">مسوّقك الذكي</p>

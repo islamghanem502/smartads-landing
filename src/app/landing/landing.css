@@ -69,9 +69,9 @@ html:has(.landing-root) body {
   max-width: 36rem;
 }
 
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
   .mh-tree {
-    width: 22rem;
+    width: min(22rem, 52vw);
   }
 }
 
@@ -96,15 +96,28 @@ html:has(.landing-root) body {
   }
 }
 
-/* من 1180 (يعني 1366 على زوم 110٪ بعد): الشخصية تطلّ من حافة الشاشة، والشجرة تبعد عنها بقدر اللي تاخذه */
-@media (min-width: 1180px) {
-  .mh {
-    --m: clamp(20rem, min(31vw, 66vh), 34rem);
-    --cl: max(2rem, calc((100vw - 78rem) / 2 + 2rem));
-  }
+/* الشخصية الواقفة: تكبر مع الشاشة بس ما تطغى على الشجرة، وتصغر في الشاشات القصيرة */
+.mh-presenter {
+  display: none;
+  width: min(20rem, 38vw);
+}
 
-  .mh-col {
-    padding-left: max(0px, calc(var(--m) * 0.67 - var(--cl) + 1rem));
+/* تبان في التابلت ومن 1180. هنا مو في Tailwind لأن min-[1180px] ينرتّب قبل lg:hidden فيخسر قدامه */
+@media (min-width: 640px) and (max-width: 1023.98px), (min-width: 1180px) {
+  .mh-presenter {
+    display: block;
+  }
+}
+
+/* فوق كتفه اليسار، بعيد عن الغترة */
+.mh-hello-p {
+  left: -6%;
+  top: -3%;
+}
+
+@media (min-width: 1180px) {
+  .mh-presenter {
+    width: min(22rem, 24vw, 62vh);
   }
 }
 
