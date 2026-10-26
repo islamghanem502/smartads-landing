@@ -3,6 +3,8 @@ import { Hero } from "./components/hero/Hero";
 import { Services } from "./components/services/Services";
 import { How } from "./components/how/How";
 import { Why } from "./components/why/Why";
+import { Pricing } from "./components/pricing/Pricing";
+import { Footer } from "./components/footer/Footer";
 
 export function App() {
   return (
@@ -13,7 +15,9 @@ export function App() {
         <Services />
         <How />
         <Why />
+        <Pricing />
       </main>
+      <Footer />
     </>
   );
 }

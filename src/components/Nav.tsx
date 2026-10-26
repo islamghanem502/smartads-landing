@@ -2,7 +2,7 @@ import { useState } from "react";
 import { LOGIN_URL, SIGNUP_URL } from "../lib/links";
 import { Container } from "./layout";
 
-const LINKS = [
+export const LINKS = [
   { href: "#services", label: "خدماتنا" },
   { href: "#how", label: "كيف نشتغل" },
   { href: "#why", label: "ليش إحنا" },
