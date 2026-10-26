@@ -4,6 +4,7 @@ import { Services } from "./components/services/Services";
 import { How } from "./components/how/How";
 import { Why } from "./components/why/Why";
 import { Pricing } from "./components/pricing/Pricing";
+import { Faq } from "./components/faq/Faq";
 import { Footer } from "./components/footer/Footer";
 
 export function App() {
@@ -16,6 +17,7 @@ export function App() {
         <How />
         <Why />
         <Pricing />
+        <Faq />
       </main>
       <Footer />
     </>

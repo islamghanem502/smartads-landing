@@ -252,3 +252,18 @@ body {
 .team [data-on] [data-bar] {
   scale: 1 1;
 }
+
+/* الأسئلة: الجواب ينفتح بنعومة في المتصفحات اللي تدعم ::details-content، والباقي يفتح على طول */
+:root {
+  interpolate-size: allow-keywords;
+}
+
+.faq::details-content {
+  block-size: 0;
+  overflow-y: clip;
+  transition: block-size 0.4s var(--ease-lift), content-visibility 0.4s allow-discrete;
+}
+
+.faq[open]::details-content {
+  block-size: auto;
+}
