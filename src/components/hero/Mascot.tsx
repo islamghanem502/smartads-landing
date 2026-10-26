@@ -9,7 +9,7 @@ const EYES = [{ x: 880, y: 520 }, { x: 1050, y: 520 }];
 const EYE_R = 29;
 const SMILE = "M925 578 C948 604 985 604 1007 578";
 
-/** الشخصية واقفة وتمدّ يدها للشجرة، كأنها تقول: هذا اللي نسويه لك. */
+/** الشخصية واقفة وتمدّ يدها لكرت الفريق، كأنها تقول: هذا فريقك. */
 export function Mascot({ className = "" }: { className?: string }) {
   const svg = useRef<SVGSVGElement>(null);
 
@@ -30,7 +30,7 @@ export function Mascot({ className = "" }: { className?: string }) {
     <div data-a="mascot" data-reveal className={`mascot-ground relative shrink-0 ${className}`}>
       <img
         src="/mascot.webp"
-        alt="شخصية مسوّقك الذكي: روبوت أبيض لابس غترة وعقال، واقف ويأشّر بيده على خدماتنا"
+        alt="شخصية مسوّقك الذكي: روبوت أبيض لابس غترة وعقال، واقف ويأشّر بيده على فريقك التسويقي"
         width={1200}
         height={1200}
         fetchPriority="high"

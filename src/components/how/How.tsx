@@ -76,10 +76,10 @@ export function How() {
           </ol>
 
           {/* في اللابتوب: الرسمة ثابتة على الشاشة وتتبدّل مع الخطوة */}
-          {/* المسرح في نص المساحة اللي تحت النافبار بالضبط، وحجمه على طول الشاشة */}
+          {/* المسرح في نص المساحة اللي تحت النافبار بالضبط، وحجمه على طول الشاشة وما يطلع عن عرض العمود (100cqw) */}
           {/* العمود يطول تحت القائمة بقد اللي يحتاجه المسرح عشان يبقى في النص لين آخر خطوة */}
           {/* (الـ sticky يوقف عند محتوى أبوه، فالـ padding ما ينفع؛ الهامش السالب يمدّد العمود نفسه) */}
-          <div className="hidden [--over:max(0px,calc(var(--nav-h)/2+var(--stage)/2-35vh))] [--stage:min(34rem,calc(100svh-var(--nav-h)-5rem))] [margin-bottom:calc(-1*var(--over))] lg:block">
+          <div className="@container hidden [--over:max(0px,calc(var(--nav-h)/2+var(--stage)/2-35vh))] [--stage:min(34rem,calc(100svh-var(--nav-h)-5rem),100cqw)] [margin-bottom:calc(-1*var(--over))] lg:block">
             <div className="sticky top-[calc(var(--nav-h)+(100svh-var(--nav-h)-var(--stage))/2)]">
               <div className="relative mx-auto w-(--stage)">
                 {STEPS.map(({ title, Visual }, i) => (

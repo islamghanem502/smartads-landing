@@ -5,16 +5,16 @@ import { Ink } from "../Ink";
 import { Container } from "../layout";
 import { StoreChips } from "../StoreChips";
 import { Mascot } from "./Mascot";
-import { ServiceTree } from "./ServiceTree";
+import { Team } from "./Team";
 
 /*
  * الهيرو يملا الشاشة (لين 56rem في الشاشات الطويلة، وبعدها يبان أول القسم اللي بعده)، والمحتوى في نص المساحة اللي تحت النافبار:
  * المسافة فوقه نفس اللي تحته، على أي ارتفاع.
  *
  * التخطيط حسب العرض الفعلي (يعني بعد الزوم):
- *   الجوال: الكلام، بعده الشخصية، بعدها الشجرة.
- *   من 640: تحت الكلام الشجرة يمين والشخصية يسار تقدّمها.
- *   من 1024: الكلام يمين بعرضه، والشجرة مع الشخصية في نص اللي باقي.
+ *   الجوال: الكلام، بعده الشخصية، بعدها كرت الفريق.
+ *   من 640: تحت الكلام كرت الفريق يمين والشخصية يسار تأشّر عليه.
+ *   من 1024: الكلام يمين بعرضه، والفريق مع الشخصية في نص اللي باقي.
  * السطر الثاني مقسوم سطرين عن قصد: يخلّي عمود الكلام ضيق، فتلقى الشخصية مكان حتى على 1024.
  */
 export function Hero() {
@@ -25,7 +25,8 @@ export function Hero() {
     gsap.timeline({ defaults: { ease: "power3.out" } })
       .fromTo("[data-a=line]", { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.12 }, 0.1)
       .fromTo("[data-a=fade]", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, 0.4)
-      .fromTo("[data-a=tree]", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.45)
+      .fromTo("[data-a=team]", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.45)
+      .fromTo("[data-a=team] [data-row]", { x: 14, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.09 }, 0.75)
       .fromTo("[data-a=mascot]", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "back.out(1.4)" }, 0.75)
       .fromTo("[data-a=hello]", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
   }, { scope: ref });
@@ -66,7 +67,7 @@ export function Hero() {
         </div>
 
         <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:justify-between lg:justify-end lg:gap-4">
-          <ServiceTree />
+          <Team />
           <Mascot className="w-[min(15rem,62vw)] self-center max-sm:order-first sm:w-[min(20rem,38vw)] lg:w-[min(24rem,26vw,62vh)]" />
         </div>
       </Container>
