@@ -11,16 +11,25 @@
   --color-chip: #f2f3f6;
   --font-sans: "Rubik Variable", system-ui, sans-serif;
   --ease-lift: cubic-bezier(0.32, 0.72, 0, 1);
+  --container-page: 80rem;
 }
 
+/* قواعد التخطيط، شرحها في components/layout.tsx */
 :root {
+  --gutter: clamp(1rem, 4vw, 2rem);
+  --section-y: clamp(4rem, 9vw, 8rem);
+  --nav-h: 4.5rem;
   --gradient: linear-gradient(100deg, #7c5cff, #d946ef 45%, #ff6b6b 78%, #ffa94d);
   color-scheme: dark;
 }
 
 html {
+  /* فوق 1536 كل شي يكبر مع العرض بنفس النسبة (لين 20px)، فالشاشات الكبيرة ما تبان فاضية. تحتها 16px */
+  font-size: clamp(100%, 0.52vw + 0.5rem, 125%);
   -webkit-text-size-adjust: 100%;
   background: var(--color-night);
+  /* الروابط اللي تنزل لقسم (#services مثلاً) توقف تحت النافبار مو وراه */
+  scroll-padding-top: var(--nav-h);
 }
 
 body {
@@ -90,7 +99,7 @@ body {
   background-size: 100% 100%, 100% 100%;
 }
 
-/* مقاسات الشجرة. في شاشات اللابتوب القصيرة (وأي زوم فوق 100٪) تتلمّ عشان تبان كاملة بدون نزول */
+/* مقاسات الشجرة. من 1024 تمشي على طول الشاشة: تتلمّ في اللابتوب القصير (وأي زوم فوق 100٪)، وتكبر في الشاشات الطويلة */
 .tree {
   --leaf: 2.75rem;
   --branch-gap: 1.5rem;
@@ -103,9 +112,9 @@ body {
   }
 }
 
-@media (min-width: 1024px) and (max-height: 760px) {
+@media (min-width: 1024px) {
   .tree {
-    --leaf: 2.625rem;
-    --branch-gap: 1.1rem;
+    --leaf: clamp(2.625rem, 6.2vh, 3.25rem);
+    --branch-gap: clamp(1.1rem, 3vh, 2.25rem);
   }
 }
