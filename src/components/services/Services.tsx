@@ -5,8 +5,8 @@ import { Container } from "../layout";
 import { BudgetScene, ReportsScene, SeoScene, SocialScene } from "./scenes";
 
 /*
- * كل خدمة: العنوان ووصف بسطر، وتحتهم كرت غامق قصير. الواجهة والشخصية بحجمهم الكامل فوق الكرت،
- * فيطلعون من حافته العليا على الخلفية الفاتحة، والشخصية مقصوصة عند الخصر على حافته السفلى.
+ * كل خدمة: العنوان ووصف بسطر، وتحتهم كرت غامق. الواجهة داخل الكرت بس جزءها العلوي طالع فوق حافته،
+ * والشخصية مقصوصة عند الخصر على حافته السفلى.
  * الكلمة المهمة في الوصف عليها قلم تظليل بلون الخدمة (.hl)، ونفس اللون يتوهّج خفيف داخل الكرت.
  */
 type Service = {
@@ -88,12 +88,12 @@ export function Services() {
           <li key={title} data-card className="group w-[72vw] max-w-[20rem] shrink-0 snap-center sm:w-[44vw] lg:w-auto lg:max-w-none" style={{ "--hl": hl } as CSSProperties}>
             <h3 className="text-[1.125rem] font-bold">{title}</h3>
             <p className="mt-1 text-[0.9375rem] text-ink-soft">{text}</p>
-            {/* المسرح بحجم الرسمة كاملة، والكرت الغامق نصّه السفلي بس. كل واجهة قاعدة على حافة الكرت العليا مهما كان طولها */}
-            <div className="relative mt-5 aspect-[6/7]">
-              <div className="absolute inset-x-0 bottom-0 h-[52%] overflow-hidden rounded-[24px] bg-night shadow-[0_22px_44px_-26px_rgb(17_19_24/0.6)]">
+            {/* الكرت يبدأ تحت أول المسرح بشوي (2.25rem)، فالواجهة كلها داخله إلا جزءها العلوي يطلع فوق حافته */}
+            <div className="relative mt-5 aspect-[5/6]">
+              <div className="absolute inset-x-0 bottom-0 top-9 overflow-hidden rounded-[24px] bg-night shadow-[0_22px_44px_-26px_rgb(17_19_24/0.6)]">
                 <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(80% 90% at 50% 100%, ${glow}, transparent)` }} />
               </div>
-              <div className="absolute inset-x-0 bottom-[51%] transition-transform duration-500 ease-lift group-hover:-translate-y-1">
+              <div className="relative transition-transform duration-500 ease-lift group-hover:-translate-y-1">
                 <Scene accent={accent} />
               </div>
               {/* الشخصية تطلّ أكثر لما تمرّ على الكرت */}
