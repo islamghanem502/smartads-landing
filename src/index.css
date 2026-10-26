@@ -9,6 +9,11 @@
   --color-fog: #a3a8b4; /* روابط النافبار */
   --color-mist: #cfd3db; /* الكلام الثانوي */
   --color-chip: #f2f3f6;
+  /* الأقسام البيضاء: الكلام الثانوي، ولون كل كرت خدمة (درجة فاتحة من نفس التدرّج) */
+  --color-ink-soft: #5c6170;
+  --color-violet-tint: #efeaff;
+  --color-pink-tint: #fce7fb;
+  --color-amber-tint: #fff0e0;
   --font-sans: "Rubik Variable", system-ui, sans-serif;
   --ease-lift: cubic-bezier(0.32, 0.72, 0, 1);
   --container-page: 80rem;
