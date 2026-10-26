@@ -7,8 +7,8 @@ import { Facebook, Google, Instagram, Meta, Snapchat, TikTok } from "../logos";
  * (الكروت تمشي ورا بعض) وتعيد لما تمرّ عليه. الـ HTML مرسوم على آخر القصة، فبدون جافاسكربت
  * أو مع «تقليل الحركة» يبان كامل. المشاهد للزينة (aria-hidden) لأن عنوان الكرت ووصفه يشرحون الخدمة.
  *
- * كل مشهد على «توهّج» (Glow): لون الخدمة خفيف من فوق، ويختفي تدريجياً لين يدخل ورا الشخصية، بدون إطار.
- * الأشياء اللي لازم تركب على الشخصية نفسها (الرينق لايت، كلمة العدسة) مكانها absolute بالنسبة للكرت كله،
+ * كل مشهد لوحة تبدأ تحت الكلام وتمتد لين راس الشخصية، ونصّها السفلي يختفي تدريجياً (fade): الرسمة ما تكتمل،
+ * فتترك مساحة وتبان كأنها تكمّل ورا الشخصية. الأشياء اللي لازم تركب على الشخصية نفسها (الرينق لايت، كلمة العدسة) مكانها absolute بالنسبة للكرت كله،
  * بنفس مقاسات صورة الشخصية (ART). الأرقام أمثلة توضيحية.
  */
 export type SceneProps = { play: number; hover: boolean };
@@ -36,13 +36,10 @@ function useStory(play: number, build: (q: Q) => gsap.core.Timeline) {
   return ref;
 }
 
-/** اللوحة بدون إطار: لون خفيف من فوق يختفي لتحت، وتمتد ورا الشخصية (الهامش السالب يدخلها تحت راسها) */
-function Glow({ tint, children }: { tint: string; children: ReactNode }) {
+/** اللوحة: نفس الإطار الغامق، بس نصّها السفلي يختفي، وتمتد ورا راس الشخصية (الهامش السالب) */
+function Panel({ className = "", children }: { className?: string; children: ReactNode }) {
   return (
-    <div
-      className="-mb-[30%] flex-1 rounded-t-[22px] px-4 pt-4 text-white [mask-image:linear-gradient(to_bottom,#000_55%,transparent_96%)]"
-      style={{ background: `linear-gradient(180deg, ${tint}, transparent 88%)` }}
-    >
+    <div className={`-mb-[24%] w-[86%] flex-1 rounded-2xl bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 [mask-image:linear-gradient(to_bottom,#000_50%,transparent_97%)] ${className}`}>
       {children}
     </div>
   );
@@ -75,23 +72,24 @@ export function BudgetScene({ play }: SceneProps) {
 
   return (
     <div ref={ref} aria-hidden className="contents">
-      <Glow tint="rgb(124 92 255 / 0.3)">
-        <p className="text-[0.6875rem] text-white/60">ميزانيتك رايحة لـ</p>
-        <p className="mt-1 flex items-center gap-1.5 text-[1.25rem] font-bold leading-none">
+      <Panel className="px-4">
+        <p className="text-[0.6875rem] text-white/55">ميزانيتك رايحة لـ</p>
+        <p className="mt-1 flex items-center gap-1.5 text-[1.125rem] font-bold leading-none">
           <Snapchat className="size-5 rounded-[5px]" />
           سناب <span className="tabular-nums"><span data-share>{TOP}</span>٪</span>
         </p>
-        <ul className="mt-3.5 grid grid-cols-4 items-end gap-3">
+        {/* كل منصة: شعارها فوق، وعمودها تحته يكبر ويصغر، وأسفل الأعمدة يختفي مع اللوحة */}
+        <ul className="mt-3 grid grid-cols-4 gap-2.5">
           {SPLIT.map(({ L, to }, i) => (
             <li key={i} className="flex flex-col items-center gap-1.5">
-              <span className="flex h-10 w-full items-end">
-                <span data-bar={i} className="w-full rounded-md" style={{ height: `${(to / TOP) * 100}%`, background: i === 0 ? VIOLET : IDLE }} />
-              </span>
               <span className={`${tile} size-5`}><L className="size-3.5" /></span>
+              <span className="flex h-16 w-full items-end">
+                <span data-bar={i} className="w-full rounded-t-md" style={{ height: `${(to / TOP) * 100}%`, background: i === 0 ? VIOLET : IDLE }} />
+              </span>
             </li>
           ))}
         </ul>
-      </Glow>
+      </Panel>
     </div>
   );
 }
@@ -150,21 +148,34 @@ export function StudioScene({ play, hover }: SceneProps) {
 
   return (
     <div ref={ref} aria-hidden className="contents">
-      <Glow tint="rgb(232 90 166 / 0.26)">
-        {/* المنشور الجاهز: وين ينزل، ومتى */}
-        <div data-post className="flex items-center justify-between gap-2">
-          <span className="flex gap-1">
-            {[Instagram, TikTok, Facebook].map((L, i) => <span key={i} className={`${tile} size-6`}><L className="size-4" /></span>)}
-          </span>
-          <span className="flex items-center gap-1 text-[0.6875rem] font-semibold">
-            <svg viewBox="0 0 16 16" className="size-3 text-[#f9a8d4]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-              <rect x="2" y="3" width="12" height="11" rx="2.5" />
-              <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
-            </svg>
-            مجدول · الخميس 8 م
-          </span>
+      <Panel>
+        <div data-post>
+          <div className="flex items-center justify-between gap-2">
+            <span className="flex gap-1">
+              {[Instagram, TikTok, Facebook].map((L, i) => <span key={i} className={`${tile} size-6`}><L className="size-4" /></span>)}
+            </span>
+            <span className="flex items-center gap-1 text-[0.6875rem] font-semibold">
+              <svg viewBox="0 0 16 16" className="size-3 text-[#f9a8d4]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <rect x="2" y="3" width="12" height="11" rx="2.5" />
+                <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
+              </svg>
+              مجدول · الخميس 8 م
+            </span>
+          </div>
+          {/* المنشورات: صورتين وفيديو، وتكمّل لتحت وتختفي */}
+          <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+            {[0, 1].map((k) => (
+              <span key={k} className="relative aspect-[3/4] rounded-lg bg-white/[0.08]">
+                <span className="absolute left-[22%] top-[22%] size-[18%] rounded-full bg-white/20" />
+                <svg viewBox="0 0 40 20" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[42%] w-full rounded-b-lg"><path d="M0 20 13 7l9 8 6-5 12 10z" fill="rgb(255 255 255 / 0.18)" /></svg>
+              </span>
+            ))}
+            <span className="grid aspect-[3/4] place-items-center rounded-lg bg-[#e85aa6]">
+              <span className="ml-0.5 border-y-[6px] border-l-[9px] border-y-transparent border-l-white" />
+            </span>
+          </div>
         </div>
-      </Glow>
+      </Panel>
 
       {/* الضوء من الرينق لوجه الشخصية */}
       <div data-beam className="pointer-events-none absolute inset-0 bg-[radial-gradient(48%_22%_at_34%_69%,rgb(255_240_220/0.13),transparent)]" />
@@ -219,26 +230,32 @@ export function SearchScene({ play }: SceneProps) {
   const word = "absolute top-[-0.66em] whitespace-nowrap font-black leading-[1.2] text-white";
   return (
     <div ref={ref} aria-hidden className="contents">
-      <Glow tint="rgb(255 169 77 / 0.24)">
-        <div className="flex h-7 items-center gap-2 rounded-full bg-white/10 px-3">
+      <Panel>
+        <div className="flex h-7 items-center gap-2 rounded-full bg-white/[0.07] px-3">
           <Google className="size-4 shrink-0" />
           <span className="text-[0.75rem]">
             <span data-query>{QUERY}</span>
             <span className="ms-px inline-block h-3 w-px animate-pulse bg-white/70 align-middle" />
           </span>
         </div>
-        {/* أول نتيجة: منتجك */}
-        <div data-result className="mt-3 flex items-center gap-2.5 px-1">
-          <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#ffa94d] text-[0.6875rem] font-bold text-[#3b2200]">1</span>
-          <span className="min-w-0">
-            <span className="block truncate text-[0.75rem] font-semibold">عباية سوداء كلوش</span>
-            <span className="flex items-center gap-1 text-[0.625rem] text-white/60">
-              <span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((s) => <span key={s} data-star>★</span>)}</span>
-              189 ر.س
+        {/* أول نتيجة منتجك، والنتيجة الثانية تختفي مع اللوحة */}
+        <div data-result className="mt-2 grid gap-1.5">
+          <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.05] p-2">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#ffa94d] text-[0.6875rem] font-bold text-[#3b2200]">1</span>
+            <span className="min-w-0">
+              <span className="block truncate text-[0.75rem] font-semibold">عباية سوداء كلوش</span>
+              <span className="flex items-center gap-1 text-[0.625rem] text-white/60">
+                <span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((s) => <span key={s} data-star>★</span>)}</span>
+                189 ر.س
+              </span>
             </span>
-          </span>
+          </div>
+          <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] p-2 text-white/55">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white/10 text-[0.6875rem] font-bold">2</span>
+            <span className="text-[0.75rem]">عباية كريب سادة</span>
+          </div>
         </div>
-      </Glow>
+      </Panel>
 
       {/* نفس صندوق صورة الشخصية */}
       <div className="absolute bottom-0 -translate-x-1/2" style={{ left: SEO_AT, width: ART.width, aspectRatio: ART.ratio }}>
@@ -267,30 +284,34 @@ export function SearchScene({ play }: SceneProps) {
 export function ChatScene({ play }: SceneProps) {
   const ref = useStory(play, (q) =>
     gsap.timeline()
-      .fromTo(q("[data-msg]"), { opacity: 0, y: 10, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.9, ease: "back.out(1.6)" }, 0.15)
+      .fromTo(q("[data-msg]"), { opacity: 0, y: 10, scale: 0.96 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.8, ease: "back.out(1.6)" }, 0.15)
   );
 
-  const bubble = "rounded-2xl px-3";
+  const bubble = "rounded-2xl px-3 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]";
   return (
     <div ref={ref} aria-hidden className="contents">
-      <Glow tint="rgb(59 143 230 / 0.26)">
-        <div className="grid gap-1.5">
-          <div data-msg className={`${bubble} rounded-ss-md bg-[#202c33] py-2`}>
-            <p className="text-[0.6875rem] font-semibold text-[#53bdeb]">مسوّقك الذكي</p>
-            <p className="mt-0.5 text-[0.8125rem] font-semibold">تقرير الأسبوع</p>
-            <p className="flex items-end justify-between gap-2 whitespace-nowrap text-[0.75rem] text-white/80">
-              الطلبات 42 · المبيعات +18٪
-              <span className="shrink-0 text-[0.5625rem] text-white/45">9:00 ص</span>
-            </p>
-          </div>
-          <div data-msg className={`${bubble} ms-7 rounded-se-md bg-[#005c4b] py-1.5`}>
-            <p className="flex items-end justify-between gap-2 text-[0.75rem]">
-              تمام، زيدوا ميزانية سناب
-              <span className="shrink-0 text-[0.5625rem] text-white/55">9:04 ص</span>
-            </p>
-          </div>
+      <div className="-mb-[24%] grid w-[86%] flex-1 content-start gap-1.5 text-white [mask-image:linear-gradient(to_bottom,#000_55%,transparent_97%)]">
+        <div data-msg className={`${bubble} me-3 rounded-ss-md bg-[#202c33] py-2`}>
+          <p className="text-[0.6875rem] font-semibold text-[#53bdeb]">مسوّقك الذكي</p>
+          <p className="mt-0.5 text-[0.8125rem] font-semibold">تقرير الأسبوع</p>
+          <p className="flex items-end justify-between gap-2 whitespace-nowrap text-[0.75rem] text-white/80">
+            الطلبات 42 · المبيعات +18٪
+            <span className="shrink-0 text-[0.5625rem] text-white/45">9:00 ص</span>
+          </p>
         </div>
-      </Glow>
+        <div data-msg className={`${bubble} ms-7 rounded-se-md bg-[#005c4b] py-1.5`}>
+          <p className="flex items-end justify-between gap-2 text-[0.75rem]">
+            تمام، زيدوا ميزانية سناب
+            <span className="shrink-0 text-[0.5625rem] text-white/55">9:04 ص</span>
+          </p>
+        </div>
+        <div data-msg className={`${bubble} me-10 rounded-ss-md bg-[#202c33] py-1.5`}>
+          <p className="flex items-end justify-between gap-2 text-[0.75rem]">
+            تم، زدناها 20٪
+            <span className="shrink-0 text-[0.5625rem] text-white/45">9:05 ص</span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

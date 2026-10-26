@@ -135,8 +135,8 @@ function ServiceCard({ title, text, hl, Scene, art, artAt = "50%", index, play, 
           <h3 className="text-[1.125rem] font-bold text-white">{title}</h3>
           <p className="mt-1 text-[0.875rem] leading-[1.7] text-mist">{text}</p>
         </div>
-        {/* منطقة المشهد: من تحت الكلام، ولوحتها تمتد ورا راس الشخصية وتختفي. نفسها في الأربعة */}
-        <div className="flex min-h-0 flex-1 flex-col px-[7%] pt-3">
+        {/* منطقة المشهد: من تحت الكلام، ولوحتها تمتد لين راس الشخصية ونصّها السفلي يختفي. نفسها في الأربعة */}
+        <div className="flex min-h-0 flex-1 flex-col items-center pt-3">
           <Scene play={play} hover={hover} />
         </div>
         <div aria-hidden className="h-[42%] shrink-0" />
