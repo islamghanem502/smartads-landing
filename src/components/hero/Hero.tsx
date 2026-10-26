@@ -88,7 +88,7 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:justify-between lg:justify-center lg:gap-4">
+        <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:justify-between lg:justify-end lg:gap-4">
           <ServiceTree />
           <Mascot className="w-[min(15rem,62vw)] self-center max-sm:order-first sm:w-[min(20rem,38vw)] lg:w-[min(24rem,26vw,62vh)]" />
         </div>
