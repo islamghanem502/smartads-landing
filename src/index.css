@@ -175,6 +175,7 @@ body {
   margin-inline: -0.06em;
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
-  color: var(--color-night);
+  /* على الكروت الغامقة: --hl-ink أبيض و--hl لون شفاف */
+  color: var(--hl-ink, var(--color-night));
   font-weight: 600;
 }
