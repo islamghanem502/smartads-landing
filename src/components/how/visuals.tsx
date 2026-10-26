@@ -127,42 +127,56 @@ export function ChooseVisual({ play }: VisualProps) {
   );
 }
 
-/* ─── 3. إعلانين يتنافسون، والميزانية تروح للي يبيع ─── */
+/* ─── 3. ثلاث إعلانات، وميزانيتك تنتقل للي يبيع (وطلباته تعدّ) ─── */
+
+const ADS3 = [
+  { from: 33, to: 14, bg: "linear-gradient(160deg,#3b4256,#232733)" },
+  { from: 34, to: 72, bg: "linear-gradient(160deg,#f9a8d4,#8b6cff)" },
+  { from: 33, to: 14, bg: "linear-gradient(160deg,#3b4256,#232733)" },
+];
+const WIN = 1;
+const ORDERS = 12;
 
 export function TestVisual({ play }: VisualProps) {
-  const ref = useStory(play, (q) =>
-    gsap.timeline()
-      .fromTo(q("[data-fill]"), { scaleX: 0 }, { scaleX: 0.45, duration: 0.8, ease: "power2.out" }, 0.2)
-      .to(q('[data-fill="b"]'), { scaleX: 1, duration: 0.9, ease: "power3.inOut" }, 1.1)
-      .fromTo(q('[data-ad="b"]'), { scale: 1 }, { scale: 1.06, duration: 0.5, ease: "back.out(2)" }, 1.6)
-      .fromTo(q('[data-ad="a"]'), { opacity: 1 }, { opacity: 0.35, duration: 0.5 }, 1.6)
-      .fromTo(q("[data-win]"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, ease: "back.out(2.5)" }, 1.9)
-  );
-
-  const ad = (id: "a" | "b", from: string, to: string) => (
-    <div data-ad={id} className={`relative flex w-[34cqw] flex-col gap-[3cqw] ${id === "a" ? "opacity-35" : "scale-[1.06]"}`}>
-      <div className="relative aspect-[4/5] overflow-hidden rounded-[18%] ring-1 ring-white/10" style={{ background: `linear-gradient(160deg, ${from}, ${to})` }}>
-        {/* منتج بسيط في نص الإعلان */}
-        <span className="absolute left-1/2 top-[30%] h-[9%] w-[16%] -translate-x-1/2 rounded-t-md bg-white/70" />
-        <span className="absolute left-1/2 top-[39%] h-[30%] w-[38%] -translate-x-1/2 rounded-[22%] bg-white/85" />
-      </div>
-      <div className="relative h-[3.5cqw] overflow-hidden rounded-full bg-white/10">
-        <span data-fill={id} className="absolute inset-0 origin-right rounded-full" style={{ background: id === "b" ? GREEN : "rgb(255 255 255 / 0.4)", transform: `scaleX(${id === "b" ? 1 : 0.45})` }} />
-      </div>
-      {id === "b" && (
-        <span data-win className="absolute -right-[3cqw] -top-[3cqw] grid size-[10cqw] place-items-center rounded-full text-white shadow-[0_6px_20px_-6px_rgb(34_197_94/0.8)]" style={{ background: GREEN }}>
-          <svg viewBox="0 0 24 24" className="size-[55%]" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 16l5-5 4 4 7-7M14 8h6v6" />
-          </svg>
-        </span>
-      )}
-    </div>
-  );
+  const ref = useStory(play, (q) => {
+    const tl = gsap.timeline({ defaults: { ease: "power3.inOut" } });
+    ADS3.forEach(({ from, to }, i) => {
+      tl.fromTo(q(`[data-seg="${i}"]`), { width: `${from}%` }, { width: `${to}%`, duration: 1.2 }, 0.6);
+    });
+    return tl
+      .fromTo(q("[data-ad]"), { opacity: 1, scale: 1 }, { opacity: (i) => (i === WIN ? 1 : 0.35), scale: (i) => (i === WIN ? 1.06 : 1), duration: 0.6 }, 0.9)
+      .fromTo(q("[data-orders]"), { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.3, ease: "back.out(2)" }, 1.4)
+      .fromTo(q("[data-count]"), { innerText: 0 }, { innerText: ORDERS, snap: { innerText: 1 }, duration: 1, ease: "power1.out" }, 1.45);
+  });
 
   return (
-    <div ref={ref} aria-hidden className="flex items-center justify-center gap-[7cqw]">
-      {ad("a", "#3b4256", "#232733")}
-      {ad("b", "#f9a8d4", "#8b6cff")}
+    <div ref={ref} aria-hidden className="flex w-[80%] flex-col gap-[6cqw]">
+      {/* ميزانيتك: شريط واحد مقسوم على الإعلانات */}
+      <div>
+        <p className="mb-[2.5cqw] text-[4cqw] font-semibold text-white/70">ميزانيتك</p>
+        <div className="flex h-[5cqw] gap-[1cqw] overflow-hidden rounded-full">
+          {ADS3.map(({ to, bg }, i) => (
+            <span key={i} data-seg={i} className="h-full rounded-full" style={{ width: `${to}%`, background: i === WIN ? bg : "rgb(255 255 255 / 0.18)" }} />
+          ))}
+        </div>
+      </div>
+      {/* الإعلانات الثلاثة، واللي يبيع يكبر وطلباته تعدّ */}
+      <div className="grid grid-cols-3 gap-[4cqw]">
+        {ADS3.map(({ bg }, i) => (
+          <div key={i} data-ad className={`relative aspect-[4/5] rounded-[16%] ring-1 ring-white/10 ${i === WIN ? "scale-[1.06]" : "opacity-35"}`} style={{ background: bg }}>
+            <span className="absolute left-1/2 top-[28%] h-[10%] w-[18%] -translate-x-1/2 rounded-t-md bg-white/70" />
+            <span className="absolute left-1/2 top-[38%] h-[32%] w-[42%] -translate-x-1/2 rounded-[22%] bg-white/85" />
+            {i === WIN && (
+              <span data-orders className="absolute -bottom-[4cqw] left-1/2 flex -translate-x-1/2 items-center gap-[1.5cqw] whitespace-nowrap rounded-full bg-white px-[3cqw] py-[1.3cqw] text-[3.8cqw] font-bold text-night shadow-[0_10px_24px_-10px_rgb(0_0_0/0.8)]">
+                <svg viewBox="0 0 24 24" className="size-[4cqw]" fill="none" stroke={GREEN} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 8h12l-1 12H7zM9 8a3 3 0 0 1 6 0" />
+                </svg>
+                <span className="tabular-nums" data-count>{ORDERS}</span> طلب
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -231,17 +245,33 @@ const POSTS_GRID = [
   "linear-gradient(160deg,#ffd3e8,#8b6cff)",
 ];
 
+const FOLLOWERS = 12480;
+
 export function GrowVisual({ play }: VisualProps) {
-  const ref = useStory(play, (q) =>
-    gsap.timeline()
+  const ref = useStory(play, (q) => {
+    const count = q("[data-followers]")[0];
+    const n = { v: 0 };
+    return gsap.timeline()
       .fromTo(q("[data-post]"), { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.35, stagger: 0.12, ease: "back.out(1.8)" }, 0.15)
-      .fromTo(q("[data-sale]"), { opacity: 0, y: 10, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(2)" }, 1.5)
-  );
+      .fromTo(n, { v: 3200 }, { v: FOLLOWERS, duration: 1.6, ease: "power2.out", onUpdate: () => { count.textContent = Math.round(n.v).toLocaleString("en-US"); } }, 0.2)
+      .fromTo(q("[data-sale]"), { opacity: 0, y: 10, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.45, ease: "back.out(2)" }, 1.6);
+  });
 
   return (
-    <div ref={ref} aria-hidden className="relative w-[64%]">
+    <div ref={ref} aria-hidden className="relative flex w-[66%] flex-col gap-[5cqw]">
+      {/* حسابك: الصورة وعدد المتابعين يزيد */}
+      <div className="flex items-center gap-[3.5cqw]">
+        <span className="size-[13cqw] shrink-0 rounded-full p-[0.8cqw]" style={{ background: "linear-gradient(135deg,#ffa94d,#e85aa6,#8b6cff)" }}>
+          <span className="block size-full rounded-full border-[0.8cqw] border-night-2 bg-[linear-gradient(160deg,#ffd3e8,#e85aa6)]" />
+        </span>
+        <span>
+          <span className="block text-[6.5cqw] font-bold leading-none tabular-nums" data-followers>{FOLLOWERS.toLocaleString("en-US")}</span>
+          <span className="mt-[1cqw] block text-[3.8cqw] text-white/60">متابع</span>
+        </span>
+      </div>
+      {/* منشوراتك تنزل بانتظام */}
       <div className="grid grid-cols-3 gap-[2.2cqw]">
-        {POSTS_GRID.map((bg, i) => (
+        {POSTS_GRID.slice(0, 6).map((bg, i) => (
           <span key={i} data-post className="relative aspect-square rounded-[16%]" style={{ background: bg }}>
             {i % 3 === 0 && (
               <span className="absolute left-1/2 top-1/2 ml-[0.4cqw] -translate-x-1/2 -translate-y-1/2 border-y-[1.6cqw] border-l-[2.4cqw] border-y-transparent border-l-white/90" />

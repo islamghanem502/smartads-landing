@@ -47,7 +47,7 @@ export function How() {
         </h2>
 
         <div className="mt-12 grid gap-x-16 lg:mt-20 lg:grid-cols-2">
-          <ol ref={list} className="relative">
+          <ol ref={list} className="relative lg:self-start">
             {/* الخط اللي يتعبّى مع الخطوات: من رقم أول خطوة لين رقم آخر وحدة */}
             <span aria-hidden className="absolute bottom-14 right-4 top-14 w-px bg-white/10 lg:bottom-[10%] lg:top-[10%]">
               <span
@@ -73,9 +73,12 @@ export function How() {
           </ol>
 
           {/* في اللابتوب: الرسمة ثابتة على الشاشة وتتبدّل مع الخطوة */}
-          <div className="hidden lg:block">
-            <div className="sticky top-[calc(50vh-min(17rem,35vh))]">
-              <div className="relative mx-auto w-[min(34rem,70vh)]">
+          {/* المسرح في نص المساحة اللي تحت النافبار بالضبط، وحجمه على طول الشاشة */}
+          {/* العمود يطول تحت القائمة بقد اللي يحتاجه المسرح عشان يبقى في النص لين آخر خطوة */}
+          {/* (الـ sticky يوقف عند محتوى أبوه، فالـ padding ما ينفع؛ الهامش السالب يمدّد العمود نفسه) */}
+          <div className="hidden [--over:max(0px,calc(var(--nav-h)/2+var(--stage)/2-35vh))] [--stage:min(34rem,calc(100svh-var(--nav-h)-5rem))] [margin-bottom:calc(-1*var(--over))] lg:block">
+            <div className="sticky top-[calc(var(--nav-h)+(100svh-var(--nav-h)-var(--stage))/2)]">
+              <div className="relative mx-auto w-(--stage)">
                 {STEPS.map(({ title, Visual }, i) => (
                   <div
                     key={title}
