@@ -1,157 +1,255 @@
-/*
- * الواجهات اللي فوق الشخصية في كل كرت: شكلها شكل المنتج الحقيقي (ألوان وأرقام)، بس صغيرة وبدون زحمة.
- * الأرقام أمثلة توضيحية. كلها على كرت غامق، فألوانها ألوان الوضع الليلي.
- */
-
+import { useEffect, useRef } from "react";
+import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { Google, Meta, Snapchat, TikTok } from "../logos";
 
-/* أيقونات العناوين: مربع ملوّن ورمز بسيط */
-export function Tile({ bg, children }: { bg: string; children: React.ReactNode }) {
-  return (
-    <span className="grid size-12 place-items-center rounded-[14px] shadow-[inset_0_-3px_0_rgb(0_0_0/0.12)]" style={{ background: bg }}>
-      <svg viewBox="0 0 24 24" aria-hidden className="size-6">{children}</svg>
-    </span>
-  );
+/*
+ * المشاهد اللي ورا الشخصية في كروت الخدمات. كل مشهد واجهة من منتجنا تحكي قصة قصيرة:
+ * تشتغل أول ما يبان الكرت، وتعيد لما تمرّ عليه. الـ HTML مرسوم على آخر القصة، فبدون جافاسكربت
+ * أو مع «تقليل الحركة» يبان كامل. المشاهد للزينة (aria-hidden) لأن عنوان الكرت ووصفه يشرحون الخدمة.
+ * الأرقام أمثلة توضيحية.
+ */
+export type SceneProps = { play: number };
+
+type Q = (selector: string) => HTMLElement[];
+
+function useStory(play: number, build: (q: Q) => gsap.core.Timeline) {
+  const ref = useRef<HTMLDivElement>(null);
+  const story = useRef<gsap.core.Timeline | null>(null);
+
+  useGSAP(() => {
+    if (reduced()) return;
+    story.current = build(gsap.utils.selector(ref) as Q).pause(0);
+  }, { scope: ref });
+
+  // ما نقطع القصة لو المؤشر دخل وطلع وهي شغّالة
+  useEffect(() => {
+    const s = story.current;
+    if (play && s && !s.isActive()) s.restart();
+  }, [play]);
+
+  return ref;
 }
 
-export const Megaphone = () => (
-  <path fill="#fff" d="M3 10.2v3.6c0 .7.5 1.2 1.2 1.2H6l1.6 4.3c.2.6.8.9 1.4.7l.6-.2c.6-.2.9-.9.7-1.5L9.1 15H10l7.3 3.9c.8.4 1.7-.2 1.7-1V6.1c0-.9-.9-1.4-1.7-1L10 9H4.2C3.5 9 3 9.5 3 10.2Zm17.5-.7a3 3 0 0 1 0 5" />
-);
-export const Heart = () => (
-  <path fill="#ff4d7d" d="M12 20.3s-7.8-4.6-7.8-10.2A4.4 4.4 0 0 1 12 7.4a4.4 4.4 0 0 1 7.8 2.7c0 5.6-7.8 10.2-7.8 10.2Z" />
-);
-export const ArrowUp = () => (
-  <path fill="none" stroke="#2563eb" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" d="M7 17 17 7M9 7h8v8" />
-);
-export const Bars = () => (
-  <g fill="#fff">
-    <rect x="4" y="12" width="4" height="8" rx="1.5" />
-    <rect x="10" y="8" width="4" height="12" rx="1.5" />
-    <rect x="16" y="4" width="4" height="16" rx="1.5" />
-  </g>
-);
+const panel = "mx-auto rounded-2xl bg-[#1b1e25] text-white ring-1 ring-white/10 shadow-[0_18px_40px_-16px_rgb(0_0_0/0.7)]";
 
-/** الإعلانات: جوال فيه مبيعات الإعلانات طالعة (الشخصية رافعة يدينها تحته) */
-export function AdsScene() {
-  const bars = [30, 38, 44, 66, 90];
-  return (
-    <div className="mx-auto w-[64%] rounded-[22px] border-[3px] border-[#2b2f3a] bg-[linear-gradient(180deg,#1f3d8f,#0d1f52)] px-3.5 pb-20 pt-3.5 text-white shadow-[0_18px_40px_-16px_rgb(0_0_0/0.7)]">
-      <p className="text-[0.6875rem] text-white/70">مبيعات الإعلانات</p>
-      <p className="mt-0.5 text-[1.25rem] font-bold leading-none">9.1 ألف <span className="text-[0.75rem] font-medium text-white/70">ر.س</span></p>
-      <div className="mt-3 flex h-16 items-end gap-1.5">
-        {bars.map((h, i) => (
-          <span key={i} className={`flex-1 rounded-t-[5px] ${i === bars.length - 1 ? "bg-white" : "bg-white/25"}`} style={{ height: `${h}%` }} />
-        ))}
-      </div>
-    </div>
-  );
-}
+/* ─── الإعلانات: الميزانية تبدأ متساوية، وبعد التحسين تروح للمنصة اللي تبيع ─── */
 
-/** الحسابات: تقويم الأسبوع، وكل منشور في يومه */
-export function SocialScene() {
-  const days = [
-    { d: "الأحد", posts: [{ c: "#93c5fd", t: "منشور", h: "h-12" }] },
-    { d: "الإثنين", posts: [{ c: "#f9a8d4", t: "ريلز", h: "h-16" }] },
-    { d: "الثلاثاء", posts: [{ c: "#fdba74", t: "ستوري", h: "h-9" }, { c: "#c4b5fd", t: "منشور", h: "h-9" }] },
-    { d: "الأربعاء", posts: [{ c: "#86efac", t: "ريلز", h: "h-20" }] },
-  ];
-  return (
-    <div className="mx-auto w-[82%] rounded-[16px] bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 shadow-[0_18px_40px_-16px_rgb(0_0_0/0.7)]">
-      <p className="text-[0.75rem] font-semibold">تقويم المحتوى</p>
-      <div className="mt-2 grid grid-cols-4 items-start gap-1.5">
-        {days.map(({ d, posts }) => (
-          <div key={d} className="grid gap-1.5">
-            <span className="rounded-md bg-white/[0.07] py-0.5 text-center text-[0.5625rem] text-white/70">{d}</span>
-            {posts.map((p, i) => (
-              <span key={i} className={`rounded-[7px] p-1 ${p.h}`} style={{ background: p.c }}>
-                <span className="block w-fit rounded-[4px] bg-black/20 px-1 text-[0.5rem] font-medium text-white">{p.t}</span>
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
+const VIOLET = "#8b6cff";
+const IDLE = "rgb(255 255 255 / 0.22)";
+const SPLIT = [
+  { L: Snapchat, to: 42, move: "up" },
+  { L: TikTok, to: 28 },
+  { L: Meta, to: 20 },
+  { L: Google, to: 10, move: "down" },
+];
+const TOP = 42;
 
-/** السيو: ثلاث إشعارات فوق بعض، وآخرها إن متجرك صار الأول */
-export function SeoScene() {
-  const chip = "absolute inset-x-0 flex items-center gap-2.5 rounded-2xl bg-[#23262e] px-3 py-2 text-white ring-1 ring-white/10 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]";
-  return (
-    <div className="relative mx-auto h-[7.75rem] w-[86%]">
-      <div className={`${chip} top-0 mx-5 opacity-55`}>
-        <span className="size-5 shrink-0 rounded-full bg-[#fdba74]" />
-        <span className="truncate text-[0.75rem]">«عبايات سوداء»</span>
-      </div>
-      <div className={`${chip} top-[1.7rem] mx-2.5 opacity-80`}>
-        <span className="size-5 shrink-0 rounded-full bg-[#c4b5fd]" />
-        <span className="truncate text-[0.75rem]">مقال قيد الكتابة…</span>
-      </div>
-      <div className={`${chip} top-[3.6rem] py-2.5`}>
-        <span className="grid size-7 shrink-0 place-items-center rounded-full bg-[#ffa94d] text-[0.8125rem] font-bold text-[#3b2200]">1</span>
-        <span className="min-w-0">
-          <span className="block text-[0.8125rem] font-semibold">الأول في البحث</span>
-          <span className="block text-[0.6875rem] text-white/60">+1,240 زيارة شهرياً</span>
-        </span>
-      </div>
-    </div>
-  );
-}
+export function BudgetScene({ play }: SceneProps) {
+  const ref = useStory(play, (q) => {
+    const tl = gsap.timeline({ defaults: { duration: 1.1, ease: "power3.inOut" } });
+    SPLIT.forEach(({ to }, i) => {
+      tl.fromTo(q(`[data-bar="${i}"]`), { height: `${(25 / TOP) * 100}%` }, { height: `${(to / TOP) * 100}%` }, 0.35)
+        .fromTo(q(`[data-pct="${i}"]`), { innerText: 25 }, { innerText: to, snap: { innerText: 1 } }, 0.35);
+    });
+    return tl
+      .fromTo(q('[data-bar="0"]'), { backgroundColor: IDLE }, { backgroundColor: VIOLET, duration: 0.45 }, 0.95)
+      .fromTo(q("[data-arrow]"), { opacity: 0, y: 3 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.12, ease: "power2.out" }, 1.4);
+  });
 
-/** التقارير: رسالة واتساب فيها تقرير الأسبوع، وردّك على المستشار */
-export function ReportsScene() {
   return (
-    <div className="mx-auto grid w-[84%] gap-1.5 text-white">
-      <div className="me-5 rounded-2xl rounded-ss-md bg-[#202c33] px-3 py-2 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]">
-        <p className="text-[0.6875rem] font-semibold text-[#53bdeb]">مسوّقك الذكي</p>
-        <p className="mt-0.5 text-[0.8125rem] font-semibold">تقرير الأسبوع</p>
-        <p className="flex items-end justify-between gap-2 text-[0.75rem] text-white/80">
-          الطلبات 42 · المبيعات +18٪
-          <span className="shrink-0 text-[0.5625rem] text-white/45">9:00 ص</span>
-        </p>
-      </div>
-      <div className="ms-8 rounded-2xl rounded-se-md bg-[#005c4b] px-3 py-1.5 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]">
-        <p className="flex items-end justify-between gap-2 text-[0.75rem]">
-          تمام، زيدوا ميزانية سناب
-          <span className="shrink-0 text-[0.5625rem] text-white/55">9:04 ص</span>
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/** الإعلانات: توزيع الميزانية على المنصات، والرابحة عمودها يكبر وأضعفها ينقص (هذا التحسين كل ربع ساعة) */
-export function BudgetScene({ accent }: { accent: string }) {
-  const cols = [
-    { L: Snapchat, n: "سناب شات", v: 42, move: "up" },
-    { L: TikTok, n: "تيك توك", v: 28 },
-    { L: Meta, n: "ميتا", v: 20 },
-    { L: Google, n: "قوقل", v: 10, move: "down" },
-  ];
-  return (
-    <div className="mx-auto w-[80%] rounded-2xl bg-[#1b1e25] px-3.5 pb-3 pt-3 text-white ring-1 ring-white/10 shadow-[0_18px_40px_-16px_rgb(0_0_0/0.7)]">
+    <div ref={ref} aria-hidden className={`${panel} w-[80%] px-3.5 pb-3 pt-3`}>
       <div className="flex items-center justify-between">
         <span className="text-[0.75rem] font-semibold">توزيع الميزانية</span>
         <span className="text-[0.6875rem] text-white/45">اليوم</span>
       </div>
       <ul className="mt-2.5 grid grid-cols-4 gap-3">
-        {cols.map(({ L, n, v, move }) => (
-          <li key={n} className="flex flex-col items-center gap-1">
+        {SPLIT.map(({ L, to, move }, i) => (
+          <li key={i} className="flex flex-col items-center gap-1">
             <span className="flex items-center gap-0.5 text-[0.625rem] tabular-nums text-white/70">
               {move && (
-                <svg viewBox="0 0 10 10" aria-hidden className={`size-2 ${move === "up" ? "text-[#4ade80]" : "rotate-180 text-[#f87171]"}`}>
+                <svg data-arrow viewBox="0 0 10 10" className={`size-2 ${move === "up" ? "text-[#4ade80]" : "rotate-180 text-[#f87171]"}`}>
                   <path d="M5 2 9 7H1z" fill="currentColor" />
                 </svg>
               )}
-              {v}٪
+              <span data-pct={i}>{to}</span>٪
             </span>
             <span className="flex h-10 w-full items-end">
-              <span className="w-full rounded-t-md" style={{ height: `${(v / 42) * 100}%`, background: move === "up" ? accent : "rgb(255 255 255 / 0.22)" }} />
+              <span data-bar={i} className="w-full rounded-t-md" style={{ height: `${(to / TOP) * 100}%`, background: i === 0 ? VIOLET : IDLE }} />
             </span>
             <span className="mt-1 grid size-6 place-items-center rounded-md bg-white"><L className="size-4" /></span>
           </li>
         ))}
       </ul>
+    </div>
+  );
+}
+
+/* ─── المحتوى: الرينق لايت يولّع، الكاميرا تسجّل، وبعدها المقطع ينجدول ─── */
+
+export function StudioScene({ play }: SceneProps) {
+  const ref = useStory(play, (q) => {
+    const clock = q("[data-clock]")[0];
+    const t = { s: 0 };
+    return gsap.timeline()
+      // يولّع برمشة، مثل الحقيقي
+      .fromTo(q("[data-ring]"), { opacity: 0.12 }, { keyframes: [{ opacity: 0.75, duration: 0.07 }, { opacity: 0.3, duration: 0.1 }, { opacity: 1, duration: 0.35 }] }, 0.2)
+      .fromTo(q("[data-spill]"), { opacity: 0 }, { opacity: 1, duration: 0.6 }, 0.35)
+      // إطار الكاميرا يقفل على الشخصية
+      .fromTo(q("[data-corner]"), { scale: 1.15, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "power3.out" }, 0.6)
+      .fromTo(q("[data-rec]"), { opacity: 0, y: -4 }, { opacity: 1, y: 0, duration: 0.3 }, 0.85)
+      .fromTo(t, { s: 0 }, { s: 12, duration: 1.6, ease: "none", onUpdate: () => { clock.textContent = `00:${String(Math.round(t.s)).padStart(2, "0")}`; } }, 0.9)
+      // خلص التصوير: التسجيل يصير موعد نشر
+      .to(q("[data-rec]"), { opacity: 0, y: -4, duration: 0.25 }, 2.7)
+      .fromTo(q("[data-sched]"), { opacity: 0, y: 4 }, { opacity: 1, y: 0, duration: 0.35, ease: "back.out(2)" }, 2.85);
+  });
+
+  const corner = "absolute size-4 border-white/80";
+  return (
+    <div ref={ref} aria-hidden className="absolute inset-0">
+      {/* الرينق ورا راس الشخصية، وضوءه على الخلفية */}
+      <div data-spill className="absolute left-1/2 top-[71%] aspect-square w-[86%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgb(255_240_220/0.14),transparent)]" />
+      <div
+        data-ring
+        className="absolute left-1/2 top-[71%] aspect-square w-[56%] -translate-x-1/2 -translate-y-1/2 rounded-full border-[0.6rem] border-[#fff5e8] shadow-[0_0_24px_3px_rgb(255_236_210/0.5),inset_0_0_14px_rgb(255_236_210/0.4)]"
+      />
+      {/* إطار الكاميرا حول الشخصية */}
+      <div className="absolute inset-x-[9%] bottom-[5%] top-[31%]">
+        <span data-corner className={`${corner} right-0 top-0 rounded-tr-lg border-r-2 border-t-2`} />
+        <span data-corner className={`${corner} left-0 top-0 rounded-tl-lg border-l-2 border-t-2`} />
+        <span data-corner className={`${corner} bottom-0 right-0 rounded-br-lg border-b-2 border-r-2`} />
+        <span data-corner className={`${corner} bottom-0 left-0 rounded-bl-lg border-b-2 border-l-2`} />
+        <div className="absolute inset-x-0 -top-3.5 flex justify-center">
+          <span data-rec className="absolute flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 text-[0.6875rem] font-medium text-white opacity-0 backdrop-blur-sm">
+            <span className="size-1.5 animate-pulse rounded-full bg-[#ef4444]" />
+            تسجيل <span data-clock dir="ltr" className="tabular-nums">00:12</span>
+          </span>
+          <span data-sched className="flex items-center gap-1.5 rounded-full bg-white px-2.5 py-1 text-[0.6875rem] font-semibold text-night">
+            <svg viewBox="0 0 16 16" className="size-3.5 text-[#e85aa6]" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round">
+              <rect x="2" y="3" width="12" height="11" rx="2.5" />
+              <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
+            </svg>
+            مجدول · الخميس 8 م
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── السيو: نكتب البحث، ومتجرك يطلع من تحت لين يصير الأول ─── */
+
+const AMBER = "#ffa94d";
+const QUERY = "عباية سوداء";
+
+export function SearchScene({ play }: SceneProps) {
+  const ref = useStory(play, (q) => {
+    const typed = q("[data-query]")[0];
+    const [ours, ...others] = q("[data-row]");
+    const gap = parseFloat(getComputedStyle(ours.parentElement!).rowGap) || 0;
+    const below = others.reduce((h, r) => h + r.offsetHeight + gap, 0);
+    const n = { i: 0 };
+    return gsap.timeline()
+      .fromTo(n, { i: 0 }, { i: QUERY.length, duration: 0.8, ease: "none", onUpdate: () => { typed.textContent = QUERY.slice(0, Math.round(n.i)); } }, 0.2)
+      .fromTo(q("[data-row]"), { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.06 }, 1.05)
+      // متجرك يبدأ آخر واحد، ويطلع فوقهم
+      .fromTo(ours, { y: below }, { y: 0, duration: 0.9, ease: "power3.inOut" }, 1.5)
+      .fromTo(others, { y: -(ours.offsetHeight + gap) }, { y: 0, duration: 0.9, ease: "power3.inOut" }, 1.5)
+      .fromTo(ours, { borderColor: "rgb(255 255 255 / 0.06)", backgroundColor: "rgb(255 255 255 / 0)" }, { borderColor: "rgb(255 169 77 / 0.6)", backgroundColor: "rgb(255 169 77 / 0.1)", duration: 0.4 }, 2.2)
+      .fromTo(q("[data-rank]"), { scale: 0 }, { scale: 1, duration: 0.4, ease: "back.out(2.5)" }, 2.3)
+      .fromTo(q("[data-star]"), { opacity: 0.2 }, { opacity: 1, duration: 0.15, stagger: 0.07 }, 2.45);
+  });
+
+  const other = (w: string) => (
+    <li data-row className="flex items-center gap-2 rounded-xl border border-white/[0.06] px-2.5 py-2">
+      <span className="size-5 shrink-0 rounded-full bg-white/10" />
+      <span className="grid flex-1 gap-1.5">
+        <span className={`h-1.5 rounded-full bg-white/15 ${w}`} />
+        <span className="h-1.5 w-1/2 rounded-full bg-white/[0.08]" />
+      </span>
+    </li>
+  );
+
+  return (
+    <div ref={ref} aria-hidden className={`${panel} w-[86%] p-2.5`}>
+      <div className="flex h-7 items-center gap-2 rounded-full bg-white/[0.07] px-3">
+        <Google className="size-4 shrink-0" />
+        <span className="text-[0.75rem]">
+          <span data-query>{QUERY}</span>
+          <span className="ms-px inline-block h-3 w-px animate-pulse bg-white/70 align-middle" />
+        </span>
+      </div>
+      <ul className="mt-2 grid gap-1.5">
+        <li data-row className="flex items-center gap-2 rounded-xl border px-2.5 py-2" style={{ borderColor: "rgb(255 169 77 / 0.6)", backgroundColor: "rgb(255 169 77 / 0.1)" }}>
+          <span data-rank className="grid size-5 shrink-0 place-items-center rounded-full text-[0.6875rem] font-bold text-[#3b2200]" style={{ background: AMBER }}>1</span>
+          <span className="min-w-0">
+            <span className="block truncate text-[0.75rem] font-semibold">متجرك · عباية سوداء كلوش</span>
+            <span className="flex items-center gap-1 text-[0.625rem] text-white/60">
+              <span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((s) => <span key={s} data-star>★</span>)}</span>
+              4.9 · 189 ر.س
+            </span>
+          </span>
+        </li>
+        {other("w-3/4")}
+      </ul>
+    </div>
+  );
+}
+
+/* ─── التقارير: المستشار يكتب، يوصلك التقرير، وترد عليه ─── */
+
+export function ChatScene({ play }: SceneProps) {
+  const ref = useStory(play, (q) =>
+    gsap.timeline()
+      .fromTo(q("[data-typing]"), { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, transformOrigin: "100% 0" }, 0.2)
+      .fromTo(q("[data-dot]"), { y: 0 }, { y: -3, duration: 0.22, yoyo: true, repeat: 3, stagger: 0.1, ease: "sine.inOut" }, 0.35)
+      .to(q("[data-typing]"), { opacity: 0, duration: 0.15 }, 1.3)
+      .fromTo(q("[data-report]"), { opacity: 0, scale: 0.85 }, { opacity: 1, scale: 1, duration: 0.4, transformOrigin: "100% 0", ease: "back.out(1.6)" }, 1.35)
+      .fromTo(q("[data-col]"), { scaleY: 0 }, { scaleY: 1, duration: 0.4, stagger: 0.05, transformOrigin: "50% 100%", ease: "power2.out" }, 1.55)
+      .fromTo(q("[data-reply]"), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 2.4)
+      .fromTo(q("[data-ticks]"), { color: "rgb(255 255 255 / 0.45)" }, { color: "#53bdeb", duration: 0.25 }, 3)
+  );
+
+  const cols = [30, 45, 38, 55, 48, 70, 100];
+  return (
+    <div ref={ref} aria-hidden className={`${panel} w-[86%] overflow-hidden !bg-[#0b141a]`}>
+      <div className="flex items-center gap-2 bg-[#202c33] px-3 py-1.5">
+        <span className="grid size-6 shrink-0 place-items-center overflow-hidden rounded-full bg-night-3">
+          <img src="/mascot-head.png" alt="" width={24} height={24} className="mt-1 size-5 object-contain" />
+        </span>
+        <span>
+          <span className="block text-[0.75rem] font-semibold leading-tight">مسوّقك الذكي</span>
+          <span className="block text-[0.625rem] leading-tight text-white/55">متصل</span>
+        </span>
+      </div>
+      <div className="relative grid gap-1.5 p-2">
+        {/* يكتب… */}
+        <span data-typing className="absolute right-2 top-2 flex gap-1 rounded-2xl rounded-se-md bg-[#202c33] px-3 py-2.5 opacity-0">
+          {[0, 1, 2].map((d) => <span key={d} data-dot className="size-1.5 rounded-full bg-white/60" />)}
+        </span>
+        <div data-report className="me-6 rounded-2xl rounded-se-md bg-[#202c33] px-2.5 py-1.5">
+          <p className="text-[0.75rem] font-semibold">تقرير الأسبوع</p>
+          <div className="mt-1 flex h-5 items-end gap-1">
+            {cols.map((h, i) => (
+              <span key={i} data-col className={`flex-1 rounded-sm ${i === cols.length - 1 ? "bg-[#25d366]" : "bg-white/20"}`} style={{ height: `${h}%` }} />
+            ))}
+          </div>
+          <p className="mt-1 flex items-end justify-between gap-2 text-[0.6875rem] text-white/80">
+            الطلبات 42 · المبيعات +18٪
+            <span className="shrink-0 text-[0.5625rem] text-white/45">9:00 ص</span>
+          </p>
+        </div>
+        <div data-reply className="ms-8 rounded-2xl rounded-ss-md bg-[#005c4b] px-2.5 py-1">
+          <p className="flex items-end justify-between gap-2 text-[0.6875rem]">
+            تمام، زيدوا ميزانية سناب
+            <span className="flex shrink-0 items-center gap-0.5 text-[0.5625rem] text-white/55">
+              9:04
+              <svg data-ticks viewBox="0 0 18 11" className="h-2.5 w-3.5 text-[#53bdeb]" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="m1 6 3 3 6-7M7 8l1 1 6-7" />
+              </svg>
+            </span>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
