@@ -6,6 +6,8 @@ import { gsap, reduced } from "../../lib/gsap";
  * الخط من اليسار (--p): يسار الخط «مع»، ويمينه «بدون». أول ما توصل يوقف على «بدون» شوي، وبعدها يمشي لحاله لين «مع».
  * كل طبقة اسمها ومجموعها في جهتها («بدون» يمين و«مع» يسار)، فلما يكون الخط في النص تقرأ الاثنين.
  * الماوس يسحب من أي مكان، وفي الجوال من المقبض بس عشان التمرير العادي ما يحرّك الخط.
+ * على الخط فقاعة فيها تكلفتك الشهرية: تنزل من رواتب الفريق لين سعر أول باقة كل ما تسحب الخط لـ«مع».
+ * في اللابتوب في صف الأسماء فوق (فاضي في النص)، وفي الجوال فوق المقبض.
  * الرواتب تقريبية من السوق السعودي (مستوى متوسط، شهرياً).
  */
 const ROLES = [
@@ -16,6 +18,8 @@ const ROLES = [
   { role: "مختص سيو", salary: 7000, gain: "متجرك أول في قوقل" },
 ];
 const TOTAL = ROLES.reduce((sum, r) => sum + r.salary, 0);
+/** أرخص باقة (المبتدئ) في المنصة، وفيها كل الخدمات. لو تغيّر السعر هناك غيّره هنا */
+const PLAN = 799;
 const PAINS = ["توظيف ومقابلات", "إجازات وغياب", "دوام 8 ساعات"];
 const GAINS = ["نشتغل 24/7", "بدون توظيف", "كله في مكان واحد"];
 
@@ -24,14 +28,17 @@ const sar = (n: number) => n.toLocaleString("en-US");
 export function Compare() {
   const box = useRef<HTMLDivElement>(null);
   const knob = useRef<HTMLButtonElement>(null);
-  const sweep = useRef<gsap.core.Tween | null>(null);
+  const cost = useRef<HTMLSpanElement>(null);
+  const sweep = useRef<gsap.core.Timeline | null>(null);
 
   // نحرّك الخط بمتغيّر CSS مباشرة (بدون رسم React كل فريم)
   const set = (p: number) => {
     p = Math.min(100, Math.max(0, p));
     box.current!.style.setProperty("--p", `${p}%`);
+    const now = sar(p >= 100 ? PLAN : Math.round((TOTAL - ((TOTAL - PLAN) * p) / 100) / 10) * 10);
+    cost.current!.textContent = now;
     knob.current!.setAttribute("aria-valuenow", `${Math.round(p)}`);
-    knob.current!.setAttribute("aria-valuetext", p < 50 ? "بدون مسوّقك الذكي" : "مع مسوّقك الذكي");
+    knob.current!.setAttribute("aria-valuetext", `${p < 50 ? "بدون مسوّقك الذكي" : "مع مسوّقك الذكي"}: ${now} ريال شهرياً`);
   };
 
   useEffect(() => {
@@ -40,7 +47,11 @@ export function Compare() {
       io.disconnect();
       if (reduced()) return set(100);
       const s = { p: 0 };
-      sweep.current = gsap.to(s, { p: 100, delay: 1.4, duration: 1.8, ease: "power2.inOut", onUpdate: () => set(s.p) });
+      // يمشي لين «مع»، وبعدين يرجع شوي ويرجع، عشان يبان إن الخط ينسحب
+      sweep.current = gsap.timeline({ delay: 1.4, onUpdate: () => set(s.p) })
+        .to(s, { p: 100, duration: 1.8, ease: "power2.inOut" })
+        .to(s, { p: 86, duration: 0.4, ease: "power1.out" }, "+=0.5")
+        .to(s, { p: 100, duration: 0.5, ease: "power2.inOut" });
     }, { threshold: 0.6 });
     io.observe(box.current!);
     return () => {
@@ -110,13 +121,19 @@ export function Compare() {
           chips={GAINS.map((g) => <span key={g} className="rounded-full bg-white/[0.08] px-3.5 py-1.5 text-mist">{g}</span>)}
           total={
             <>
-              <span className="text-[0.9375rem] text-mist">والفريق كامل، كل شهر</span>
+              <span className="text-[0.9375rem] text-mist">من {sar(PLAN)} ريال في الشهر، والفريق كامل</span>
               <strong className="block bg-(image:--gradient) bg-clip-text text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-transparent">بأقل من راتب موظف واحد</strong>
             </>
           }
         />
 
-        {/* الخط والمقبض */}
+        {/* الخط والمقبض، وفوقه تكلفتك الشهرية */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute top-[calc(50%-4.5rem)] z-10 lg:top-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3.5 py-1.5 text-[0.875rem] font-bold text-night shadow-[0_8px_24px_-8px_rgb(17_19_24/0.5)] ring-1 ring-black/10 [left:clamp(4.75rem,var(--p),calc(100%-4.75rem))]"
+        >
+          <span ref={cost} className="tabular-nums">{sar(TOTAL)}</span> ريال/شهر
+        </span>
         <span aria-hidden className="pointer-events-none absolute inset-y-0 left-(--p) w-[3px] -translate-x-1/2 bg-[linear-gradient(#7c5cff,#d946ef,#ffa94d)]" />
         <button
           ref={knob}
@@ -128,7 +145,7 @@ export function Compare() {
           aria-valuenow={0}
           aria-valuetext="بدون مسوّقك الذكي"
           onKeyDown={keys}
-          className="absolute top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 touch-none place-items-center rounded-full bg-white text-night shadow-[0_8px_24px_-6px_rgb(17_19_24/0.5)] ring-1 ring-black/10 [left:clamp(1.75rem,var(--p),calc(100%-1.75rem))]"
+          className="absolute top-1/2 grid size-12 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-full bg-white focus-visible:rounded-full! text-night shadow-[0_8px_24px_-6px_rgb(17_19_24/0.5)] ring-1 ring-black/10 [left:clamp(1.75rem,var(--p),calc(100%-1.75rem))]"
         >
           <svg viewBox="0 0 24 24" aria-hidden className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 7 4 12l5 5M15 7l5 5-5 5" />

@@ -7,7 +7,7 @@ import { Compare } from "./Compare";
  * «ليش مسوّقك الذكي»: ثلاث لحظات ورا بعض.
  *  1. الشخصية تمدّ لك فنجال قهوة طالع من الشاشة: إنت تقهوى، وإحنا نسوّق.
  *  2. المقارنة: فريق تسويق بالرواتب، ولا مسوّقك الذكي.
- *  3. العرض: 7 أيام مجاناً، وهدية محتوى أسبوع كامل، وتحليل حساباتك أول ما تسجّل.
+ *  3. العرض: أول أسبوع على حسابنا (تجربة، ومحتوى أسبوع، وتحليل حساباتك) قبل ما يدفع ريال.
  */
 export function Why() {
   return (
@@ -43,7 +43,7 @@ export function Why() {
  */
 function Coffee() {
   return (
-    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[34rem]">
+    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[24rem] lg:max-w-[27rem]">
       <div aria-hidden className="absolute inset-x-[2%] bottom-0 top-[52%] overflow-hidden rounded-[32px] bg-night ring-1 ring-white/10">
         <span className="absolute inset-x-[15%] -bottom-1/2 h-full rounded-full bg-[#7c5cff]/50 blur-3xl" />
       </div>
@@ -67,39 +67,45 @@ function Coffee() {
   );
 }
 
-/* العرض: الختام بعد المقارنة، وفيه الزر */
-const PERKS = [
-  {
-    text: "صور وفيديوهات لمتجرك تكفيك أسبوع كامل.",
-    icon: <path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1.5-3-5-3.5-5-1s3 1 5 1c2 0 5 1.5 5-1s-3.5-2-5 1" />,
-  },
-  {
-    text: "وأول ما تسجّل، نحلّل حساباتك ونوريك وش اللي ضايع عليك.",
-    icon: <path d="M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zM15.5 15.5 20 20M7.5 12l2-2.5 2 1.5 2-3" />,
-  },
+/* العرض: فاتورة أول أسبوع، وكل بنودها علينا، والمجموع اللي تدفعه اليوم صفر */
+const BILL = [
+  { item: "7 أيام تجربة كاملة", value: "مجاناً" },
+  { item: "صور وفيديوهات لمتجرك تكفيك أسبوع", value: "هدية" },
+  { item: "تحليل حساباتك أول ما تسجّل، ونوريك وش اللي ضايع عليك", value: "هدية" },
 ];
 
 function Offer() {
   return (
-    <div className="mt-16 overflow-hidden rounded-[32px] bg-night p-7 text-white sm:p-10 lg:mt-24 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:p-14">
-      <div>
-        <p className="text-[clamp(1.625rem,3vw,2.5rem)] font-bold leading-[1.3]">
-          جرّبنا 7 أيام مجاناً… <span className="whitespace-nowrap bg-(image:--gradient) bg-clip-text text-transparent">ومعها هدية</span>
+    // في الجوال الزر بعد الفاتورة (بعد ما يشوف «0 ريال»)، وفي اللابتوب تحت العنوان والفاتورة جنبهم
+    <div className="mt-16 grid gap-8 rounded-[32px] bg-night p-7 text-white sm:p-10 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-x-16 lg:p-14">
+      <div className="lg:self-end">
+        <p className="text-[clamp(1.875rem,3.6vw,3rem)] font-bold leading-[1.25]">
+          أول أسبوع… <span className="whitespace-nowrap bg-(image:--gradient) bg-clip-text text-transparent">على حسابنا</span>
         </p>
-        <ul className="mt-6 grid gap-4">
-          {PERKS.map(({ text, icon }) => (
-            <li key={text} className="flex items-start gap-3.5 text-[1.0625rem] leading-[1.7] text-mist">
-              <span className="grid size-9 shrink-0 place-items-center rounded-full bg-white/[0.08] text-white">
-                <svg viewBox="0 0 24 24" aria-hidden className="size-[1.125rem]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">{icon}</svg>
-              </span>
-              <span className="pt-1">{text}</span>
+        <p className="mt-4 max-w-[30rem] text-balance text-[1.0625rem] leading-[1.8] text-mist">جرّب فريقك التسويقي كامل، وشوف شغلنا بعينك قبل ما تدفع ريال واحد.</p>
+      </div>
+
+      {/* الفاتورة: قصّتين على جنب الخط المنقّط مثل التذكرة */}
+      <div className="rounded-[24px] bg-white/[0.05] p-(--pad) ring-1 ring-white/10 [--pad:1.5rem] sm:[--pad:1.75rem] lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center">
+        <ul className="grid gap-4">
+          {BILL.map(({ item, value }) => (
+            <li key={item} className="flex items-start justify-between gap-6 text-[1rem] leading-[1.6]">
+              <span className="text-mist">{item}</span>
+              <span className="shrink-0 rounded-full bg-white/[0.08] px-3 py-0.5 text-[0.875rem] font-semibold">{value}</span>
             </li>
           ))}
         </ul>
+        <div className="relative mt-6 flex items-end justify-between border-t border-dashed border-white/20 pt-6">
+          <span aria-hidden className="absolute -right-[calc(var(--pad)+0.75rem)] -top-3 size-6 rounded-full bg-night" />
+          <span aria-hidden className="absolute -left-[calc(var(--pad)+0.75rem)] -top-3 size-6 rounded-full bg-night" />
+          <span className="text-[1.0625rem] font-semibold">تدفع اليوم</span>
+          <strong className="bg-(image:--gradient) bg-clip-text text-[clamp(2.25rem,4vw,3rem)] leading-none text-transparent">0 ريال</strong>
+        </div>
       </div>
+
       <a
         href={SIGNUP_URL}
-        className="mt-8 inline-flex h-14 shrink-0 items-center rounded-[16px] bg-white px-8 text-[1.0625rem] font-bold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.97] lg:mt-0"
+        className="inline-flex h-14 items-center justify-center rounded-[16px] bg-white px-8 text-[1.0625rem] font-bold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.97] lg:col-start-1 lg:row-start-2 lg:justify-self-start lg:self-start"
       >
         ابدأ تجربتك المجانية
       </a>
