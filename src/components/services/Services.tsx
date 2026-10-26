@@ -120,11 +120,13 @@ export function Services() {
 }
 
 function ServiceCard({ title, text, hl, Scene, art, artAt = "50%", index, play, onHover }: Service & { index: number; play: number; onHover: () => void }) {
+  const [hover, setHover] = useState(false);
   return (
     <li
       data-card
       data-index={index}
-      onPointerEnter={onHover}
+      onPointerEnter={(e) => { if (e.pointerType === "mouse") setHover(true); onHover(); }}
+      onPointerLeave={() => setHover(false)}
       className="group w-[72vw] max-w-[20rem] shrink-0 snap-center sm:w-[44vw] lg:w-auto lg:max-w-none"
       style={{ "--hl": hl, "--hl-ink": "#fff" } as CSSProperties}
     >
@@ -133,9 +135,9 @@ function ServiceCard({ title, text, hl, Scene, art, artAt = "50%", index, play, 
           <h3 className="text-[1.125rem] font-bold text-white">{title}</h3>
           <p className="mt-1 text-[0.875rem] leading-[1.7] text-mist">{text}</p>
         </div>
-        {/* منطقة المشهد: بين الكلام وراس الشخصية، ونفسها في الأربعة */}
-        <div className="flex min-h-0 flex-1 items-center justify-center py-3">
-          <Scene play={play} />
+        {/* منطقة المشهد: من تحت الكلام، ولوحتها تمتد ورا راس الشخصية وتختفي. نفسها في الأربعة */}
+        <div className="flex min-h-0 flex-1 flex-col px-[7%] pt-3">
+          <Scene play={play} hover={hover} />
         </div>
         <div aria-hidden className="h-[42%] shrink-0" />
         {/* الشخصية ثابتة على حافة الكرت حتى وقت التحويم */}
