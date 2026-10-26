@@ -118,3 +118,36 @@ body {
     --branch-gap: clamp(1.1rem, 3vh, 2.25rem);
   }
 }
+
+/* ظل الشخصية على الأرض: بقعة ضوء خفيفة، وفي نصها ظل غامق تحت الرجلين.
+   على الخلفية الغامقة الظل لحاله ما يبان، الضوء اللي حوله هو اللي يبيّنه.
+   المواضع من مكان الرجلين في الصورة (من 23٪ لين 65٪ بالعرض، والأرض عند 97.8٪ بالطول). */
+.mascot-ground {
+  isolation: isolate;
+}
+
+.mascot-ground::before,
+.mascot-ground::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.mascot-ground::before {
+  left: 5%;
+  width: 80%;
+  top: 89.8%;
+  height: 16%;
+  background: radial-gradient(closest-side, rgb(255 255 255 / 0.11), transparent);
+}
+
+.mascot-ground::after {
+  left: 21%;
+  width: 52%;
+  top: 95.2%;
+  height: 5.2%;
+  background: radial-gradient(closest-side, rgb(0 0 0 / 0.95), rgb(0 0 0 / 0.5) 50%, transparent);
+  filter: blur(2px);
+}

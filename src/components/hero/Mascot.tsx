@@ -56,7 +56,7 @@ export function Mascot({ className = "" }: { className?: string }) {
   }, []);
 
   return (
-    <div data-a="mascot" data-reveal className={`relative shrink-0 ${className}`}>
+    <div data-a="mascot" data-reveal className={`mascot-ground relative shrink-0 ${className}`}>
       <img
         src="/mascot.webp"
         alt="شخصية مسوّقك الذكي: روبوت أبيض لابس غترة وعقال، واقف ويأشّر بيده على خدماتنا"
