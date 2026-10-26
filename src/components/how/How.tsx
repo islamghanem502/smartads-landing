@@ -2,10 +2,10 @@ import { useEffect, useRef, useState, type ComponentType, type ReactNode } from 
 import { Ink } from "../Ink";
 import { Container } from "../layout";
 import { StoreChips } from "../StoreChips";
-import { ChooseVisual, GrowVisual, LearnVisual, LinkVisual, TestVisual, type VisualProps } from "./visuals";
+import { ChooseVisual, GrowVisual, LearnVisual, LinkVisual, RankVisual, TestVisual, type VisualProps } from "./visuals";
 
 /*
- * «طيب، كيف نشتغل؟»: خمس خطوات ورا بعض. في اللابتوب الكلام يمين والرسمة يسار ثابتة على الشاشة،
+ * «طيب، كيف نشتغل؟»: ست خطوات ورا بعض. في اللابتوب الكلام يمين والرسمة يسار ثابتة على الشاشة،
  * وتتبدّل لما توصل كل خطوة (الخطوة اللي في نص الشاشة هي النشطة). في الجوال كل خطوة كلامها ورسمتها مع بعض.
  * على يمين الخطوات خط يتعبّى لين الخطوة النشطة.
  */
@@ -14,6 +14,7 @@ const STEPS: { title: string; text: string; extra?: ReactNode; Visual: Component
   { title: "اختر وش نمسك لك", text: "إعلانات، أو نشر في حساباتك، أو الاثنين مع بعض.", Visual: ChooseVisual },
   { title: "نطلق حملاتك ونتابعها لحظة بلحظة", text: "نختبر أكثر من إعلان، ونوجّه ميزانيتك تلقائياً للي يجيب مبيعات.", Visual: TestVisual },
   { title: "طلب واحد يعلّم كل المنصات", text: "جاك طلب من سناب؟ ميتا وتيك توك وقوقل يعرفون مين اشترى، ويوصلون لناس يشبهونه.", Visual: LearnVisual },
+  { title: "يدوّرون في قوقل؟ يلقونك أول", text: "نحسّن منتجاتك كل يوم ونكتب مقالات لمدونتك، عشان تكون أول اسم في قوقل وأدوات الذكاء الاصطناعي.", Visual: RankVisual },
   { title: "جمهور يشتري حتى بدون إعلانات", text: "صور وفيديوهات بهويتك، ونشر منتظم يبني لك متابعين يرجعون يشترون.", Visual: GrowVisual },
 ];
 

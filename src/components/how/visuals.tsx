@@ -231,7 +231,77 @@ export function LearnVisual({ play }: VisualProps) {
   );
 }
 
-/* ─── 5. منشورات بهويتك تنزل بانتظام، والطلب يجي بدون إعلان ─── */
+/* ─── 5. أحد يدوّر في قوقل: متجرك يطلع من المركز الثامن لين الأول، والذكاء الاصطناعي يرشّحك ─── */
+
+const QUERY = "عطر عود";
+const FROM_RANK = 8;
+
+function Skeleton({ w }: { w: string }) {
+  return <span className="block h-[1.6cqw] rounded-full bg-white/15" style={{ width: w }} />;
+}
+
+export function RankVisual({ play }: VisualProps) {
+  const ref = useStory(play, (q) => {
+    const typed = q("[data-query]")[0];
+    const n = { i: 0 };
+    return gsap.timeline()
+      .fromTo(n, { i: 0 }, { i: QUERY.length, duration: 0.6, ease: "none", onUpdate: () => { typed.textContent = QUERY.slice(0, Math.round(n.i)); } }, 0.15)
+      .fromTo(q("[data-row]"), { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.08 }, 0.8)
+      // متجرك تحت، ويطلع فوق الكل (كل صف بمسافته، فـ200٪ = صفين)
+      .fromTo(q("[data-mine]"), { yPercent: 200 }, { yPercent: 0, duration: 1.1, ease: "power3.inOut" }, 1.2)
+      .fromTo(q("[data-other]"), { yPercent: -100 }, { yPercent: 0, duration: 1.1, ease: "power3.inOut" }, 1.2)
+      .fromTo(q("[data-rank]"), { innerText: FROM_RANK }, { innerText: 1, snap: { innerText: 1 }, duration: 1.1, ease: "power2.inOut" }, 1.2)
+      .fromTo(q("[data-mine] > div"), { scale: 1 }, { scale: 1.04, duration: 0.18, yoyo: true, repeat: 1, ease: "power2.out" }, 2.3)
+      .fromTo(q("[data-ai]"), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.4)
+      .fromTo(q("[data-cite]"), { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 2.65);
+  });
+
+  const site = (
+    <>
+      <span className="size-[5cqw] shrink-0 rounded-full" style={{ background: "linear-gradient(135deg,#7c5cff,#d946ef,#ffa94d)" }} />
+      <span dir="ltr" className="font-semibold">matjarak.com</span>
+    </>
+  );
+
+  return (
+    <div ref={ref} aria-hidden className="flex w-[80%] flex-col gap-[4.5cqw]">
+      {/* البحث */}
+      <div className="flex h-[12cqw] items-center gap-[3cqw] rounded-full bg-white/[0.06] px-[4.5cqw] ring-1 ring-white/10">
+        <Google className="size-[5cqw] shrink-0" />
+        <span className="text-[4.4cqw] font-medium" data-query>{QUERY}</span>
+      </div>
+      {/* النتائج: متجرك أول (الصف ومسافته مع بعض عشان الحركة تنحسب بالصفوف) */}
+      <div>
+        <div data-row data-mine className="relative z-10 pb-[2.4cqw]">
+          <div className="flex h-[11cqw] items-center gap-[2.5cqw] rounded-[3.5cqw] bg-[#8b6cff]/18 px-[3.5cqw] text-[4cqw] ring-2 ring-[#8b6cff]">
+            {site}
+            <span className="ms-auto grid size-[7cqw] place-items-center rounded-full bg-white text-[3.8cqw] font-bold text-night tabular-nums" data-rank>1</span>
+          </div>
+        </div>
+        {["60%", "48%"].map((w) => (
+          <div key={w} data-row data-other className="pb-[2.4cqw]">
+            <div className="flex h-[11cqw] items-center gap-[2.5cqw] rounded-[3.5cqw] bg-white/[0.05] px-[3.5cqw]">
+              <span className="size-[5cqw] shrink-0 rounded-full bg-white/15" />
+              <Skeleton w={w} />
+            </div>
+          </div>
+        ))}
+      </div>
+      {/* وإجابة الذكاء الاصطناعي ترشّحك */}
+      <div data-ai className="-mt-[2.4cqw] flex items-start gap-[3cqw] rounded-[3.5cqw] bg-white/[0.04] p-[3.5cqw] ring-1 ring-white/10">
+        <span className="grid size-[7cqw] shrink-0 place-items-center rounded-full" style={{ background: "linear-gradient(135deg,#7c5cff,#d946ef)" }}>
+          <svg viewBox="0 0 24 24" className="size-[60%]" fill="#fff"><path d="M12 3.5 13.9 9 19.5 11 13.9 13 12 18.5 10.1 13 4.5 11 10.1 9z" /></svg>
+        </span>
+        <div className="flex flex-1 flex-col gap-[2.2cqw] pt-[1cqw]">
+          <Skeleton w="85%" />
+          <span data-cite className="flex w-fit items-center gap-[2cqw] rounded-full bg-white py-[1.2cqw] pe-[3cqw] ps-[1.4cqw] text-[3.6cqw] text-night">{site}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── 6. منشورات بهويتك تنزل بانتظام، والطلب يجي بدون إعلان ─── */
 
 const POSTS_GRID = [
   "linear-gradient(160deg,#ffd3e8,#e85aa6)",
