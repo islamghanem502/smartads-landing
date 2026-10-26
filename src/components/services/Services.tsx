@@ -1,18 +1,22 @@
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type ComponentType, type CSSProperties } from "react";
 import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { Container } from "../layout";
+import { AdsVisual, DesignVisual, PublishingVisual, ReportsVisual, SeoVisual, TrackingVisual } from "./visuals";
 
 /*
- * نظرة سريعة على خدماتنا قبل ما نفصّلها: كرت لكل خدمة، اسمها وسطر واحد، وتحت الشخصية ماسكة أداة وحدة.
- * الكرت أبيض، ولونه الخاص يطلع خفيف من تحت ويختفي قبل الكلام.
+ * نظرة سريعة على خدماتنا قبل ما نفصّلها: كرت لكل خدمة، اسمها وسطر واحد، تحتهم رسمة صغيرة بالكود تحمل الفكرة،
+ * وتحت الشخصية ماسكة أداة وحدة، طالعة من حافة الكرت. الكرت أبيض، ولونه الخاص يطلع خفيف من تحت.
+ *   tint: لون التدرّج تحت · accent/soft: لون عنصر الرسمة وخلفيته
  */
-const SERVICES: { title: string; text: string; tint: string; art?: string }[] = [
-  { title: "الإعلانات الممولة", text: "نطلق حملاتك ونتابعها كل ربع ساعة", tint: "#e7e0ff", art: "/services/ads.webp" },
-  { title: "تتبّع المبيعات", text: "كل طلب يوصل للمنصات، وإعلاناتك تتعلّم منه", tint: "#d8ecff" },
-  { title: "تصميم الإعلانات", text: "صور وفيديوهات لمنتجاتك، جاهزة للإعلان", tint: "#fbe0f1" },
-  { title: "النشر في حساباتك", text: "منشورات منتظمة في حساباتك", tint: "#d5f3e6" },
-  { title: "السيو", text: "متجرك يظهر في قوقل والذكاء الاصطناعي", tint: "#ffe5cf", art: "/services/seo.webp" },
-  { title: "التقارير", text: "تقرير كل أسبوع على واتساب، ومستشار تسأله", tint: "#fdf0c4" },
+type Service = { title: string; text: string; tint: string; accent: string; soft: string; Visual: ComponentType<{ accent: string; soft: string }>; art: string };
+
+const SERVICES: Service[] = [
+  { title: "الإعلانات الممولة", text: "نطلق حملاتك ونتابعها كل ربع ساعة", tint: "#e7e0ff", accent: "#7c5cff", soft: "#ece7ff", Visual: AdsVisual, art: "/services/ads.webp" },
+  { title: "تتبّع المبيعات", text: "كل طلب يوصل للمنصات، وإعلاناتك تتعلّم منه", tint: "#d8ecff", accent: "#3b8fe6", soft: "#e2f0ff", Visual: TrackingVisual, art: "/services/tracking.webp" },
+  { title: "تصميم الإعلانات", text: "صور وفيديوهات لمنتجاتك، جاهزة للإعلان", tint: "#fbe0f1", accent: "#e0529c", soft: "#fde6f2", Visual: DesignVisual, art: "/services/design.webp" },
+  { title: "النشر في حساباتك", text: "منشورات منتظمة في حساباتك", tint: "#d5f3e6", accent: "#1fa36b", soft: "#dcf5ea", Visual: PublishingVisual, art: "/services/publishing.webp" },
+  { title: "السيو", text: "متجرك يظهر في قوقل والذكاء الاصطناعي", tint: "#ffe5cf", accent: "#f08a24", soft: "#ffeedd", Visual: SeoVisual, art: "/services/seo.webp" },
+  { title: "التقارير", text: "تقرير كل أسبوع على واتساب، ومستشار تسأله", tint: "#fdf0c4", accent: "#e0a400", soft: "#fdf3d2", Visual: ReportsVisual, art: "/services/reports.webp" },
 ];
 
 function Chevron({ className = "" }: { className?: string }) {
@@ -86,20 +90,18 @@ export function Services() {
             key={s.title}
             data-card
             style={{ "--tint": s.tint } as CSSProperties}
-            className="relative aspect-[3/4] w-[78vw] max-w-[22rem] shrink-0 snap-center overflow-hidden rounded-[28px] bg-white shadow-[0_1px_2px_rgb(17_19_24/0.05),0_14px_34px_-18px_rgb(17_19_24/0.2)] sm:w-[clamp(16.5rem,25vw,21rem)] sm:snap-start"
+            className="relative aspect-[2/3] w-[78vw] max-w-[22rem] shrink-0 snap-center overflow-hidden rounded-[28px] bg-white shadow-[0_1px_2px_rgb(17_19_24/0.05),0_14px_34px_-18px_rgb(17_19_24/0.2)] sm:w-[clamp(16.5rem,25vw,21rem)] sm:snap-start"
           >
             <div aria-hidden className="absolute inset-0 bg-[linear-gradient(to_top,var(--tint),transparent_68%)]" />
-            <div className="relative p-7">
+            <div className="relative px-7 pt-7">
               <h3 className="text-[1.375rem] font-bold leading-tight">{s.title}</h3>
-              <p className="mt-2 leading-relaxed text-ink-soft">{s.text}</p>
+              <p className="mt-2 min-h-[3.25em] leading-relaxed text-ink-soft">{s.text}</p>
+              <div className="mt-4">
+                <s.Visual accent={s.accent} soft={s.soft} />
+              </div>
             </div>
-            {s.art && (
-              <>
-                {/* ظل خفيف تحت الرجلين عشان تبان واقفة على أرض الكرت */}
-                <span aria-hidden className="absolute bottom-[4.2%] left-1/2 h-[3.5%] w-[40%] -translate-x-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgb(17_19_24/0.14),transparent)]" />
-                <img src={s.art} width={760} height={930} alt="" loading="lazy" decoding="async" draggable={false} className="absolute bottom-[5%] left-1/2 w-[70%] max-w-none -translate-x-1/2 select-none" />
-              </>
-            )}
+            {/* الشخصية أكبر من الكرت شوي: حافته تقصّها عند الورك، فتبان طالعة منه والأداة اللي بيدها كاملة */}
+            <img src={s.art} width={760} height={930} alt="" loading="lazy" decoding="async" draggable={false} className="absolute bottom-[-18%] left-1/2 w-[92%] max-w-none -translate-x-1/2 select-none" />
           </li>
         ))}
       </ul>
