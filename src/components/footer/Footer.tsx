@@ -110,13 +110,15 @@ export function Footer() {
  * الطبقات: جوف الفتحة والحافة اللي ورا ← الشخصية ← الحافة اللي قدّام.
  * الشخصية مقصوصة بـ(كل اللي فوق نص الفتحة + الفتحة نفسها): جسمها ينزل داخل الفتحة، ويختفي ورا الحافة اللي قدّام
  * بنفس انحناءها، ويغمق كل ما نزل. لما ينزل الزائر للفوتر تطلع من الفتحة (rise في index.css، على خط زمني --portal).
- * الصورة: مقاسها ومكان وجه الساعة فيها (نسبة من عرضها وطولها) في IMG. لو تغيّرت الصورة غيّر الأرقام هنا بس.
+ * الصورة: مقاسها، ومكان وجه الساعة فيها، ونص الجسم بالعرض (الذراع المرفوعة تخلّيه يسار نص الصورة) في IMG.
+ * لو تغيّرت الصورة غيّر الأرقام هنا بس.
+ * الفتحة أعرض من الشخصية بكثير (ذراعها داخل حدودها)، وعمقها ثلث عرضها عشان حافتها اللي ورا تطلع ورا الذراعين.
  */
-const IMG = { src: "/footer/watch.webp", w: 900, h: 915, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
-const HOLE = { w: 1000, cy: 760, rx: 494, ry: 122 };
-const ART_W = 760;
+const IMG = { src: "/footer/watch.webp", w: 900, h: 915, body: 0.473, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
+const HOLE = { w: 1000, cy: 520, rx: 494, ry: 165 };
+const ART_W = 640;
 const ART_H = (ART_W * IMG.h) / IMG.w;
-const ART_X = (HOLE.w - ART_W) / 2;
+const ART_X = HOLE.w / 2 - IMG.body * ART_W; // نص الجسم على نص الفتحة
 const ART_Y = HOLE.cy + HOLE.ry * 0.92 - ART_H; // الخصر تحت الحافة اللي قدّام (مخفي)
 const VIEW_H = HOLE.cy + HOLE.ry + 20;
 const arc = (sweep: 0 | 1) => `M${HOLE.w / 2 - HOLE.rx} ${HOLE.cy}a${HOLE.rx} ${HOLE.ry} 0 0 ${sweep} ${2 * HOLE.rx} 0`;
@@ -131,7 +133,7 @@ function Portal() {
         className="absolute inset-x-0 h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.16)_18%,rgb(255_255_255/0.16)_82%,transparent)]"
         style={{ top: `${(cy / VIEW_H) * 100}%` }}
       />
-      <svg viewBox={`0 0 ${HOLE.w} ${VIEW_H}`} role="img" aria-label="مسوّقك الذكي يأشّر على ساعته" className="relative mx-auto block w-[min(30rem,96vw)] overflow-visible">
+      <svg viewBox={`0 0 ${HOLE.w} ${VIEW_H}`} role="img" aria-label="مسوّقك الذكي يأشّر على ساعته" className="relative mx-auto block w-[min(36rem,96vw)] overflow-visible">
         <defs>
           <linearGradient id="rim" x1="0" x2="1">
             <stop offset="0" stopColor="#7c5cff" />
@@ -148,7 +150,7 @@ function Portal() {
             <rect width={HOLE.w} height={cy} />
             <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
           </clipPath>
-          <linearGradient id="sink" gradientUnits="userSpaceOnUse" x1="0" y1={cy - 30} x2="0" y2={cy + ry * 0.75}>
+          <linearGradient id="sink" gradientUnits="userSpaceOnUse" x1="0" y1={cy - ry * 0.3} x2="0" y2={cy + ry * 0.8}>
             <stop offset="0" stopColor="#fff" />
             <stop offset="1" stopColor="#000" />
           </linearGradient>
