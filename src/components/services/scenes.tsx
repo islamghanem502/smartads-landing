@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react";
-import { gsap, reduced, useGSAP } from "../../lib/gsap";
+import { gsap, reduced } from "../../lib/gsap";
+import { useStory } from "../../lib/story";
 import { Facebook, Google, Instagram, Meta, Snapchat, TikTok } from "../logos";
 
 /*
@@ -15,26 +16,6 @@ export type SceneProps = { play: number; hover: boolean };
 
 /** صورة الشخصية: عرضها من الكرت، ونسبتها (760×716). نفسها في Services.tsx */
 export const ART = { width: "66%", ratio: "760/716" };
-
-type Q = (selector: string) => HTMLElement[];
-
-function useStory(play: number, build: (q: Q) => gsap.core.Timeline) {
-  const ref = useRef<HTMLDivElement>(null);
-  const story = useRef<gsap.core.Timeline | null>(null);
-
-  useGSAP(() => {
-    if (reduced()) return;
-    story.current = build(gsap.utils.selector(ref) as Q).pause(0);
-  }, { scope: ref });
-
-  // ما نقطع القصة لو المؤشر دخل وطلع وهي شغّالة
-  useEffect(() => {
-    const s = story.current;
-    if (play && s && !s.isActive()) s.restart();
-  }, [play]);
-
-  return ref;
-}
 
 /** اللوحة: نفس الإطار الغامق، بس نصّها السفلي يختفي، وتمتد ورا راس الشخصية (الهامش السالب) */
 function Panel({ className = "", children }: { className?: string; children: ReactNode }) {

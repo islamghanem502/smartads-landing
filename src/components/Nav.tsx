@@ -4,6 +4,7 @@ import { Container } from "./layout";
 
 const LINKS = [
   { href: "#services", label: "خدماتنا" },
+  { href: "#how", label: "كيف نشتغل" },
   { href: "#why", label: "ليش إحنا" },
   { href: "#pricing", label: "الأسعار" },
   { href: "#faq", label: "الأسئلة" },
