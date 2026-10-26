@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { gsap, reduced } from "../../lib/gsap";
 import { useStory } from "../../lib/story";
-import { Facebook, Google, Instagram, Meta, Salla, Snapchat, TikTok, Website, ZidMark, type Logo } from "../logos";
+import { Facebook, Google, Instagram, Meta, Snapchat, TikTok, type Logo } from "../logos";
 
 /*
  * رسمات «كيف نشتغل»: عنصر واحد كبير في كل رسمة، وكلمتين بالكثير. كل رسمة مرسومة على آخر قصتها،
@@ -23,9 +23,8 @@ function Check({ className = "" }: { className?: string }) {
   );
 }
 
-/* ─── 1. متجرك في سلة أو زد أو موقعك الخاص: رابطه ينكتب، ونحلّل منتجات، عملاء، أسعار ─── */
+/* ─── 1. رابط متجرك ينكتب، ونحلّل: منتجات، عملاء، أسعار ─── */
 
-const STORES: Logo[] = [Salla, ZidMark, Website];
 const URL = "matjarak.com";
 const ICONS = [
   // منتجات
@@ -41,18 +40,14 @@ export function LinkVisual({ play }: VisualProps) {
     const typed = q("[data-url]")[0];
     const n = { i: 0 };
     return gsap.timeline()
-      .fromTo(q("[data-store]"), { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.12, ease: "back.out(2)" }, 0)
-      .fromTo(n, { i: 0 }, { i: URL.length, duration: 0.9, ease: "none", onUpdate: () => { typed.textContent = URL.slice(0, Math.round(n.i)); } }, 0.6)
-      .fromTo(q("[data-scan]"), { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power2.inOut" }, 1.55)
-      .fromTo(q("[data-done]"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.18, ease: "back.out(2.4)" }, 2.2)
-      .fromTo(q("[data-icon]"), { color: "rgb(255 255 255 / 0.35)", borderColor: "rgb(255 255 255 / 0.08)" }, { color: "#fff", borderColor: VIOLET, duration: 0.3, stagger: 0.18 }, 2.2);
+      .fromTo(n, { i: 0 }, { i: URL.length, duration: 0.9, ease: "none", onUpdate: () => { typed.textContent = URL.slice(0, Math.round(n.i)); } }, 0.15)
+      .fromTo(q("[data-scan]"), { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power2.inOut" }, 1.1)
+      .fromTo(q("[data-done]"), { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.35, stagger: 0.18, ease: "back.out(2.4)" }, 1.75)
+      .fromTo(q("[data-icon]"), { color: "rgb(255 255 255 / 0.35)", borderColor: "rgb(255 255 255 / 0.08)" }, { color: "#fff", borderColor: VIOLET, duration: 0.3, stagger: 0.18 }, 1.75);
   });
 
   return (
-    <div ref={ref} aria-hidden className="flex w-[78%] flex-col items-center gap-[6cqw]">
-      <div className="flex gap-[3.5cqw]">
-        {STORES.map((L, i) => <span key={i} data-store className={`${tile} size-[14cqw]`}><L className="size-[56%]" /></span>)}
-      </div>
+    <div ref={ref} aria-hidden className="flex w-[78%] flex-col items-center gap-[7cqw]">
       <div className="relative w-full overflow-hidden rounded-full bg-white/[0.06] ring-1 ring-white/10">
         <div className="flex h-[13cqw] items-center gap-[3cqw] px-[5cqw]">
           <svg viewBox="0 0 24 24" className="size-[5cqw] shrink-0 text-white/50" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">

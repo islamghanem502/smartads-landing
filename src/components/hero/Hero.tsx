@@ -3,15 +3,9 @@ import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { SIGNUP_URL } from "../../lib/links";
 import { Ink } from "../Ink";
 import { Container } from "../layout";
-import { Salla, Website, ZidMark } from "../logos";
+import { StoreChips } from "../StoreChips";
 import { Mascot } from "./Mascot";
 import { ServiceTree } from "./ServiceTree";
-
-const STORES = [
-  { L: Salla, name: "سلة" },
-  { L: ZidMark, name: "زد" },
-  { L: Website, name: "موقعك الخاص" },
-];
 
 /*
  * الهيرو يملا الشاشة (لين 56rem في الشاشات الطويلة، وبعدها يبان أول القسم اللي بعده)، والمحتوى في نص المساحة اللي تحت النافبار:
@@ -68,14 +62,7 @@ export function Hero() {
 
           <div data-reveal data-a="fade" className="mt-8">
             <p className="text-[0.9375rem] font-medium">نشتغل مع متجرك على</p>
-            <ul className="mt-3 flex flex-wrap gap-2.5">
-              {STORES.map(({ L, name }) => (
-                <li key={name} className="flex h-11 items-center gap-2.5 rounded-full bg-white ps-2.5 pe-4 text-[0.9375rem] font-semibold text-night">
-                  <span className="grid size-7 place-items-center rounded-full bg-chip"><L className="size-[1.1rem]" /></span>
-                  {name}
-                </li>
-              ))}
-            </ul>
+            <StoreChips className="mt-3" />
           </div>
         </div>
 

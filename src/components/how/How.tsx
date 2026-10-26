@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useRef, useState, type ComponentType, type ReactNode } from "react";
 import { Ink } from "../Ink";
 import { Container } from "../layout";
+import { StoreChips } from "../StoreChips";
 import { ChooseVisual, GrowVisual, LearnVisual, LinkVisual, TestVisual, type VisualProps } from "./visuals";
 
 /*
@@ -8,8 +9,8 @@ import { ChooseVisual, GrowVisual, LearnVisual, LinkVisual, TestVisual, type Vis
  * وتتبدّل لما توصل كل خطوة (الخطوة اللي في نص الشاشة هي النشطة). في الجوال كل خطوة كلامها ورسمتها مع بعض.
  * على يمين الخطوات خط يتعبّى لين الخطوة النشطة.
  */
-const STEPS: { title: string; text: string; Visual: ComponentType<VisualProps> }[] = [
-  { title: "حط رابط متجرك", text: "ونحلّل منتجاتك وعملاءك، ونطلع لك خطة تناسبك.", Visual: LinkVisual },
+const STEPS: { title: string; text: string; extra?: ReactNode; Visual: ComponentType<VisualProps> }[] = [
+  { title: "حط رابط متجرك", text: "ونحلّل منتجاتك وعملاءك، ونطلع لك خطة تناسبك.", extra: <StoreChips />, Visual: LinkVisual },
   { title: "اختر وش نمسك لك", text: "إعلانات، أو نشر في حساباتك، أو الاثنين مع بعض.", Visual: ChooseVisual },
   { title: "نطلق حملاتك ونتابعها لحظة بلحظة", text: "نختبر أكثر من إعلان، ونوجّه ميزانيتك تلقائياً للي يجيب مبيعات.", Visual: TestVisual },
   { title: "طلب واحد يعلّم كل المنصات", text: "جاك طلب من سناب؟ ميتا وتيك توك وقوقل يعرفون مين اشترى، ويوصلون لناس يشبهونه.", Visual: LearnVisual },
@@ -55,7 +56,7 @@ export function How() {
                 style={{ height: `${(shown / (STEPS.length - 1)) * 100}%` }}
               />
             </span>
-            {STEPS.map(({ title, text, Visual }, i) => (
+            {STEPS.map(({ title, text, extra, Visual }, i) => (
               <li key={title} data-step={i} className="relative flex flex-col justify-center py-10 pe-0 ps-14 lg:min-h-[70vh] lg:py-0">
                 <span
                   className={`absolute right-0 top-10 grid size-8 place-items-center rounded-full text-[0.875rem] font-bold transition-colors duration-500 lg:top-1/2 lg:-translate-y-1/2 ${i <= shown ? "bg-white text-night" : "bg-night-3 text-white/50"}`}
@@ -64,6 +65,7 @@ export function How() {
                 </span>
                 <h3 className={`text-[clamp(1.5rem,2.4vw,2.125rem)] font-bold leading-[1.3] transition-opacity duration-500 lg:max-w-[26rem] ${i === shown ? "opacity-100" : "lg:opacity-35"}`}>{title}</h3>
                 <p className={`mt-3 max-w-[26rem] text-[1.0625rem] leading-[1.8] text-mist transition-opacity duration-500 ${i === shown ? "opacity-100" : "lg:opacity-35"}`}>{text}</p>
+                {extra && <div className={`mt-6 transition-opacity duration-500 ${i === shown ? "opacity-100" : "lg:opacity-35"}`}>{extra}</div>}
                 {/* في الجوال: الرسمة تحت الكلام */}
                 <div className={`${stage} mt-8 max-w-[26rem] lg:hidden`}>
                   <Visual play={plays[i]} />
