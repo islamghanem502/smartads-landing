@@ -39,7 +39,7 @@ function useStory(play: number, build: (q: Q) => gsap.core.Timeline) {
 /** اللوحة: نفس الإطار الغامق، بس نصّها السفلي يختفي، وتمتد ورا راس الشخصية (الهامش السالب) */
 function Panel({ className = "", children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={`-mb-[24%] w-[86%] flex-1 rounded-2xl bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 [mask-image:linear-gradient(to_bottom,#000_38%,transparent_84%)] ${className}`}>
+    <div className={`-mb-[24%] w-[86%] flex-1 rounded-2xl bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 [mask-image:linear-gradient(to_bottom,#000_30%,transparent_74%)] ${className}`}>
       {children}
     </div>
   );
@@ -82,7 +82,7 @@ export function BudgetScene({ play }: SceneProps) {
         <ul className="mt-3 grid grid-cols-4 gap-2.5">
           {SPLIT.map(({ L, to }, i) => (
             <li key={i} className="flex flex-col items-center gap-1.5">
-              <span className={`${tile} size-5`}><L className="size-3.5" /></span>
+              <span className={`${tile} size-[1.125rem]`}><L className="size-3" /></span>
               <span className="flex h-16 w-full items-end">
                 <span data-bar={i} className="w-full rounded-t-md" style={{ height: `${(to / TOP) * 100}%`, background: i === 0 ? VIOLET : IDLE }} />
               </span>
@@ -150,18 +150,9 @@ export function StudioScene({ play, hover }: SceneProps) {
     <div ref={ref} aria-hidden className="contents">
       <Panel>
         <div data-post>
-          <div className="flex items-center justify-between gap-2">
-            <span className="flex gap-1">
-              {[Instagram, TikTok, Facebook].map((L, i) => <span key={i} className={`${tile} size-6`}><L className="size-4" /></span>)}
-            </span>
-            <span className="flex items-center gap-1 text-[0.6875rem] font-semibold">
-              <svg viewBox="0 0 16 16" className="size-3 text-[#f9a8d4]" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <rect x="2" y="3" width="12" height="11" rx="2.5" />
-                <path d="M2 6.5h12M5.5 1.5v3M10.5 1.5v3" />
-              </svg>
-              مجدول · الخميس 8 م
-            </span>
-          </div>
+          <span className="flex gap-1">
+            {[Instagram, TikTok, Facebook].map((L, i) => <span key={i} className={`${tile} size-[1.125rem]`}><L className="size-3" /></span>)}
+          </span>
           {/* المنشورات: صورتين وفيديو، وتكمّل لتحت وتختفي */}
           <div className="mx-auto mt-2.5 grid w-[78%] grid-cols-3 gap-1.5">
             {[0, 1].map((k) => (
@@ -220,7 +211,6 @@ export function SearchScene({ play }: SceneProps) {
     return gsap.timeline()
       .fromTo(n, { i: 0 }, { i: QUERY.length, duration: 0.8, ease: "none", onUpdate: () => { typed.textContent = QUERY.slice(0, Math.round(n.i)); } }, 0.15)
       .fromTo(q("[data-result]"), { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 1)
-      .fromTo(q("[data-star]"), { opacity: 0.2 }, { opacity: 1, duration: 0.12, stagger: 0.06 }, 1.25)
       .fromTo(q("[data-word]"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.5)
       // العدسة تكبّر الحرف
       .fromTo(q("[data-zoom]"), { scale: 1 }, { scale: 1.6, duration: 0.7, ease: "back.out(1.7)" }, 1.75);
@@ -238,21 +228,15 @@ export function SearchScene({ play }: SceneProps) {
             <span className="ms-px inline-block h-3 w-px animate-pulse bg-white/70 align-middle" />
           </span>
         </div>
-        {/* أول نتيجة منتجك، والنتيجة الثانية تختفي مع اللوحة */}
+        {/* أول نتيجة منتجك، والثانية تختفي مع اللوحة */}
         <div data-result className="mt-2 grid gap-1.5">
           <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.05] p-2">
             <span className="grid size-5 shrink-0 place-items-center rounded-full bg-[#ffa94d] text-[0.6875rem] font-bold text-[#3b2200]">1</span>
-            <span className="min-w-0">
-              <span className="block truncate text-[0.75rem] font-semibold">عباية سوداء كلوش</span>
-              <span className="flex items-center gap-1 text-[0.625rem] text-white/60">
-                <span className="flex text-[#fbbf24]">{[0, 1, 2, 3, 4].map((s) => <span key={s} data-star>★</span>)}</span>
-                189 ر.س
-              </span>
-            </span>
+            <span className="truncate text-[0.75rem] font-semibold">عباية سوداء كلوش</span>
           </div>
-          <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] p-2 text-white/55">
-            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white/10 text-[0.6875rem] font-bold">2</span>
-            <span className="text-[0.75rem]">عباية كريب سادة</span>
+          <div className="flex items-center gap-2.5 rounded-xl bg-white/[0.03] p-2">
+            <span className="grid size-5 shrink-0 place-items-center rounded-full bg-white/10 text-[0.6875rem] font-bold text-white/55">2</span>
+            <span className="h-1.5 w-1/2 rounded-full bg-white/10" />
           </div>
         </div>
       </Panel>
@@ -279,7 +263,7 @@ export function SearchScene({ play }: SceneProps) {
   );
 }
 
-/* ─── التقارير: رسالة التقرير من المستشار، وردّك عليه ─── */
+/* ─── التقارير: رسالة التقرير من المستشار على واتساب، وردّك عليه ─── */
 
 export function ChatScene({ play }: SceneProps) {
   const ref = useStory(play, (q) =>
@@ -290,26 +274,14 @@ export function ChatScene({ play }: SceneProps) {
   const bubble = "rounded-2xl px-3 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]";
   return (
     <div ref={ref} aria-hidden className="contents">
-      <div className="-mb-[24%] grid w-[86%] flex-1 content-start gap-1.5 text-white [mask-image:linear-gradient(to_bottom,#000_45%,transparent_86%)]">
+      <div className="-mb-[24%] grid w-[86%] flex-1 content-start gap-1.5 text-white [mask-image:linear-gradient(to_bottom,#000_40%,transparent_80%)]">
         <div data-msg className={`${bubble} me-3 rounded-ss-md bg-[#202c33] py-2`}>
-          <p className="text-[0.6875rem] font-semibold text-[#53bdeb]">مسوّقك الذكي</p>
+          <p className="text-[0.6875rem] font-semibold text-[#25d366]">مسوّقك الذكي</p>
           <p className="mt-0.5 text-[0.8125rem] font-semibold">تقرير الأسبوع</p>
-          <p className="flex items-end justify-between gap-2 whitespace-nowrap text-[0.75rem] text-white/80">
-            الطلبات 42 · المبيعات +18٪
-            <span className="shrink-0 text-[0.5625rem] text-white/45">9:00 ص</span>
-          </p>
+          <p className="whitespace-nowrap text-[0.75rem] text-white/80">الطلبات 42 · المبيعات +18٪</p>
         </div>
         <div data-msg className={`${bubble} ms-7 rounded-se-md bg-[#005c4b] py-1.5`}>
-          <p className="flex items-end justify-between gap-2 text-[0.75rem]">
-            تمام، زيدوا ميزانية سناب
-            <span className="shrink-0 text-[0.5625rem] text-white/55">9:04 ص</span>
-          </p>
-        </div>
-        <div data-msg className={`${bubble} me-10 rounded-ss-md bg-[#202c33] py-1.5`}>
-          <p className="flex items-end justify-between gap-2 text-[0.75rem]">
-            تم، زدناها 20٪
-            <span className="shrink-0 text-[0.5625rem] text-white/45">9:05 ص</span>
-          </p>
+          <p className="text-[0.75rem]">تمام، زيدوا ميزانية سناب</p>
         </div>
       </div>
     </div>

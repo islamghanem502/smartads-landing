@@ -3,6 +3,7 @@ import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { SIGNUP_URL } from "../../lib/links";
 import { Ink } from "../Ink";
 import { Container } from "../layout";
+import { WhatsApp } from "../logos";
 import { ART, BudgetScene, ChatScene, SEO_AT, SearchScene, StudioScene, type SceneProps } from "./scenes";
 
 /*
@@ -29,7 +30,13 @@ const SERVICES: Service[] = [
     artAt: "64%",
   },
   { title: "السيو", text: <>متجرك <mark className="hl">أول</mark> في قوقل والذكاء الاصطناعي.</>, hl: "#d2741a", Scene: SearchScene, art: "/services/seo.webp", artAt: SEO_AT },
-  { title: "التقارير والمستشار", text: <>تقريرك ومستشارك على <mark className="hl">واتساب</mark>.</>, hl: "#2f6fe0", Scene: ChatScene, art: "/services/reports.webp" },
+  {
+    title: "التقارير والمستشار",
+    text: <>تقريرك ومستشارك على <mark className="hl">واتساب</mark> <WhatsApp className="inline size-4 align-[-0.15em]" />.</>,
+    hl: "#1c9a4e",
+    Scene: ChatScene,
+    art: "/services/reports.webp",
+  },
 ];
 
 export function Services() {
