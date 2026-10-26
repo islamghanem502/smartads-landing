@@ -2,7 +2,7 @@ import { useRef, type ComponentType, type CSSProperties, type ReactNode } from "
 import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { Ink } from "../Ink";
 import { Container } from "../layout";
-import { BudgetScene } from "./scenes";
+import { BudgetScene, ReportsScene, SeoScene, SocialScene } from "./scenes";
 
 /*
  * كل خدمة: لوحة غامقة فيها واجهة من منتجنا والشخصية طالعة من حافتها، وتحت اللوحة على الخلفية الفاتحة
@@ -27,6 +27,33 @@ const SERVICES: Service[] = [
     glow: "rgb(124 92 255 / 0.38)",
     Scene: BudgetScene,
     art: "/services/ads.webp",
+  },
+  {
+    title: "محتوى حساباتك",
+    text: <>نصمّم منشوراتك وفيديوهاتك، وننشرها في حساباتك <mark className="hl">بجدول ثابت</mark>.</>,
+    accent: "#e85aa6",
+    hl: "#ffd3e8",
+    glow: "rgb(232 90 166 / 0.32)",
+    Scene: SocialScene,
+    art: "/services/social.webp",
+  },
+  {
+    title: "السيو",
+    text: <>متجرك يطلع <mark className="hl">أول</mark> في قوقل وفي إجابات الذكاء الاصطناعي.</>,
+    accent: "#ffa94d",
+    hl: "#ffe0bf",
+    glow: "rgb(255 169 77 / 0.3)",
+    Scene: SeoScene,
+    art: "/services/seo.webp",
+  },
+  {
+    title: "التقارير والمستشار",
+    text: <>تقرير كل أسبوع يوصلك على <mark className="hl">واتساب</mark>، ومستشار تسأله متى ما تبي.</>,
+    accent: "#3b8fe6",
+    hl: "#cfe2ff",
+    glow: "rgb(59 143 230 / 0.32)",
+    Scene: ReportsScene,
+    art: "/services/reports.webp",
   },
 ];
 
