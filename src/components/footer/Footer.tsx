@@ -7,7 +7,7 @@ import { LINKS } from "../Nav";
 
 /*
  * الفوتر: الختام فوق (لا تضيّع وقت + سجّل/دخول)، وبعده الشخصية طالعة من بوابة بيضاوية على خط الأفق
- * وتورّيك ساعتها (تمشي على الوقت الحقيقي وعقرب الثواني يتكتك)، وتحت الخط الروابط وبيانات المؤسسة.
+ * وتورّيك ساعتها (عقاربها تركض: الوقت يمشي)، وتحت الخط الروابط وبيانات المؤسسة.
  */
 const GROUPS = [
   { title: "الصفحة", links: LINKS },
@@ -112,13 +112,13 @@ export function Footer() {
  * بنفس انحناءها، ويغمق كل ما نزل. لما ينزل الزائر للفوتر تطلع من الفتحة (rise في index.css، على خط زمني --portal).
  * الصورة: مقاسها، ومكان وجه الساعة فيها، ونص الجسم بالعرض (الذراع المرفوعة تخلّيه يسار نص الصورة) في IMG.
  * لو تغيّرت الصورة غيّر الأرقام هنا بس.
- * الفتحة أعرض من الشخصية بكثير (ذراعها داخل حدودها)، وعمقها ثلث عرضها عشان حافتها اللي ورا تطلع ورا الذراعين.
+ * الشخصية كلها (بذراعها المرفوعة) في نص الفتحة، والفتحة أعرض منها شوي، وعمقها ثلث عرضها عشان حافتها اللي ورا تمر ورا الذراعين.
  */
-const IMG = { src: "/footer/watch.webp", w: 900, h: 915, body: 0.473, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
-const HOLE = { w: 1000, cy: 520, rx: 494, ry: 165 };
+const IMG = { src: "/footer/watch.webp", w: 900, h: 915, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
+const HOLE = { w: 1000, cy: 535, rx: 420, ry: 140 };
 const ART_W = 640;
 const ART_H = (ART_W * IMG.h) / IMG.w;
-const ART_X = HOLE.w / 2 - IMG.body * ART_W; // نص الجسم على نص الفتحة
+const ART_X = (HOLE.w - ART_W) / 2;
 const ART_Y = HOLE.cy + HOLE.ry * 0.92 - ART_H; // الخصر تحت الحافة اللي قدّام (مخفي)
 const VIEW_H = HOLE.cy + HOLE.ry + 20;
 const arc = (sweep: 0 | 1) => `M${HOLE.w / 2 - HOLE.rx} ${HOLE.cy}a${HOLE.rx} ${HOLE.ry} 0 0 ${sweep} ${2 * HOLE.rx} 0`;
@@ -178,26 +178,43 @@ function Portal() {
 }
 
 /*
- * الساعة على الوقت الحقيقي حق الزائر: الساعات والدقائق في مكانها، وعقرب الثواني يتكتك كل ثانية.
+ * الساعة: تبدأ على الوقت الحقيقي حق الزائر، وبعدين تركض (عقرب الدقائق يلف كل 12 ثانية والساعات معه بنسبته)،
+ * يعني الوقت يمشي وإنت واقف. عقربين عريضين بس، الدقائق بالوردي، عشان الحركة تبان على وجه صغير.
  * مرسومة على وجه 100 وحدة (نص قطره 50) وتنكبر على وجه الساعة اللي في الصورة.
- * قبل الجافاسكربت (الصفحة المولّدة) تطلع على 10:10. مع «تقليل الحركة» بدون عقرب الثواني.
+ * تركض بس والفوتر على الشاشة. قبل الجافاسكربت تطلع على 10:10، ومع «تقليل الحركة» على الوقت الحقيقي وثابتة.
  */
+const LAP = 12; // ثواني للفة عقرب الدقائق
+
 function Clock() {
   const hands = useRef<SVGGElement>(null);
   useEffect(() => {
-    const [h, m, sec] = [...hands.current!.children] as SVGGElement[];
-    const calm = reduced();
-    if (calm) sec.style.display = "none";
-    const set = () => {
-      const t = new Date();
-      const s = t.getSeconds(), min = t.getMinutes() + s / 60;
-      h.setAttribute("transform", `rotate(${((t.getHours() % 12) + min / 60) * 30})`);
-      m.setAttribute("transform", `rotate(${min * 6})`);
-      sec.setAttribute("transform", `rotate(${s * 6})`);
+    const [h, m] = [...hands.current!.children] as SVGGElement[];
+    const now = new Date();
+    let minutes = (now.getHours() % 12) * 60 + now.getMinutes() + now.getSeconds() / 60; // من الساعة 12
+    const draw = () => {
+      h.setAttribute("transform", `rotate(${(minutes / 2) % 360})`);
+      m.setAttribute("transform", `rotate(${(minutes * 6) % 360})`);
     };
-    set();
-    const id = window.setInterval(set, calm ? 30000 : 1000);
-    return () => clearInterval(id);
+    draw();
+    if (reduced()) return;
+
+    let frame = 0, last = 0;
+    const run = (t: number) => {
+      if (last) minutes += ((t - last) / 1000) * (60 / LAP);
+      last = t;
+      draw();
+      frame = requestAnimationFrame(run);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      cancelAnimationFrame(frame);
+      last = 0;
+      if (e.isIntersecting) frame = requestAnimationFrame(run);
+    });
+    io.observe(hands.current!.closest("svg")!);
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(frame);
+    };
   }, []);
 
   const x = ART_X + IMG.dial.x * ART_W, y = ART_Y + IMG.dial.y * ART_H;
@@ -205,15 +222,11 @@ function Clock() {
   return (
     <g transform={`translate(${x} ${y}) scale(${sx} ${sy})`}>
       <circle r="46" fill="#fbfbfc" />
-      {Array.from({ length: 12 }, (_, i) => (
-        <line key={i} y1="-42" y2={i % 3 ? "-38" : "-35"} stroke={i % 3 ? "#c9ccd3" : "#8a8f9c"} strokeWidth={i % 3 ? 2 : 3} strokeLinecap="round" transform={`rotate(${i * 30})`} />
-      ))}
       <g ref={hands} strokeLinecap="round">
-        <g transform="rotate(300)"><line y1="5" y2="-22" stroke="#111318" strokeWidth="5.5" /></g>
-        <g transform="rotate(60)"><line y1="5" y2="-33" stroke="#111318" strokeWidth="3.5" /></g>
-        <g><line y1="9" y2="-38" stroke="#d946ef" strokeWidth="1.6" /></g>
+        <g transform="rotate(300)"><line y1="4" y2="-21" stroke="#111318" strokeWidth="10" /></g>
+        <g transform="rotate(60)"><line y1="4" y2="-34" stroke="#d946ef" strokeWidth="7" /></g>
       </g>
-      <circle r="3.4" fill="#d946ef" />
+      <circle r="7" fill="#111318" />
     </g>
   );
 }
