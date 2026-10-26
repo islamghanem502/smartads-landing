@@ -4,7 +4,7 @@ import { Google, Instagram, Meta, Snapchat, TikTok, type Logo } from "../logos";
 
 /*
  * «فريقك التسويقي، شغّال الحين»: أربعة من الفريق، كلهم الشخصية نفسها (يعني كلهم ذكاء اصطناعي).
- * كل كم ثانية واحد منهم ينوّر ويتكتب جنبه وش يسوي الحين، ومرات يطلع له «+ طلب جديد».
+ * كل كم ثانية واحد منهم ينوّر (والباقي يخفت، مثل خطوات «كيف نشتغل») ويتكتب جنبه وش يسوي الحين، ومرات «+1 طلب».
  * الصفحة المولّدة فيها أول مهمة لكل واحد، والحركة تبدأ بعدها (المهمة الثانية فيها طلب، فيبان من أول لفة). الصور من art/unused/services-standing (مقصوصة).
  */
 type Task = { L: Logo; text: string; sale?: boolean };
@@ -51,6 +51,7 @@ export function Team() {
     if (reduced()) return;
     const el = box.current!;
     const rows = [...el.querySelectorAll<HTMLElement>("[data-row]")];
+    el.setAttribute("data-live", "");
     const at = TEAM.map(() => 0); // وين وصل كل واحد في مهماته
     let r = -1, visible = true;
     const io = new IntersectionObserver(([e]) => (visible = e.isIntersecting));
@@ -69,8 +70,8 @@ export function Team() {
         const tl = gsap.timeline()
           .fromTo(n, { i: 0 }, { i: task.text.length, duration: task.text.length * 0.035, ease: "none", onUpdate: () => { typed.textContent = task.text.slice(0, Math.round(n.i)); } });
         if (task.sale) {
-          tl.fromTo(row.querySelector("[data-sale]"), { opacity: 0, scale: 0.6, y: 4 }, { opacity: 1, scale: 1, y: 0, duration: 0.35, ease: "back.out(2.4)" }, "+=0.25")
-            .to(row.querySelector("[data-sale]"), { opacity: 0, duration: 0.3 }, "+=1.4");
+          tl.fromTo(row.querySelector("[data-sale]"), { opacity: 0, x: 6 }, { opacity: 1, x: 0, duration: 0.3, ease: "power2.out" }, "+=0.2")
+            .to(row.querySelector("[data-sale]"), { opacity: 0, duration: 0.3 }, "+=1.2");
         }
       }
       loop.restart(true);
@@ -79,49 +80,33 @@ export function Team() {
     return () => {
       loop.kill();
       io.disconnect();
+      el.removeAttribute("data-live");
     };
   }, []);
 
   return (
-    <div ref={box} data-a="team" data-reveal className="w-full max-w-[24rem] rounded-[26px] bg-night-2 p-3 ring-1 ring-line sm:w-[clamp(15.5rem,28vw,21rem)] sm:p-3.5">
-      <div className="flex items-center justify-between gap-3 px-2 pb-3 pt-1.5">
-        <p className="whitespace-nowrap text-[1rem] font-bold">فريقك التسويقي</p>
-        <span className="flex items-center gap-1.5 whitespace-nowrap rounded-full bg-[#22c55e]/12 px-2.5 py-1 text-[0.75rem] font-semibold text-[#86efac]">
-          <span className="relative flex size-1.5">
-            <span className="absolute inset-0 animate-ping rounded-full bg-[#22c55e]" />
-            <span className="relative size-1.5 rounded-full bg-[#22c55e]" />
-          </span>
-          شغّال الحين
-        </span>
-      </div>
-
-      <ul className="grid gap-1">
+    <div ref={box} data-a="team" data-reveal className="team w-full max-w-[24rem] rounded-[28px] bg-white/[0.03] px-5 py-5 ring-1 ring-white/[0.07] sm:w-[clamp(15.5rem,28vw,21rem)]">
+      <p className="text-[0.8125rem] font-medium text-fog">فريقك التسويقي</p>
+      <ul className="mt-4 grid gap-4">
         {TEAM.map(({ role, img, tasks }) => (
-          <li
-            key={role}
-            data-row
-            className="relative flex items-center gap-3 rounded-[18px] p-2 transition-colors duration-500 data-on:bg-white/[0.06]"
-          >
-            <span className="relative shrink-0">
-              <img src={img} alt="" width={48} height={48} className="size-11 rounded-[14px] bg-night-3 object-cover sm:size-12" />
-              <span className="absolute -bottom-0.5 -left-0.5 size-3 rounded-full bg-[#22c55e] ring-2 ring-night-2" />
-            </span>
+          <li key={role} data-row className="relative flex items-center gap-3.5 transition-opacity duration-500">
+            {/* خط التدرّج جنب اللي شغّال الحين */}
+            <span aria-hidden data-bar className="absolute -right-3 top-1/2 h-9 w-[3px] -translate-y-1/2 rounded-full bg-(image:--gradient)" />
+            <img src={img} alt="" width={48} height={48} className="size-11 shrink-0 rounded-[15px] bg-night-3 object-cover sm:size-12" />
             <span className="min-w-0 flex-1">
               <span className="block text-[0.9375rem] font-semibold">{role}</span>
-              <span className="mt-0.5 flex items-center gap-1.5 text-[0.8125rem] text-mist">
+              <span className="mt-1 flex items-center gap-1.5 text-[0.8125rem] text-mist">
                 {tasks.map(({ L }, k) => (
                   <span key={k} data-icon={k} hidden={k !== 0} className="grid size-4 shrink-0 place-items-center rounded-[5px] bg-white">
                     <L className="size-3 rounded-[3px]" />
                   </span>
                 ))}
                 <span data-text className="truncate">{tasks[0].text}</span>
+                {tasks.some((t) => t.sale) && (
+                  <span data-sale aria-hidden className="shrink-0 font-semibold text-[#4ade80] opacity-0"><bdi dir="ltr">+1</bdi> طلب</span>
+                )}
               </span>
             </span>
-            {tasks.some((t) => t.sale) && (
-              <span data-sale aria-hidden className="absolute left-2 top-2 rounded-full bg-[#22c55e] px-2 py-0.5 text-[0.6875rem] font-bold text-night opacity-0">
-                + طلب جديد
-              </span>
-            )}
           </li>
         ))}
       </ul>

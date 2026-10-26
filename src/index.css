@@ -237,3 +237,18 @@ body {
     transform: translateY(70%);
   }
 }
+
+/* كرت الفريق: لما تشتغل الحركة (data-live) اللي مو شغّال يخفت وخط التدرّج يطلع جنب اللي شغّال.
+   بدونها (الصفحة المولّدة أو «تقليل الحركة») الكل واضح وبدون خط */
+.team [data-bar] {
+  scale: 1 0;
+  transition: scale 0.5s var(--ease-lift);
+}
+
+.team[data-live] [data-row]:not([data-on]) {
+  opacity: 0.45;
+}
+
+.team [data-on] [data-bar] {
+  scale: 1 1;
+}

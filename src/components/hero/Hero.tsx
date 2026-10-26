@@ -26,7 +26,7 @@ export function Hero() {
       .fromTo("[data-a=line]", { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.12 }, 0.1)
       .fromTo("[data-a=fade]", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, 0.4)
       .fromTo("[data-a=team]", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.45)
-      .fromTo("[data-a=team] [data-row]", { x: 14, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.09 }, 0.75)
+      .fromTo("[data-a=team] [data-row]", { x: 14, opacity: 0 }, { x: 0, opacity: 1, duration: 0.5, stagger: 0.09, clearProps: "opacity,transform" }, 0.75)
       .fromTo("[data-a=mascot]", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "back.out(1.4)" }, 0.75)
       .fromTo("[data-a=hello]", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
   }, { scope: ref });
