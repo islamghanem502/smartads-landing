@@ -108,18 +108,21 @@ export function Footer() {
 /*
  * البوابة: SVG واحد بعرض الفتحة (1000 وحدة)، وخط الأفق يمر من نصها.
  * الطبقات: جوف الفتحة والحافة اللي ورا ← الشخصية ← الحافة اللي قدّام.
- * الشخصية مقصوصة بـ(كل اللي فوق نص الفتحة + الفتحة نفسها): جسمها ينزل داخل الفتحة، ويختفي ورا الحافة اللي قدّام
- * بنفس انحناءها، ويغمق كل ما نزل. لما ينزل الزائر للفوتر تطلع من الفتحة (rise في index.css، على خط زمني --portal).
+ * الشخصية طالعة من نص الفتحة، وقدّامها جوف الفتحة فاضي لين الحافة اللي قدّام: مقصوصة بـ«كل اللي فوق نص الفتحة
+ * + مقطع جسمها عند السطح» (WAIST)، وتغمق وتذوب كل ما نزلت. لما ينزل الزائر للفوتر تطلع من الفتحة (rise في index.css، على خط زمني --portal).
  * الصورة: مقاسها، ومكان وجه الساعة فيها، ونص الجسم بالعرض (الذراع المرفوعة تخلّيه يسار نص الصورة) في IMG.
  * لو تغيّرت الصورة غيّر الأرقام هنا بس.
  * الشخصية كلها (بذراعها المرفوعة) في نص الفتحة، والفتحة أعرض منها شوي، وعمقها ثلث عرضها عشان حافتها اللي ورا تمر ورا الذراعين.
  */
-const IMG = { src: "/footer/watch.webp", w: 900, h: 915, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
-const HOLE = { w: 1000, cy: 535, rx: 420, ry: 140 };
+const IMG = { src: "/footer/watch.webp", w: 900, h: 915, waist: { x: 0.103, w: 0.7413 }, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
+const HOLE = { w: 1000, cy: 645, rx: 420, ry: 140 };
 const ART_W = 640;
 const ART_H = (ART_W * IMG.h) / IMG.w;
 const ART_X = (HOLE.w - ART_W) / 2;
-const ART_Y = HOLE.cy + HOLE.ry * 0.92 - ART_H; // الخصر تحت الحافة اللي قدّام (مخفي)
+// مقطع الجسم عند سطح الفتحة: بيضاوي صغير بنفس منظور الفتحة، فأسفل الجسم ينقص بانحناء مو بخط مستقيم
+const WAIST = { cx: ART_X + (IMG.waist.x + IMG.waist.w / 2) * ART_W, rx: (IMG.waist.w / 2) * ART_W + 8 };
+const WAIST_RY = (WAIST.rx * HOLE.ry) / HOLE.rx;
+const ART_Y = HOLE.cy + WAIST_RY - ART_H; // الخصر (أسفل الصورة) عند أسفل المقطع، فيختفي مع الانحناء
 const VIEW_H = HOLE.cy + HOLE.ry + 20;
 const arc = (sweep: 0 | 1) => `M${HOLE.w / 2 - HOLE.rx} ${HOLE.cy}a${HOLE.rx} ${HOLE.ry} 0 0 ${sweep} ${2 * HOLE.rx} 0`;
 
@@ -148,9 +151,9 @@ function Portal() {
           </linearGradient>
           <clipPath id="portal-clip">
             <rect width={HOLE.w} height={cy} />
-            <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
+            <ellipse cx={WAIST.cx} cy={cy} rx={WAIST.rx} ry={WAIST_RY} />
           </clipPath>
-          <linearGradient id="sink" gradientUnits="userSpaceOnUse" x1="0" y1={cy - ry * 0.3} x2="0" y2={cy + ry * 0.8}>
+          <linearGradient id="sink" gradientUnits="userSpaceOnUse" x1="0" y1={cy - ry * 0.45} x2="0" y2={cy + WAIST_RY}>
             <stop offset="0" stopColor="#fff" />
             <stop offset="1" stopColor="#000" />
           </linearGradient>
