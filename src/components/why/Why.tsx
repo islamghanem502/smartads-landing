@@ -19,8 +19,9 @@ export function Why() {
               <Ink>إنت تقهوى،</Ink> <span className="chip text-white">وإحنا نسوّق</span>
             </h2>
             <p className="mt-6 max-w-[34rem] text-[1.125rem] leading-[1.9] text-ink-soft">
-              هدفنا مو بس ندير حملاتك. هدفنا نكون <strong className="font-semibold text-night">فريقك التسويقي الكامل</strong>: بخبرة تسويق حقيقية،
-              نخطط، ونصمم، وننشر، ونتابع 24 ساعة… حتى وإنت نايم.
+              بنينا مسوّقك الذكي على خبرة تسويق كبيرة، وهدفنا مو بس ندير حملاتك. هدفنا نكون فريقك التسويقي الكامل: نطلق لك
+              <strong className="font-semibold text-night"> حملات قوية تجيب مبيعات</strong>، ونبني لعلامتك
+              <strong className="font-semibold text-night"> جمهور يعرفها ويرجع لها</strong>، ونتابع 24 ساعة… حتى وإنت نايم.
             </p>
             <p className="mt-5 text-[1.375rem] font-bold leading-[1.6]">
               وهمّنا الأول؟ <mark className="hl [--hl:#ddd2ff]">مبيعاتك</mark>، وجمهورك، وهويتك.
@@ -40,10 +41,11 @@ export function Why() {
  * الشخصية طالعة من «شاشة» غامقة: نص جسمها اللي تحت داخلها، وراسها والفنجال طالعين فوقها على الصفحة.
  * المواضع من الصورة نفسها (1000×893): الجسم من 23٪ لين 81٪ بالعرض، وحافة الفنجال عند 78٪ بالعرض و36٪ بالطول.
  * لما تنزل للقسم الشخصية تكبر شوي كأنها تقرّب منك (popout في index.css)، والبخار يطلع من الفنجال.
+ * في اللابتوب حافة الشاشة الغامقة على حافة المحتوى اليسار (مقابل الكلام اللي على اليمين)، فنزيحها 2٪ قد هامش الشاشة داخل الصورة.
  */
 function Coffee() {
   return (
-    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[24rem] lg:max-w-[27rem]">
+    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[24rem] lg:me-0 lg:max-w-[27rem] lg:-translate-x-[2%]">
       <div aria-hidden className="absolute inset-x-[2%] bottom-0 top-[52%] overflow-hidden rounded-[32px] bg-night ring-1 ring-white/10">
         <span className="absolute inset-x-[15%] -bottom-1/2 h-full rounded-full bg-[#7c5cff]/50 blur-3xl" />
       </div>
@@ -99,7 +101,7 @@ function Offer() {
           <span aria-hidden className="absolute -right-[calc(var(--pad)+0.75rem)] -top-3 size-6 rounded-full bg-night" />
           <span aria-hidden className="absolute -left-[calc(var(--pad)+0.75rem)] -top-3 size-6 rounded-full bg-night" />
           <span className="text-[1.0625rem] font-semibold">تدفع اليوم</span>
-          <strong className="bg-(image:--gradient) bg-clip-text text-[clamp(2.25rem,4vw,3rem)] leading-none text-transparent">0 ريال</strong>
+          <strong className="bg-(image:--gradient) bg-clip-text text-[clamp(2.25rem,4vw,3rem)] pb-[0.2em] leading-none text-transparent">0 ريال</strong>
         </div>
       </div>
 
