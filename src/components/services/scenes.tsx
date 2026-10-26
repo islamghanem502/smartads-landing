@@ -39,7 +39,7 @@ function useStory(play: number, build: (q: Q) => gsap.core.Timeline) {
 /** اللوحة: نفس الإطار الغامق، بس نصّها السفلي يختفي، وتمتد ورا راس الشخصية (الهامش السالب) */
 function Panel({ className = "", children }: { className?: string; children: ReactNode }) {
   return (
-    <div className={`-mb-[24%] w-[86%] flex-1 rounded-2xl bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 [mask-image:linear-gradient(to_bottom,#000_50%,transparent_97%)] ${className}`}>
+    <div className={`-mb-[24%] w-[86%] flex-1 rounded-2xl bg-[#1b1e25] p-3 text-white ring-1 ring-white/10 [mask-image:linear-gradient(to_bottom,#000_38%,transparent_84%)] ${className}`}>
       {children}
     </div>
   );
@@ -163,14 +163,14 @@ export function StudioScene({ play, hover }: SceneProps) {
             </span>
           </div>
           {/* المنشورات: صورتين وفيديو، وتكمّل لتحت وتختفي */}
-          <div className="mt-2.5 grid grid-cols-3 gap-1.5">
+          <div className="mx-auto mt-2.5 grid w-[78%] grid-cols-3 gap-1.5">
             {[0, 1].map((k) => (
               <span key={k} className="relative aspect-[3/4] rounded-lg bg-white/[0.08]">
                 <span className="absolute left-[22%] top-[22%] size-[18%] rounded-full bg-white/20" />
                 <svg viewBox="0 0 40 20" preserveAspectRatio="none" className="absolute inset-x-0 bottom-0 h-[42%] w-full rounded-b-lg"><path d="M0 20 13 7l9 8 6-5 12 10z" fill="rgb(255 255 255 / 0.18)" /></svg>
               </span>
             ))}
-            <span className="grid aspect-[3/4] place-items-center rounded-lg bg-[#e85aa6]">
+            <span className="grid aspect-[3/4] place-items-center rounded-lg bg-[#e85aa6]/45">
               <span className="ml-0.5 border-y-[6px] border-l-[9px] border-y-transparent border-l-white" />
             </span>
           </div>
@@ -290,7 +290,7 @@ export function ChatScene({ play }: SceneProps) {
   const bubble = "rounded-2xl px-3 shadow-[0_10px_28px_-10px_rgb(0_0_0/0.8)]";
   return (
     <div ref={ref} aria-hidden className="contents">
-      <div className="-mb-[24%] grid w-[86%] flex-1 content-start gap-1.5 text-white [mask-image:linear-gradient(to_bottom,#000_55%,transparent_97%)]">
+      <div className="-mb-[24%] grid w-[86%] flex-1 content-start gap-1.5 text-white [mask-image:linear-gradient(to_bottom,#000_45%,transparent_86%)]">
         <div data-msg className={`${bubble} me-3 rounded-ss-md bg-[#202c33] py-2`}>
           <p className="text-[0.6875rem] font-semibold text-[#53bdeb]">مسوّقك الذكي</p>
           <p className="mt-0.5 text-[0.8125rem] font-semibold">تقرير الأسبوع</p>
