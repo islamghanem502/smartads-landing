@@ -9,6 +9,17 @@
   --color-fog: #a3a8b4; /* روابط النافبار */
   --color-mist: #cfd3db; /* الكلام الثانوي */
   --color-chip: #f2f3f6;
+  /* الأقسام الفاتحة: ورق دافي، والكلام بنفس كحلي الهوية */
+  --color-paper: #f7f6f2;
+  --color-ink-soft: #5c6170;
+  /* لون لكل خدمة، من نفس التدرّج */
+  --color-violet: #7c5cff;
+  --color-pink: #d946ef;
+  --color-amber: #ffa94d;
+  /* ألواح الرسومات: نفس الألوان بس فاتحة، عشان الشخصية البيضاء والأداة الملوّنة يبانون عليها */
+  --color-violet-soft: #ece7ff;
+  --color-pink-soft: #fbe4fb;
+  --color-amber-soft: #ffeedd;
   --font-sans: "Rubik Variable", system-ui, sans-serif;
   --ease-lift: cubic-bezier(0.32, 0.72, 0, 1);
   --container-page: 80rem;
@@ -40,7 +51,8 @@ body {
 }
 
 :focus-visible {
-  outline: 2px solid #fff;
+  /* بلون الكلام نفسه: أبيض على الغامق، كحلي على الفاتح */
+  outline: 2px solid currentColor;
   outline-offset: 3px;
   border-radius: 6px;
 }
