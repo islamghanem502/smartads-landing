@@ -49,7 +49,6 @@ export function Hero() {
 
           <div data-reveal data-a="fade" className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-4">
             <a
-              data-smile
               href={SIGNUP_URL}
               className="inline-flex h-12 items-center rounded-[14px] bg-white px-7 font-semibold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.97]"
             >

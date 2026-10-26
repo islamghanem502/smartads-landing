@@ -5,7 +5,7 @@ import { Facebook, Google, Instagram, Meta, Snapchat, TikTok, type Logo } from "
 /* مسوّقك الذكي فوق، ومنه فرع لكل خدمة، وفي آخر الفرع المنصات اللي نشتغل عليها */
 const SERVICES: { title: string; text: string; on: Logo[] }[] = [
   { title: "حملات إعلانية", text: "نطلقها ونحسّنها كل يوم", on: [Snapchat, TikTok, Meta, Google] },
-  { title: "منشورات وفيديوهات", text: "نصمّمها وننشرها في حساباتك", on: [Instagram, TikTok, Facebook] },
+  { title: "منشورات وفيديوهات", text: "نصمّمها وننشرها في حساباتك", on: [Instagram, TikTok, Snapchat, Facebook] },
   { title: "سيو متجرك", text: "نرفعك في نتائج قوقل", on: [Google] },
 ];
 

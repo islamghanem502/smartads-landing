@@ -77,7 +77,7 @@ export function LinkVisual({ play }: VisualProps) {
 
 const MODES = ["إعلانات", "نشر", "الاثنين"];
 const ADS: Logo[] = [Snapchat, TikTok, Meta, Google];
-const POSTS: Logo[] = [Instagram, TikTok, Facebook];
+const POSTS: Logo[] = [Instagram, TikTok, Snapchat, Facebook];
 
 export function ChooseVisual({ play }: VisualProps) {
   const [mode, setMode] = useState(2);

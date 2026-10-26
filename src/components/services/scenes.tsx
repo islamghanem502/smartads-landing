@@ -132,7 +132,7 @@ export function StudioScene({ play, hover }: SceneProps) {
       <Panel>
         <div data-post>
           <span className="flex gap-1">
-            {[Instagram, TikTok, Facebook].map((L, i) => <span key={i} className={`${tile} size-[1.125rem]`}><L className="size-3" /></span>)}
+            {[Instagram, TikTok, Snapchat, Facebook].map((L, i) => <span key={i} className={`${tile} size-[1.125rem]`}><L className="size-3" /></span>)}
           </span>
           {/* المنشورات: صورتين وفيديو، وتكمّل لتحت وتختفي */}
           <div className="mx-auto mt-2.5 grid w-[78%] grid-cols-3 gap-1.5">

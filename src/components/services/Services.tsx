@@ -113,7 +113,6 @@ export function Services() {
         </div>
         <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-3 lg:justify-start">
           <a
-            data-smile
             href={SIGNUP_URL}
             className="inline-flex h-12 items-center rounded-[14px] bg-night px-7 font-semibold text-white transition-[background-color,scale] hover:bg-night-3 active:scale-[0.97]"
           >
