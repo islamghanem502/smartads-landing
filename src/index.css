@@ -83,12 +83,12 @@ body {
   }
 }
 
-/* كلام يتلوّن لما يمر عليه المؤشر: التدرّج يمسح الكلمة من اليمين، ويرجع أبيض لما يطلع */
+/* كلام يتلوّن لما يمر عليه المؤشر: التدرّج يمسح الكلمة من اليمين، ويرجع للونه لما يطلع (أبيض، أو --ink-base في الأقسام الفاتحة) */
 .ink {
   display: inline-block;
   padding-bottom: 0.1em;
   margin-bottom: -0.1em;
-  background-image: var(--gradient), linear-gradient(#fff, #fff);
+  background-image: var(--gradient), linear-gradient(var(--ink-base, #fff), var(--ink-base, #fff));
   background-size: 0% 100%, 100% 100%;
   background-position: right;
   background-repeat: no-repeat;

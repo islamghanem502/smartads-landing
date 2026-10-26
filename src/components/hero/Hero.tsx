@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { gsap, reduced, useGSAP } from "../../lib/gsap";
 import { SIGNUP_URL } from "../../lib/links";
+import { Ink } from "../Ink";
 import { Container } from "../layout";
 import { Salla, Website, ZidMark } from "../logos";
 import { Mascot } from "./Mascot";
@@ -11,16 +12,6 @@ const STORES = [
   { L: ZidMark, name: "زد" },
   { L: Website, name: "موقعك الخاص" },
 ];
-
-/** كلام يتلوّن بالتدرّج لما يمر عليه المؤشر، كلمة كلمة. */
-function Ink({ children }: { children: string }) {
-  return children.split(" ").map((w, i) => (
-    <span key={i}>
-      {i > 0 && " "}
-      <span className="ink">{w}</span>
-    </span>
-  ));
-}
 
 /*
  * الهيرو يملا الشاشة (لين 56rem في الشاشات الطويلة، وبعدها يبان أول القسم اللي بعده)، والمحتوى في نص المساحة اللي تحت النافبار:
