@@ -167,3 +167,14 @@ body {
     --edge: max(var(--gutter), calc((100% - var(--container-page)) / 2 + var(--gutter)));
   }
 }
+
+/* قلم تظليل على الكلمة المهمة في وصف الكرت، بلون الكرت (--hl). علامتنا في الأوصاف، أخف من ملصق «كاملة» في العناوين */
+.hl {
+  background: linear-gradient(transparent 50%, var(--hl) 50%, var(--hl) 92%, transparent 92%);
+  padding-inline: 0.12em;
+  margin-inline: -0.06em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  color: var(--color-night);
+  font-weight: 600;
+}

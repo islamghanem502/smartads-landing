@@ -3,6 +3,8 @@
  * الأرقام أمثلة توضيحية. كلها على كرت غامق، فألوانها ألوان الوضع الليلي.
  */
 
+import { Google, Meta, Snapchat, TikTok } from "../logos";
+
 /* أيقونات العناوين: مربع ملوّن ورمز بسيط */
 export function Tile({ bg, children }: { bg: string; children: React.ReactNode }) {
   return (
@@ -114,6 +116,42 @@ export function ReportsScene() {
           <span className="shrink-0 text-[0.5625rem] text-white/55">9:04 ص</span>
         </p>
       </div>
+    </div>
+  );
+}
+
+/** الإعلانات: توزيع الميزانية على المنصات، والرابحة عمودها يكبر وأضعفها ينقص (هذا التحسين كل ربع ساعة) */
+export function BudgetScene({ accent }: { accent: string }) {
+  const cols = [
+    { L: Snapchat, n: "سناب شات", v: 42, move: "up" },
+    { L: TikTok, n: "تيك توك", v: 28 },
+    { L: Meta, n: "ميتا", v: 20 },
+    { L: Google, n: "قوقل", v: 10, move: "down" },
+  ];
+  return (
+    <div className="mx-auto w-[80%] rounded-2xl bg-[#1b1e25] px-3.5 pb-3 pt-3 text-white ring-1 ring-white/10 shadow-[0_18px_40px_-16px_rgb(0_0_0/0.7)]">
+      <div className="flex items-center justify-between">
+        <span className="text-[0.75rem] font-semibold">توزيع الميزانية</span>
+        <span className="text-[0.6875rem] text-white/45">اليوم</span>
+      </div>
+      <ul className="mt-2.5 grid grid-cols-4 gap-3">
+        {cols.map(({ L, n, v, move }) => (
+          <li key={n} className="flex flex-col items-center gap-1">
+            <span className="flex items-center gap-0.5 text-[0.625rem] tabular-nums text-white/70">
+              {move && (
+                <svg viewBox="0 0 10 10" aria-hidden className={`size-2 ${move === "up" ? "text-[#4ade80]" : "rotate-180 text-[#f87171]"}`}>
+                  <path d="M5 2 9 7H1z" fill="currentColor" />
+                </svg>
+              )}
+              {v}٪
+            </span>
+            <span className="flex h-10 w-full items-end">
+              <span className="w-full rounded-t-md" style={{ height: `${(v / 42) * 100}%`, background: move === "up" ? accent : "rgb(255 255 255 / 0.22)" }} />
+            </span>
+            <span className="mt-1 grid size-6 place-items-center rounded-md bg-white"><L className="size-4" /></span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
