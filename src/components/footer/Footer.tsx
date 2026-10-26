@@ -1,3 +1,5 @@
+import { useEffect, useRef } from "react";
+import { reduced } from "../../lib/gsap";
 import { APP_URL, LOGIN_URL, SIGNUP_URL } from "../../lib/links";
 import { Ink } from "../Ink";
 import { Container } from "../layout";
@@ -5,7 +7,7 @@ import { LINKS } from "../Nav";
 
 /*
  * الفوتر: الختام فوق (لا تضيّع وقت + سجّل/دخول)، وبعده الشخصية طالعة من بوابة بيضاوية على خط الأفق
- * وتورّيك ساعتها (العقارب تدور)، وتحت الخط الروابط وبيانات المؤسسة.
+ * وتورّيك ساعتها (تمشي على الوقت الحقيقي وعقرب الثواني يتكتك)، وتحت الخط الروابط وبيانات المؤسسة.
  */
 const GROUPS = [
   { title: "الصفحة", links: LINKS },
@@ -104,77 +106,112 @@ export function Footer() {
 }
 
 /*
- * البوابة: خط أفق بعرض المحتوى، وفي نصه فتحة بيضاوية غامقة بحافة بالتدرّج، والشخصية طالعة منها.
- * الطبقات: نص الفتحة اللي ورا (والحافة اللي فوق) ← الشخصية (مقصوصة عند نص الفتحة وتذوب في الظلام) ← الحافة اللي قدّام.
- * لما ينزل الزائر للفوتر الشخصية تطلع من الفتحة (rise في index.css). القص overflow-clip مو hidden،
- * لأن hidden يخلّي الصندوق نفسه حاوية تمرير فالحركة تتبعه بدل الصفحة.
- * الساعة: مكان الوجه من الصورة نفسها (900×891): المركز عند 85.05٪ بالعرض و51.76٪ بالطول، وقطره 12.86٪ من العرض.
+ * البوابة: SVG واحد بعرض الفتحة (1000 وحدة)، وخط الأفق يمر من نصها.
+ * الطبقات: جوف الفتحة والحافة اللي ورا ← الشخصية ← الحافة اللي قدّام.
+ * الشخصية مقصوصة بـ(كل اللي فوق نص الفتحة + الفتحة نفسها): جسمها ينزل داخل الفتحة، ويختفي ورا الحافة اللي قدّام
+ * بنفس انحناءها، ويغمق كل ما نزل. لما ينزل الزائر للفوتر تطلع من الفتحة (rise في index.css، على خط زمني --portal).
+ * الصورة: مقاسها ومكان وجه الساعة فيها (نسبة من عرضها وطولها) في IMG. لو تغيّرت الصورة غيّر الأرقام هنا بس.
  */
+const IMG = { src: "/footer/watch.webp", w: 900, h: 915, dial: { x: 0.874, y: 0.4855, rx: 0.0489, ry: 0.0491 } };
+const HOLE = { w: 1000, cy: 760, rx: 494, ry: 122 };
+const ART_W = 760;
+const ART_H = (ART_W * IMG.h) / IMG.w;
+const ART_X = (HOLE.w - ART_W) / 2;
+const ART_Y = HOLE.cy + HOLE.ry * 0.92 - ART_H; // الخصر تحت الحافة اللي قدّام (مخفي)
+const VIEW_H = HOLE.cy + HOLE.ry + 20;
+const arc = (sweep: 0 | 1) => `M${HOLE.w / 2 - HOLE.rx} ${HOLE.cy}a${HOLE.rx} ${HOLE.ry} 0 0 ${sweep} ${2 * HOLE.rx} 0`;
+
 function Portal() {
+  const { cy, rx, ry } = HOLE;
+  const cx = HOLE.w / 2;
   return (
-    <div className="relative mt-14 lg:mt-16">
-      <span aria-hidden className="absolute inset-x-0 bottom-0 h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.16)_18%,rgb(255_255_255/0.16)_82%,transparent)]" />
-      <div className="relative mx-auto w-[min(22rem,72vw)]">
-        <Rim part="back" />
-        <div className="relative z-10 aspect-[900/891] overflow-clip [mask-image:linear-gradient(to_top,transparent,#000_16%)]">
-          <div className="rise relative size-full">
-            <img src="/footer/watch.webp" alt="مسوّقك الذكي يأشّر على ساعته" width={900} height={891} loading="lazy" decoding="async" className="size-full" />
+    <div className="portal relative mt-14 lg:mt-16">
+      <span
+        aria-hidden
+        className="absolute inset-x-0 h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.16)_18%,rgb(255_255_255/0.16)_82%,transparent)]"
+        style={{ top: `${(cy / VIEW_H) * 100}%` }}
+      />
+      <svg viewBox={`0 0 ${HOLE.w} ${VIEW_H}`} role="img" aria-label="مسوّقك الذكي يأشّر على ساعته" className="relative mx-auto block w-[min(30rem,96vw)] overflow-visible">
+        <defs>
+          <linearGradient id="rim" x1="0" x2="1">
+            <stop offset="0" stopColor="#7c5cff" />
+            <stop offset="0.5" stopColor="#d946ef" />
+            <stop offset="1" stopColor="#ffa94d" />
+          </linearGradient>
+          {/* الجدار البعيد داخل الفتحة فيه شوية ضوء، والقريب ظلام */}
+          <linearGradient id="hole" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#262a35" />
+            <stop offset="0.45" stopColor="#0b0c10" />
+            <stop offset="1" stopColor="#000" />
+          </linearGradient>
+          <clipPath id="portal-clip">
+            <rect width={HOLE.w} height={cy} />
+            <ellipse cx={cx} cy={cy} rx={rx} ry={ry} />
+          </clipPath>
+          <linearGradient id="sink" gradientUnits="userSpaceOnUse" x1="0" y1={cy - 30} x2="0" y2={cy + ry * 0.75}>
+            <stop offset="0" stopColor="#fff" />
+            <stop offset="1" stopColor="#000" />
+          </linearGradient>
+          <mask id="sink-mask" maskUnits="userSpaceOnUse" x="0" y="0" width={HOLE.w} height={VIEW_H}>
+            <rect width={HOLE.w} height={VIEW_H} fill="url(#sink)" />
+          </mask>
+          <filter id="glow" x="-10%" y="-60%" width="120%" height="220%">
+            <feGaussianBlur stdDeviation="10" />
+          </filter>
+        </defs>
+
+        <ellipse cx={cx} cy={cy} rx={rx} ry={ry} fill="url(#hole)" />
+        <path d={arc(1)} stroke="url(#rim)" strokeWidth="2.5" fill="none" opacity="0.45" />
+        <g clipPath="url(#portal-clip)" mask="url(#sink-mask)">
+          <g className="rise">
+            <image href={IMG.src} x={ART_X} y={ART_Y} width={ART_W} height={ART_H} />
             <Clock />
-          </div>
-        </div>
-        <Rim part="front" />
-      </div>
+          </g>
+        </g>
+        <path d={arc(0)} stroke="url(#rim)" strokeWidth="14" fill="none" opacity="0.5" filter="url(#glow)" />
+        <path d={arc(0)} stroke="url(#rim)" strokeWidth="4.5" fill="none" />
+      </svg>
     </div>
   );
 }
 
-/* الفتحة: بيضاوية أعرض من الشخصية، نصها فوق خط الأفق ونصها تحته */
-function Rim({ part }: { part: "back" | "front" }) {
-  const back = part === "back";
-  return (
-    <svg
-      aria-hidden
-      viewBox="0 0 600 150"
-      className={`absolute -left-[16%] bottom-0 w-[132%] translate-y-1/2 overflow-visible ${back ? "" : "z-20 drop-shadow-[0_0_10px_rgb(217_70_239/0.55)]"}`}
-      fill="none"
-    >
-      <defs>
-        <linearGradient id={`rim-${part}`} x1="0" x2="1">
-          <stop offset="0" stopColor="#7c5cff" />
-          <stop offset="0.5" stopColor="#d946ef" />
-          <stop offset="1" stopColor="#ffa94d" />
-        </linearGradient>
-        {back && (
-          <radialGradient id="hole" cx="0.5" cy="0.42" r="0.6">
-            <stop offset="0" stopColor="#000" />
-            <stop offset="0.7" stopColor="#07080b" />
-            <stop offset="1" stopColor="#15171d" />
-          </radialGradient>
-        )}
-      </defs>
-      {back ? (
-        <>
-          <ellipse cx="300" cy="75" rx="296" ry="71" fill="url(#hole)" />
-          <path d="M4 75a296 71 0 0 1 592 0" stroke={`url(#rim-${part})`} strokeWidth="2.5" opacity="0.55" />
-        </>
-      ) : (
-        <>
-          <path d="M4 75a296 71 0 0 0 592 0" stroke={`url(#rim-${part})`} strokeWidth="3" />
-        </>
-      )}
-    </svg>
-  );
-}
-
-/* عقارب فوق وجه الساعة: الدقائق تدور بسرعة والساعات أبطأ، يعني الوقت يمشي */
+/*
+ * الساعة على الوقت الحقيقي حق الزائر: الساعات والدقائق في مكانها، وعقرب الثواني يتكتك كل ثانية.
+ * مرسومة على وجه 100 وحدة (نص قطره 50) وتنكبر على وجه الساعة اللي في الصورة.
+ * قبل الجافاسكربت (الصفحة المولّدة) تطلع على 10:10. مع «تقليل الحركة» بدون عقرب الثواني.
+ */
 function Clock() {
+  const hands = useRef<SVGGElement>(null);
+  useEffect(() => {
+    const [h, m, sec] = [...hands.current!.children] as SVGGElement[];
+    const calm = reduced();
+    if (calm) sec.style.display = "none";
+    const set = () => {
+      const t = new Date();
+      const s = t.getSeconds(), min = t.getMinutes() + s / 60;
+      h.setAttribute("transform", `rotate(${((t.getHours() % 12) + min / 60) * 30})`);
+      m.setAttribute("transform", `rotate(${min * 6})`);
+      sec.setAttribute("transform", `rotate(${s * 6})`);
+    };
+    set();
+    const id = window.setInterval(set, calm ? 30000 : 1000);
+    return () => clearInterval(id);
+  }, []);
+
+  const x = ART_X + IMG.dial.x * ART_W, y = ART_Y + IMG.dial.y * ART_H;
+  const sx = (IMG.dial.rx * ART_W) / 50, sy = (IMG.dial.ry * ART_H) / 50;
   return (
-    <svg aria-hidden viewBox="-50 -50 100 100" className="absolute left-[85.05%] top-[51.76%] w-[12.86%] -translate-x-1/2 -translate-y-1/2">
-      <circle r="47" fill="#fbfbfc" />
-      <path d="M0-43v6M43 0h-6M0 43v-6M-43 0h6" stroke="#c4c8d0" strokeWidth="3" strokeLinecap="round" />
-      <line className="clock-h" y2="-22" stroke="#111318" strokeWidth="5.5" strokeLinecap="round" />
-      <line className="clock-m" y2="-34" stroke="#111318" strokeWidth="3.5" strokeLinecap="round" />
-      <circle r="4" fill="#d946ef" />
-    </svg>
+    <g transform={`translate(${x} ${y}) scale(${sx} ${sy})`}>
+      <circle r="46" fill="#fbfbfc" />
+      {Array.from({ length: 12 }, (_, i) => (
+        <line key={i} y1="-42" y2={i % 3 ? "-38" : "-35"} stroke={i % 3 ? "#c9ccd3" : "#8a8f9c"} strokeWidth={i % 3 ? 2 : 3} strokeLinecap="round" transform={`rotate(${i * 30})`} />
+      ))}
+      <g ref={hands} strokeLinecap="round">
+        <g transform="rotate(300)"><line y1="5" y2="-22" stroke="#111318" strokeWidth="5.5" /></g>
+        <g transform="rotate(60)"><line y1="5" y2="-33" stroke="#111318" strokeWidth="3.5" /></g>
+        <g><line y1="9" y2="-38" stroke="#d946ef" strokeWidth="1.6" /></g>
+      </g>
+      <circle r="3.4" fill="#d946ef" />
+    </g>
   );
 }

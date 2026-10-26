@@ -235,12 +235,18 @@ body {
   }
 }
 
-/* الفوتر: الشخصية تطلع من البوابة وإنت نازل (مع التمرير، ومكانها النهائي لو المتصفح ما يدعمها) */
+/* الفوتر: الشخصية تطلع من البوابة وإنت نازل (مع التمرير، ومكانها النهائي لو المتصفح ما يدعمها).
+   الخط الزمني على غلاف البوابة (عنصر HTML)، والحركة على مجموعة داخل الـ SVG */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
+    .portal {
+      view-timeline: --portal block;
+    }
+
     .rise {
+      transform-box: fill-box;
       animation: rise linear both;
-      animation-timeline: view();
+      animation-timeline: --portal;
       animation-range: entry 10% cover 42%;
     }
   }
@@ -248,30 +254,6 @@ body {
 
 @keyframes rise {
   from {
-    transform: translateY(72%);
-  }
-}
-
-/* عقارب الساعة: تبدأ على 10:10، والدقائق تلف بسرعة كأن الوقت يركض */
-.clock-h,
-.clock-m {
-  transform-box: view-box;
-  transform-origin: 50% 50%;
-  animation: tick linear infinite;
-}
-
-.clock-h {
-  rotate: 300deg;
-  animation-duration: 36s;
-}
-
-.clock-m {
-  rotate: 60deg;
-  animation-duration: 3s;
-}
-
-@keyframes tick {
-  to {
-    transform: rotate(360deg);
+    transform: translateY(70%);
   }
 }
