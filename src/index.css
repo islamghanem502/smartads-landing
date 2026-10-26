@@ -9,11 +9,9 @@
   --color-fog: #a3a8b4; /* روابط النافبار */
   --color-mist: #cfd3db; /* الكلام الثانوي */
   --color-chip: #f2f3f6;
-  /* الأقسام البيضاء: الكلام الثانوي، ولون كل كرت خدمة (درجة فاتحة من نفس التدرّج) */
+  /* الأقسام الفاتحة: رمادي فاتح (نفس التصميم القديم) والكروت بيضاء عليه */
+  --color-cloud: #f4f5f7;
   --color-ink-soft: #5c6170;
-  --color-violet-tint: #efeaff;
-  --color-pink-tint: #fce7fb;
-  --color-amber-tint: #fff0e0;
   --font-sans: "Rubik Variable", system-ui, sans-serif;
   --ease-lift: cubic-bezier(0.32, 0.72, 0, 1);
   --container-page: 80rem;
@@ -156,4 +154,16 @@ body {
   height: 5.2%;
   background: radial-gradient(closest-side, rgb(0 0 0 / 0.95), rgb(0 0 0 / 0.5) 50%, transparent);
   filter: blur(2px);
+}
+
+/* شريط الخدمات: أول كرت يبدأ من حافة المحتوى (نفس خط العنوان)، والباقي يكمّل لين حافة الشاشة.
+   في الجوال الكرت في النص وأطراف اللي جنبه باينة. ‎100% هنا عرض القسم نفسه، مو الشاشة، فما يدخل فيه شريط التمرير */
+.svc-track {
+  --edge: 11vw;
+}
+
+@media (min-width: 640px) {
+  .svc-track {
+    --edge: max(var(--gutter), calc((100% - var(--container-page)) / 2 + var(--gutter)));
+  }
 }

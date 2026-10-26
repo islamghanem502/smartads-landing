@@ -14,7 +14,7 @@ export function Nav() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 pt-3">
       <Container>
-        <nav aria-label="الرئيسية" className="flex items-center justify-between gap-3 rounded-[20px] bg-night-2/80 px-3 py-2.5 ring-1 ring-line backdrop-blur-md sm:gap-6 sm:px-4">
+        <nav aria-label="الرئيسية" className="flex items-center justify-between gap-3 rounded-[20px] bg-night-2/90 px-3 py-2.5 ring-1 ring-line backdrop-blur-md sm:gap-6 sm:px-4">
           <a href="/" className="flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[1rem] font-bold sm:text-[1.0625rem]">
             <span className="grid size-9 place-items-center overflow-hidden rounded-full bg-night-3 ring-1 ring-line">
               <img src="/mascot-head.png" alt="" width={36} height={36} className="mt-1 size-8 object-contain" />
