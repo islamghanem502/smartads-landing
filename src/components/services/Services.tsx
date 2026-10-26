@@ -5,8 +5,9 @@ import { Container } from "../layout";
 import { BudgetScene, ReportsScene, SeoScene, SocialScene } from "./scenes";
 
 /*
- * كل خدمة: لوحة غامقة فيها واجهة من منتجنا والشخصية طالعة من حافتها، وتحت اللوحة على الخلفية الفاتحة
- * العنوان والوصف. الكلمة المهمة في الوصف عليها قلم تظليل بلون الخدمة (.hl)، ونفس اللون يتوهّج خفيف تحت الشخصية.
+ * كل خدمة: العنوان ووصف بسطر، وتحتهم كرت غامق قصير. الواجهة والشخصية بحجمهم الكامل فوق الكرت،
+ * فيطلعون من حافته العليا على الخلفية الفاتحة، والشخصية مقصوصة عند الخصر على حافته السفلى.
+ * الكلمة المهمة في الوصف عليها قلم تظليل بلون الخدمة (.hl)، ونفس اللون يتوهّج خفيف داخل الكرت.
  */
 type Service = {
   title: string;
@@ -21,7 +22,7 @@ type Service = {
 const SERVICES: Service[] = [
   {
     title: "الإعلانات الممولة",
-    text: <>نطلق حملاتك في سناب وتيك توك وميتا وقوقل، ونحسّنها <mark className="hl">كل ربع ساعة</mark>.</>,
+    text: <>نطلقها ونحسّنها <mark className="hl">كل ربع ساعة</mark>.</>,
     accent: "#8b6cff",
     hl: "#dcd2ff",
     glow: "rgb(124 92 255 / 0.38)",
@@ -30,7 +31,7 @@ const SERVICES: Service[] = [
   },
   {
     title: "محتوى حساباتك",
-    text: <>نصمّم منشوراتك وفيديوهاتك، وننشرها في حساباتك <mark className="hl">بجدول ثابت</mark>.</>,
+    text: <>نصمّمه وننشره <mark className="hl">بجدول ثابت</mark>.</>,
     accent: "#e85aa6",
     hl: "#ffd3e8",
     glow: "rgb(232 90 166 / 0.32)",
@@ -39,7 +40,7 @@ const SERVICES: Service[] = [
   },
   {
     title: "السيو",
-    text: <>متجرك يطلع <mark className="hl">أول</mark> في قوقل وفي إجابات الذكاء الاصطناعي.</>,
+    text: <>متجرك <mark className="hl">أول</mark> في قوقل والذكاء الاصطناعي.</>,
     accent: "#ffa94d",
     hl: "#ffe0bf",
     glow: "rgb(255 169 77 / 0.3)",
@@ -48,7 +49,7 @@ const SERVICES: Service[] = [
   },
   {
     title: "التقارير والمستشار",
-    text: <>تقرير كل أسبوع يوصلك على <mark className="hl">واتساب</mark>، ومستشار تسأله متى ما تبي.</>,
+    text: <>تقريرك ومستشارك على <mark className="hl">واتساب</mark>.</>,
     accent: "#3b8fe6",
     hl: "#cfe2ff",
     glow: "rgb(59 143 230 / 0.32)",
@@ -85,16 +86,19 @@ export function Services() {
       <ul className="svc-track mt-10 flex snap-x snap-mandatory gap-4 overflow-x-auto px-(--edge) pb-4 pt-2 scroll-px-(--edge) [scrollbar-width:none] lg:grid lg:grid-cols-4 lg:gap-6 lg:overflow-visible [&::-webkit-scrollbar]:hidden">
         {SERVICES.map(({ title, text, accent, hl, glow, Scene, art }) => (
           <li key={title} data-card className="group w-[72vw] max-w-[20rem] shrink-0 snap-center sm:w-[44vw] lg:w-auto lg:max-w-none" style={{ "--hl": hl } as CSSProperties}>
-            <div className="relative aspect-[6/7] overflow-hidden rounded-[24px] bg-night shadow-[0_22px_44px_-26px_rgb(17_19_24/0.6)] transition-transform duration-500 ease-lift group-hover:-translate-y-1">
-              <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(75% 55% at 50% 100%, ${glow}, transparent)` }} />
-              <div className="relative pt-5">
+            <h3 className="text-[1.125rem] font-bold">{title}</h3>
+            <p className="mt-1 text-[0.9375rem] text-ink-soft">{text}</p>
+            {/* المسرح بحجم الرسمة كاملة، والكرت الغامق نصّه السفلي بس. كل واجهة قاعدة على حافة الكرت العليا مهما كان طولها */}
+            <div className="relative mt-5 aspect-[6/7]">
+              <div className="absolute inset-x-0 bottom-0 h-[52%] overflow-hidden rounded-[24px] bg-night shadow-[0_22px_44px_-26px_rgb(17_19_24/0.6)]">
+                <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(80% 90% at 50% 100%, ${glow}, transparent)` }} />
+              </div>
+              <div className="absolute inset-x-0 bottom-[51%] transition-transform duration-500 ease-lift group-hover:-translate-y-1">
                 <Scene accent={accent} />
               </div>
               {/* الشخصية تطلّ أكثر لما تمرّ على الكرت */}
               <img src={art} width={760} height={716} alt="" loading="lazy" decoding="async" draggable={false} className="pointer-events-none absolute bottom-0 left-1/2 w-[70%] max-w-none -translate-x-1/2 select-none transition-transform duration-500 ease-lift group-hover:-translate-y-2" />
             </div>
-            <h3 className="mt-5 text-[1.125rem] font-bold">{title}</h3>
-            <p className="mt-1.5 text-[0.9375rem] leading-[1.8] text-ink-soft">{text}</p>
           </li>
         ))}
       </ul>
