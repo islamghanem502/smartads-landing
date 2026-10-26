@@ -179,3 +179,58 @@ body {
   color: var(--hl-ink, var(--color-night));
   font-weight: 600;
 }
+
+/* «ليش إحنا»: الشخصية تقرّب منك وإنت نازل للقسم، كأنها طالعة من الشاشة (من أسفلها، مكان الخصر).
+   المتصفحات اللي ما تدعم الحركة مع التمرير تشوفها في مكانها على طول. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .popout {
+      transform-origin: 50% 100%;
+      animation: popout linear both;
+      animation-timeline: view();
+      animation-range: entry 10% cover 45%;
+    }
+  }
+}
+
+@keyframes popout {
+  from {
+    transform: scale(0.84) translateY(3%);
+  }
+}
+
+/* بخار الفنجان: ثلاث خيوط تطلع وتختفي ورا بعض */
+.steam path {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: steam 2.7s ease-out infinite;
+}
+
+.steam path:nth-child(2) {
+  animation-delay: 0.9s;
+}
+
+.steam path:nth-child(3) {
+  animation-delay: 1.8s;
+}
+
+@keyframes steam {
+  0% {
+    opacity: 0;
+    transform: translateY(18%) scaleY(0.6);
+  }
+  35% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30%) scaleY(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steam {
+    display: none;
+  }
+}
