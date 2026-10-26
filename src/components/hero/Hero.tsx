@@ -1,54 +1,93 @@
-"use client";
-
 import { useRef } from "react";
-import { motion } from "motion/react";
-import { gsap, reduced, useGSAP } from "@/lib/gsap";
-import { Mark } from "@/components/ui/Mark";
-import { SIGNUP_URL } from "@/lib/links";
-import { ConnectBoard } from "./ConnectBoard";
+import { gsap, reduced, useGSAP } from "../../lib/gsap";
+import { SIGNUP_URL } from "../../lib/links";
+import { Salla, Website, ZidMark } from "../logos";
+import { Mascot } from "./Mascot";
+import { ServiceTree } from "./ServiceTree";
 
+const STORES = [
+  { L: Salla, name: "سلة" },
+  { L: ZidMark, name: "زد" },
+  { L: Website, name: "موقعك الخاص" },
+];
+
+/** كلام يتلوّن بالتدرّج لما يمر عليه المؤشر، كلمة كلمة. */
+function Ink({ children }: { children: string }) {
+  return children.split(" ").map((w, i) => (
+    <span key={i}>
+      {i > 0 && " "}
+      <span className="ink">{w}</span>
+    </span>
+  ));
+}
+
+/*
+ * التخطيط حسب العرض الفعلي (يعني بعد الزوم):
+ *   الجوال: الكلام، بعده الشخصية، بعدها الشجرة.
+ *   من 640: تحت الكلام الشجرة يمين والشخصية يسار تقدّمها.
+ *   من 1024: الكلام يمين بعرضه، والشجرة مع الشخصية في نص اللي باقي.
+ * السطر الثاني مقسوم سطرين عن قصد: يخلّي عمود الكلام ضيق، فتلقى الشخصية مكان حتى على 1024.
+ */
 export function Hero() {
   const ref = useRef<HTMLElement>(null);
 
   useGSAP(() => {
-    const all = gsap.utils.toArray<HTMLElement>("[data-h]", ref.current);
-    if (reduced()) { gsap.set(all, { opacity: 1 }); return; }
+    if (reduced()) { gsap.set("[data-a]", { opacity: 1 }); return; }
     gsap.timeline({ defaults: { ease: "power3.out" } })
-      .fromTo("[data-h=line]", { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.12 }, 0.1)
-      .fromTo("[data-h=fade]", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, 0.4);
+      .fromTo("[data-a=line]", { yPercent: 30, opacity: 0 }, { yPercent: 0, opacity: 1, duration: 0.85, stagger: 0.12 }, 0.1)
+      .fromTo("[data-a=fade]", { y: 14, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, stagger: 0.08 }, 0.4)
+      .fromTo("[data-a=tree]", { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7 }, 0.45)
+      .fromTo("[data-a=mascot]", { x: -40, opacity: 0 }, { x: 0, opacity: 1, duration: 1, ease: "back.out(1.4)" }, 0.75)
+      .fromTo("[data-a=hello]", { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.45, ease: "back.out(2.2)" }, 1.6);
   }, { scope: ref });
 
   return (
-    <section id="top" data-theme="dark" ref={ref} className="board-grain relative overflow-x-clip bg-board pt-28 lg:pt-32">
-      <div className="mx-auto grid max-w-[80rem] items-center gap-14 px-5 pb-20 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)] lg:gap-8 lg:px-8 lg:pb-28">
-        <div className="max-w-[36rem]">
-          <h1 className="font-display text-[clamp(2.15rem,3.75vw,3.6rem)] font-extrabold leading-[1.28] text-chalk">
-            <span data-reveal data-h="line" className="block">اربط متجرك،</span>
-            <span data-reveal data-h="line" className="block">
-              والتسويق <Mark>كله علينا</Mark>.
+    <section ref={ref} className="overflow-x-clip pt-24">
+      <div className="mx-auto grid max-w-[78rem] items-center gap-x-10 gap-y-12 px-4 pb-14 sm:px-6 lg:min-h-[calc(100svh-9rem)] lg:grid-cols-[auto_minmax(0,1fr)] lg:px-8">
+        <div className="max-w-[34rem]">
+          <h1 className="text-[clamp(2.05rem,min(3.6vw,6.6vh),3.5rem)] font-bold leading-[1.3]">
+            <span data-reveal data-a="line" className="block">
+              <Ink>وكالة تسويق</Ink> <span className="chip">كاملة</span>،
+            </span>
+            <span data-reveal data-a="line" className="block">
+              <Ink>بدون ما توظّف أحد.</Ink>
             </span>
           </h1>
-          <p data-reveal data-h="fade" className="mt-6 font-display text-[clamp(1rem,1.3vw,1.125rem)] font-semibold leading-[1.7] text-chalk">
-            أول وكالة تسويق في الوطن العربي يشغّلها الذكاء الاصطناعي.
+          <p data-reveal data-a="fade" className="mt-4 text-[1.0625rem] font-semibold leading-[1.7] lg:text-lg">
+            <span className="block"><Ink>يشغّلها الذكاء الاصطناعي،</Ink></span>
+            <span className="block"><Ink>والأولى من نوعها في الوطن العربي</Ink></span>
           </p>
-          <p data-reveal data-h="fade" className="mt-3 max-w-[32em] text-[1.0625rem] leading-[1.9] text-chalk-soft">
-            من سلة أو زد أو موقعك الخاص: نطلق حملاتك على سناب وتيك توك وميتا وقوقل، ونوصّل لها كل طلب من متجرك، وننشر في انستقرام وتيك توك وفيسبوك. وأنت تتابع كل خطوة.
-          </p>
-          <div data-reveal data-h="fade" className="mt-9 flex flex-wrap items-center gap-x-8 gap-y-4">
-            <motion.a
-              whileTap={{ scale: 0.97 }}
+
+          <div data-reveal data-a="fade" className="mt-7 flex flex-wrap items-center gap-x-8 gap-y-4">
+            <a
+              data-smile
               href={SIGNUP_URL}
-              className="inline-flex h-12 items-center rounded-[12px] bg-green px-7 font-display text-[1rem] font-semibold text-white transition-colors hover:bg-green-deep"
+              className="inline-flex h-12 items-center rounded-[14px] bg-white px-7 font-semibold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.97]"
             >
               اربط متجرك
-            </motion.a>
-            <a href="#how" className="text-[1rem] text-chalk underline decoration-chalk/30 underline-offset-[7px] transition-colors hover:decoration-chalk">
-              كيف نشتغل
+            </a>
+            <a href="#services" className="underline decoration-white/40 underline-offset-[7px] transition-colors hover:decoration-white">
+              شوف وش نسوي
             </a>
           </div>
-          <p data-reveal data-h="fade" className="mt-6 text-[0.875rem] text-chalk-soft">بدون التزام، وتلغي بضغطة.</p>
+
+          <div data-reveal data-a="fade" className="mt-8">
+            <p className="text-[0.9375rem] font-medium">نشتغل مع متجرك على</p>
+            <ul className="mt-3 flex flex-wrap gap-2.5">
+              {STORES.map(({ L, name }) => (
+                <li key={name} className="flex h-11 items-center gap-2.5 rounded-full bg-white ps-2.5 pe-4 text-[0.9375rem] font-semibold text-night">
+                  <span className="grid size-7 place-items-center rounded-full bg-chip"><L className="size-[1.1rem]" /></span>
+                  {name}
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
-        <ConnectBoard />
+
+        <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:justify-between lg:justify-center lg:gap-4">
+          <ServiceTree />
+          <Mascot className="w-[min(15rem,62vw)] self-center max-sm:order-first sm:w-[min(20rem,38vw)] lg:w-[min(22rem,26vw,62vh)]" />
+        </div>
       </div>
     </section>
   );
