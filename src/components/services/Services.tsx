@@ -96,11 +96,10 @@ export function Services() {
 }
 
 /** المقترح: كرت غامق واحد فيه كل شي. العنوان والوصف يمين فوق، الواجهة في النص، والشخصية مقصوصة على الحافة السفلى */
-function InsideCard({ title, text, accent, hlDark, glow, Scene, art }: Service) {
+function InsideCard({ title, text, accent, hlDark, Scene, art }: Service) {
   return (
     <li data-card className="group w-[72vw] max-w-[20rem] shrink-0 snap-center sm:w-[44vw] lg:w-auto lg:max-w-none" style={{ "--hl": hlDark, "--hl-ink": "#fff" } as CSSProperties}>
       <div className="relative aspect-[3/4] overflow-hidden rounded-[28px] bg-night shadow-[0_24px_48px_-26px_rgb(17_19_24/0.6)] transition-transform duration-500 ease-lift group-hover:-translate-y-1">
-        <div aria-hidden className="absolute inset-0" style={{ background: `radial-gradient(80% 45% at 50% 100%, ${glow}, transparent)` }} />
         <div className="relative px-6 pt-6">
           <h3 className="text-[1.125rem] font-bold text-white">{title}</h3>
           <p className="mt-1 text-[0.875rem] text-mist">{text}</p>
