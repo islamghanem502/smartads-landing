@@ -19,11 +19,11 @@ export function Why() {
               <Ink>إنت تقهوى،</Ink> <span className="chip text-white">وإحنا نسوّق</span>
             </h2>
             <p className="mt-6 max-w-[34rem] text-[1.125rem] leading-[1.9] text-ink-soft">
-              مو أداة تطلق إعلانات وتخليك تدبّر الباقي. مسوّقك الذكي <strong className="font-semibold text-night">فريق تسويق كامل</strong>، مبني على
-              خبرة تسويق حقيقية: يخطط، ويصمم، وينشر، ويتابع 24 ساعة… حتى وإنت نايم.
+              هدفنا مو بس ندير حملاتك. هدفنا نكون <strong className="font-semibold text-night">فريقك التسويقي الكامل</strong>: بخبرة تسويق حقيقية،
+              نخطط، ونصمم، وننشر، ونتابع 24 ساعة… حتى وإنت نايم.
             </p>
             <p className="mt-5 text-[1.375rem] font-bold leading-[1.6]">
-              وهمّه الأول؟ <mark className="hl [--hl:#ddd2ff]">مبيعاتك</mark>، وجمهورك، وهويتك.
+              وهمّنا الأول؟ <mark className="hl [--hl:#ddd2ff]">مبيعاتك</mark>، وجمهورك، وهويتك.
             </p>
           </div>
           <Coffee />
@@ -70,7 +70,7 @@ function Coffee() {
 /* العرض: الختام بعد المقارنة، وفيه الزر */
 const PERKS = [
   {
-    text: "صور وفيديوهات لمتجرك تكفيك أسبوع كامل، هدية منّا.",
+    text: "صور وفيديوهات لمتجرك تكفيك أسبوع كامل.",
     icon: <path d="M4 10h16v10H4zM3 7h18v3H3zM12 7v13M12 7c-1.5-3-5-3.5-5-1s3 1 5 1c2 0 5 1.5 5-1s-3.5-2-5 1" />,
   },
   {
@@ -84,7 +84,7 @@ function Offer() {
     <div className="mt-16 overflow-hidden rounded-[32px] bg-night p-7 text-white sm:p-10 lg:mt-24 lg:flex lg:items-center lg:justify-between lg:gap-12 lg:p-14">
       <div>
         <p className="text-[clamp(1.625rem,3vw,2.5rem)] font-bold leading-[1.3]">
-          جرّبه 7 أيام مجاناً… <span className="whitespace-nowrap bg-(image:--gradient) bg-clip-text text-transparent">وعليه هدية</span>
+          جرّبنا 7 أيام مجاناً… <span className="whitespace-nowrap bg-(image:--gradient) bg-clip-text text-transparent">ومعها هدية</span>
         </p>
         <ul className="mt-6 grid gap-4">
           {PERKS.map(({ text, icon }) => (

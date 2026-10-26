@@ -17,7 +17,7 @@ const ROLES = [
 ];
 const TOTAL = ROLES.reduce((sum, r) => sum + r.salary, 0);
 const PAINS = ["توظيف ومقابلات", "إجازات وغياب", "دوام 8 ساعات"];
-const GAINS = ["يشتغل 24/7", "بدون توظيف", "كله في مكان واحد"];
+const GAINS = ["نشتغل 24/7", "بدون توظيف", "كله في مكان واحد"];
 
 const sar = (n: number) => n.toLocaleString("en-US");
 
