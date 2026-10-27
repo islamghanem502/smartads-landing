@@ -2,25 +2,25 @@ import { useEffect, useRef, type CSSProperties, type KeyboardEvent, type Pointer
 import { gsap, reduced } from "../../lib/gsap";
 
 /*
- * «اسحب الخط وشوف الفرق»: طبقتين فوق بعض بنفس الترتيب. تحت «بدون» (فريق بالرواتب)، وفوقها «مع» مقصوصة لين الخط.
+ * «اسحب الخط وشوف الفرق»: طبقتين فوق بعض بنفس الترتيب. تحت «بدون» (فريق مستقلين بالشهر)، وفوقها «مع» مقصوصة لين الخط.
  * الخط من اليسار (--p): يسار الخط «مع»، ويمينه «بدون». أول ما توصل يوقف على «بدون» شوي، وبعدها يمشي لحاله لين «مع».
  * كل طبقة اسمها ومجموعها في جهتها («بدون» يمين و«مع» يسار)، فلما يكون الخط في النص تقرأ الاثنين.
  * الماوس يسحب من أي مكان، وفي الجوال من المقبض بس عشان التمرير العادي ما يحرّك الخط.
  * على الخط فقاعة فيها تكلفتك الشهرية: تنزل من رواتب الفريق لين سعر أول باقة كل ما تسحب الخط لـ«مع».
  * في اللابتوب في صف الأسماء فوق (فاضي في النص)، وفي الجوال فوق المقبض.
- * الرواتب تقريبية من السوق السعودي (مستوى متوسط، شهرياً).
+ * الأسعار تقريبية لمستقلين في السوق السعودي (شهرياً). موظفين بدوام كامل أغلى بكثير، فما نبالغ.
  */
 const ROLES = [
-  { role: "مسوّق إعلانات", salary: 8000, gain: "إعلانات تتحسّن لحظة بلحظة" },
-  { role: "مصمم", salary: 6000, gain: "تصاميم بهويتك" },
-  { role: "مونتير", salary: 6000, gain: "فيديوهات جاهزة للنشر" },
-  { role: "مسؤول سوشال", salary: 6000, gain: "نشر منتظم في حساباتك" },
-  { role: "مختص سيو", salary: 7000, gain: "متجرك أول في قوقل" },
+  { role: "مسوّق إعلانات", salary: 2500, gain: "إعلانات تتحسّن لحظة بلحظة" },
+  { role: "مصمم", salary: 1500, gain: "تصاميم بهويتك" },
+  { role: "مونتير", salary: 1500, gain: "فيديوهات جاهزة للنشر" },
+  { role: "مسؤول سوشال", salary: 1800, gain: "نشر منتظم في حساباتك" },
+  { role: "مختص سيو", salary: 1500, gain: "متجرك أول في قوقل" },
 ];
 const TOTAL = ROLES.reduce((sum, r) => sum + r.salary, 0);
 /** أرخص باقة (المبتدئ) في المنصة، وفيها كل الخدمات. لو تغيّر السعر هناك غيّره هنا */
 const PLAN = 799;
-const PAINS = ["توظيف ومقابلات", "إجازات وغياب", "دوام 8 ساعات"];
+const PAINS = ["تنسيق بين 5 أشخاص", "مواعيد تتأخر", "كل واحد يشتغل لحاله"];
 const GAINS = ["نشتغل 24/7", "بدون توظيف", "كله في مكان واحد"];
 
 const sar = (n: number) => n.toLocaleString("en-US");
@@ -35,7 +35,8 @@ export function Compare() {
   const set = (p: number) => {
     p = Math.min(100, Math.max(0, p));
     box.current!.style.setProperty("--p", `${p}%`);
-    const now = sar(p >= 100 ? PLAN : Math.round((TOTAL - ((TOTAL - PLAN) * p) / 100) / 10) * 10);
+    // على الأطراف نفس الأرقام اللي في المجموع بالضبط، وبينها تقريب لأقرب 10
+    const now = sar(p <= 1 ? TOTAL : p >= 99 ? PLAN : Math.round((TOTAL - ((TOTAL - PLAN) * p) / 100) / 10) * 10);
     cost.current!.textContent = now;
     knob.current!.setAttribute("aria-valuenow", `${Math.round(p)}`);
     knob.current!.setAttribute("aria-valuetext", `${p < 50 ? "بدون مسوّقك الذكي" : "مع مسوّقك الذكي"}: ${now} ريال شهرياً`);
@@ -85,7 +86,7 @@ export function Compare() {
         <h3 className="text-[clamp(1.625rem,2.8vw,2.25rem)] font-bold leading-[1.35]">
           اسحب الخط… <mark className="hl [--hl:#ffd9a8]">وشوف الفرق</mark>
         </h3>
-        <p className="mt-3 text-[1.0625rem] text-ink-soft">فريق تسويق كامل بالرواتب، ولا مسوّقك الذكي؟</p>
+        <p className="mt-3 text-[1.0625rem] text-ink-soft">فريق تسويق كامل من المستقلين، ولا مسوّقك الذكي؟</p>
       </div>
 
       <div
@@ -95,7 +96,7 @@ export function Compare() {
         style={{ "--p": "0%" } as CSSProperties}
         className="relative mt-10 grid cursor-ew-resize select-none touch-pan-y overflow-hidden rounded-[32px] shadow-[0_30px_60px_-30px_rgb(17_19_24/0.35)] ring-1 ring-black/5"
       >
-        {/* بدون: فريق بالرواتب */}
+        {/* بدون: فريق مستقلين */}
         <Layer
           className="bg-white"
           label={<span className="rounded-full bg-[#eceef2] px-4 py-1.5 text-ink-soft">بدون مسوّقك الذكي</span>}
@@ -105,7 +106,7 @@ export function Compare() {
           chips={PAINS.map((p) => <span key={p} className="rounded-full bg-cloud px-3.5 py-1.5 text-ink-soft">{p}</span>)}
           total={
             <>
-              <span className="text-[0.9375rem] text-ink-soft">كل شهر تقريباً، وفوقها التأمينات</span>
+              <span className="text-[0.9375rem] text-ink-soft">كل شهر تقريباً، بأسعار المستقلين</span>
               <strong className="block text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-[#c2410c]">{sar(TOTAL)} ريال</strong>
             </>
           }
@@ -122,7 +123,7 @@ export function Compare() {
           total={
             <>
               <span className="text-[0.9375rem] text-mist">من {sar(PLAN)} ريال في الشهر، والفريق كامل</span>
-              <strong className="block bg-(image:--gradient) bg-clip-text text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-transparent">بأقل من راتب موظف واحد</strong>
+              <strong className="block bg-(image:--gradient) bg-clip-text text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-transparent">بأقل من تكلفة واحد منهم</strong>
             </>
           }
         />
@@ -130,7 +131,7 @@ export function Compare() {
         {/* الخط والمقبض، وفوقه تكلفتك الشهرية */}
         <span
           aria-hidden
-          className="pointer-events-none absolute top-[calc(50%-4.5rem)] z-10 lg:top-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3.5 py-1.5 text-[0.875rem] font-bold text-night shadow-[0_8px_24px_-8px_rgb(17_19_24/0.5)] ring-1 ring-black/10 [left:clamp(4.75rem,var(--p),calc(100%-4.75rem))]"
+          className="pointer-events-none absolute top-[calc(50%-4.5rem)] z-10 lg:top-10 -translate-x-1/2 whitespace-nowrap rounded-full bg-white px-3.5 py-1.5 text-[0.875rem] font-bold text-night shadow-[0_8px_24px_-8px_rgb(17_19_24/0.5)] ring-1 ring-black/10 [left:clamp(5.75rem,var(--p),calc(100%-5.75rem))]"
         >
           <span ref={cost} className="tabular-nums">{sar(TOTAL)}</span> ريال/شهر
         </span>
