@@ -7,20 +7,19 @@ import { gsap, reduced } from "../../lib/gsap";
  * كل طبقة اسمها ومجموعها في جهتها («بدون» يمين و«مع» يسار)، فلما يكون الخط في النص تقرأ الاثنين.
  * الماوس يسحب من أي مكان، وفي الجوال من المقبض بس عشان التمرير العادي ما يحرّك الخط.
  * على الخط فقاعة فيها تكلفتك الشهرية: تنزل من رواتب الفريق لين سعر أول باقة كل ما تسحب الخط لـ«مع».
- * الفقاعة في صف الأسماء فوق (في اللابتوب فاضي في النص)، والمقبض في نص صورة الفريق عشان ما يغطي الكلام.
+ * الفقاعة في صف الأسماء فوق (في اللابتوب فاضي في النص)، والمقبض في نص الكروت. في الجوال المقبض تحت
+ * (الصور على طرف الكروت، والمقبض يوقف على الطرف)، وتحت الطرف فاضي في الجهتين.
  * الأسعار تقريبية لمستقلين في السوق السعودي (شهرياً). موظفين بدوام كامل أغلى بكثير، فما نبالغ.
  */
-// كل دور «بدون» (شخص رمادي وسعره) يقابله في «مع» واحد من فريقنا في الصورة الجماعية، في نفس المكان،
-// شايل أداة الدور. color: لون أداته، وهو العلامة جنب اسمه
+// كل دور «بدون» (شخص رمادي وسعره) يقابله في «مع» واحد من فريقنا على مكتبه، مشغول بشغله، في نفس الكرت.
+// صورهم من مكتب واحد (Manus)، كل واحد بوضعية وثوب بلون غير
 const ROLES = [
-  { role: "مسوّق إعلانات", salary: 2200, gain: "إعلانات تتحسّن لحظة بلحظة", crew: "مدير الحملات", color: "#8b6cff" },
-  { role: "مصمم ومونتير", salary: 2200, gain: "صور وفيديوهات بهويتك", crew: "المصمم", color: "#ec4899" },
-  { role: "مسؤول سوشال", salary: 1600, gain: "نشر منتظم في حساباتك", crew: "الناشر", color: "#22c55e" },
-  { role: "مختص سيو", salary: 1400, gain: "متجرك أول في قوقل", crew: "مختص السيو", color: "#f59e0b" },
-  { role: "محلل بيانات", salary: 1400, gain: "تقريرك كل يوم على واتساب", crew: "المحلل", color: "#eab308" },
+  { role: "مسوّق إعلانات", salary: 2200, gain: "إعلانات تتحسّن لحظة بلحظة", crew: "مدير الحملات", img: "/why/crew/ads.webp" },
+  { role: "مصمم ومونتير", salary: 2200, gain: "صور وفيديوهات بهويتك", crew: "المصمم", img: "/why/crew/design.webp" },
+  { role: "مسؤول سوشال", salary: 1600, gain: "نشر منتظم في حساباتك", crew: "الناشر", img: "/why/crew/social.webp" },
+  { role: "مختص سيو", salary: 1400, gain: "متجرك أول في قوقل", crew: "مختص السيو", img: "/why/crew/seo.webp" },
+  { role: "محلل بيانات", salary: 1400, gain: "تقريرك كل يوم على واتساب", crew: "المحلل", img: "/why/crew/reports.webp" },
 ];
-/** صورة فريقنا (الخمسة جنب بعض) */
-const ART = { src: "/why/team.webp", w: 1800, h: 612 };
 const TOTAL = ROLES.reduce((sum, r) => sum + r.salary, 0);
 /** أرخص باقة (المبتدئ) في المنصة، وفيها كل الخدمات. لو تغيّر السعر هناك غيّره هنا */
 const PLAN = 799;
@@ -97,20 +96,16 @@ export function Compare() {
         ref={box}
         onPointerDown={start}
         onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && follow(e)}
-        style={{ "--p": "0%", "--fig": ART.h / ART.w } as CSSProperties}
-        className="@container relative mt-10 grid cursor-ew-resize select-none touch-pan-y overflow-hidden rounded-[32px] shadow-[0_30px_60px_-30px_rgb(17_19_24/0.35)] ring-1 ring-black/5"
+        style={{ "--p": "0%" } as CSSProperties}
+        className="relative mt-10 grid cursor-ew-resize select-none touch-pan-y overflow-hidden rounded-[32px] shadow-[0_30px_60px_-30px_rgb(17_19_24/0.35)] ring-1 ring-black/5"
       >
         {/* بدون: فريق مستقلين */}
         <Layer
           className="bg-white"
           label={<span className="rounded-full bg-[#eceef2] px-4 py-1.5 text-ink-soft">بدون مسوّقك الذكي</span>}
-          body={
-            <Team className="bg-cloud" figure={<Freelancers />}>
-              {ROLES.map(({ role, salary }) => (
-                <Row key={role} title={role} sub={<span className="text-[#c2410c]">{sar(salary)} ريال</span>} />
-              ))}
-            </Team>
-          }
+          tiles={ROLES.map(({ role, salary }) => (
+            <Tile key={role} className="bg-cloud" art={<Person />} title={role} sub={<span className="text-[#c2410c]">{sar(salary)} ريال</span>} />
+          ))}
           chips={PAINS.map((p) => <span key={p} className="rounded-full bg-cloud px-3.5 py-1.5 text-ink-soft">{p}</span>)}
           total={
             <>
@@ -131,22 +126,20 @@ export function Compare() {
               مع مسوّقك الذكي
             </span>
           }
-          body={
-            <Team className="bg-white/[0.04] ring-1 ring-white/10" figure={<img src={ART.src} alt="فريق مسوّقك الذكي: خمسة، كل واحد شايل أداة شغله" width={ART.w} height={ART.h} loading="lazy" className="block h-auto w-full" />}>
-              {ROLES.map(({ role, gain, crew, color }) => (
-                <Row
-                  key={role}
-                  title={gain}
-                  sub={
-                    <span className="flex items-center gap-1.5 text-mist">
-                      <span className="size-2 shrink-0 rounded-full" style={{ background: color }} />
-                      {crew}
-                    </span>
-                  }
-                />
-              ))}
-            </Team>
-          }
+          tiles={ROLES.map(({ role, gain, crew, img }) => (
+            <Tile
+              key={role}
+              className="bg-white/[0.06] ring-1 ring-white/10"
+              art={
+                // في الجوال المربع صغير، فنقرّب على الشخصية؛ في اللابتوب المكتب كامل
+                <span className={`${ART} bg-night-3`}>
+                  <img src={img} alt="" width={640} height={480} loading="lazy" className="size-full origin-[50%_32%] scale-[1.7] object-cover lg:scale-100" />
+                </span>
+              }
+              title={gain}
+              sub={<span className="text-mist">{crew}</span>}
+            />
+          ))}
           chips={GAINS.map((g) => <span key={g} className="rounded-full bg-white/[0.08] px-3.5 py-1.5 text-mist">{g}</span>)}
           total={
             <>
@@ -176,7 +169,7 @@ export function Compare() {
           aria-valuenow={0}
           aria-valuetext="بدون مسوّقك الذكي"
           onKeyDown={keys}
-          className="absolute top-[calc(5rem+(100cqw-2.5rem)*var(--fig)/2)] grid size-12 -translate-x-1/2 -translate-y-1/2 cursor-grab touch-none place-items-center rounded-full bg-white focus-visible:rounded-full! text-night shadow-[0_8px_24px_-6px_rgb(17_19_24/0.5)] ring-1 ring-black/10 sm:top-[calc(5.75rem+(100cqw-4rem)*var(--fig)/2)] lg:top-[calc(6.25rem+(100cqw-5rem)*var(--fig)/2)] [left:clamp(1.75rem,var(--p),calc(100%-1.75rem))]"
+          className="absolute bottom-5 grid size-12 -translate-x-1/2 cursor-grab touch-none place-items-center rounded-full bg-white focus-visible:rounded-full! text-night shadow-[0_8px_24px_-6px_rgb(17_19_24/0.5)] ring-1 ring-black/10 sm:bottom-8 lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 [left:clamp(1.75rem,var(--p),calc(100%-1.75rem))]"
         >
           <svg viewBox="0 0 24 24" aria-hidden className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 7 4 12l5 5M15 7l5 5-5 5" />
@@ -188,11 +181,11 @@ export function Compare() {
 }
 
 /* الطبقتين بنفس الهيكل بالضبط، عشان كل كرت ينقلب في مكانه لما يمر عليه الخط. end: الاسم والمجموع في الجهة اليسار */
-function Layer({ className, end = false, label, body, chips, total }: { className: string; end?: boolean; label: ReactNode; body: ReactNode; chips: ReactNode; total: ReactNode }) {
+function Layer({ className, end = false, label, tiles, chips, total }: { className: string; end?: boolean; label: ReactNode; tiles: ReactNode; chips: ReactNode; total: ReactNode }) {
   return (
     <div className={`flex flex-col gap-6 p-5 [grid-area:1/1] sm:p-8 lg:p-10 ${className}`}>
       <div className={`flex h-9 items-center text-[1rem] font-semibold ${end ? "justify-end" : ""}`}>{label}</div>
-      {body}
+      <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{tiles}</ul>
       {/* في الجوال عمود في جهة الطبقة، ومن 1024 صف: المجموع في جهتها والمميزات في الثانية */}
       <div className={`mt-auto flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8 ${end ? "items-end text-end" : "items-start lg:flex-row-reverse"}`}>
         <div className={`flex flex-wrap gap-2 text-[0.875rem] font-medium ${end ? "justify-end" : ""}`}>{chips}</div>
@@ -202,45 +195,29 @@ function Layer({ className, end = false, label, body, chips, total }: { classNam
   );
 }
 
-/*
- * الفريق في الطبقتين بنفس الشكل: صف فيه الخمسة، وتحته وش يسوي كل واحد.
- * «مع» صورة وحدة لفريقنا، و«بدون» أشخاص رماديين في نفس أماكنهم بالضبط (X)، فلما يمر الخط كل واحد ينقلب لواحد منا.
- * في اللابتوب كل واحد كلامه تحته (الهامش px-[3%] يجيب الأعمدة تحتهم)، وفي الجوال قائمة تحت الصورة.
- */
-/** وسط راس كل واحد في الصورة، من عرضها (بترتيب ROLES: أولهم يمين) */
-const X = [0.874, 0.686, 0.501, 0.314, 0.126];
+/** مكان الصورة في الكرت: في الجوال مربع صغير جنب الكلام، وفي اللابتوب فوقه بعرض الكرت */
+const ART = "size-16 shrink-0 overflow-hidden rounded-xl lg:aspect-[4/3] lg:size-auto lg:w-full";
 
-function Team({ className, figure, children }: { className: string; figure: ReactNode; children: ReactNode }) {
+function Tile({ className, art, title, sub }: { className: string; art: ReactNode; title: string; sub: ReactNode }) {
   return (
-    <div>
-      <div className={`overflow-hidden rounded-2xl ${className}`}>{figure}</div>
-      <ul className="mt-4 grid gap-2.5 text-[0.9375rem] leading-[1.5] lg:mt-3 lg:grid-cols-5 lg:gap-3 lg:px-[3%]">{children}</ul>
-    </div>
-  );
-}
-
-function Row({ title, sub }: { title: string; sub: ReactNode }) {
-  return (
-    <li className="flex items-baseline justify-between gap-3 lg:flex-col lg:items-center lg:gap-0.5 lg:text-center">
-      <span className="font-semibold">{title}</span>
-      {sub}
+    <li className={`flex items-center gap-3.5 rounded-2xl p-3 lg:flex-col lg:items-stretch lg:gap-3 lg:pb-4 ${className}`}>
+      {art}
+      <span className="lg:px-1">
+        <span className="block text-[1rem] font-semibold leading-[1.5]">{title}</span>
+        <span className="mt-0.5 block text-[0.9375rem] font-medium">{sub}</span>
+      </span>
     </li>
   );
 }
 
-/** خمسة أشخاص رماديين بمقاس صورة فريقنا، كل واحد مكان اللي يقابله فيها */
-function Freelancers() {
+/** المستقل: شخص رمادي بمقاس صورة اللي يقابله من فريقنا */
+function Person() {
   return (
-    <svg viewBox={`0 0 ${ART.w} ${ART.h}`} aria-hidden className="block h-auto w-full" fill="#dcdfe5">
-      {X.map((x) => {
-        const cx = x * ART.w;
-        return (
-          <g key={x}>
-            <circle cx={cx} cy={165} r={80} />
-            <path d={`M${cx - 165} ${ART.h}V400C${cx - 165} 330 ${cx - 115} 285 ${cx - 45} 285H${cx + 45}C${cx + 115} 285 ${cx + 165} 330 ${cx + 165} 400V${ART.h}Z`} />
-          </g>
-        );
-      })}
-    </svg>
+    <span className={`${ART} flex items-end justify-center bg-[#e6e8ec]`}>
+      <svg viewBox="0 0 40 30" aria-hidden className="w-[68%] text-[#cdd1d8]" fill="currentColor">
+        <circle cx="20" cy="9" r="6" />
+        <path d="M7 30v-5c0-4.4 3.6-8 8-8h10c4.4 0 8 3.6 8 8v5z" />
+      </svg>
+    </span>
   );
 }
