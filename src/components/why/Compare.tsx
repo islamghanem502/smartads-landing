@@ -115,15 +115,22 @@ export function Compare() {
         <Layer
           end
           className="bg-night text-white [clip-path:inset(0_calc(100%-var(--p))_0_0)]"
-          label={<span className="rounded-full bg-(image:--gradient) px-4 py-1.5">مع مسوّقك الذكي</span>}
+          label={
+            <span className="flex items-center gap-2.5">
+              <span className="grid size-9 place-items-center overflow-hidden rounded-full bg-night-3 ring-1 ring-white/15">
+                <img src="/mascot-head.png" alt="" width={36} height={36} loading="lazy" className="mt-1 size-8 object-contain" />
+              </span>
+              مع مسوّقك الذكي
+            </span>
+          }
           tiles={ROLES.map(({ role, gain }) => (
             <Tile key={role} className="bg-white/[0.06] ring-1 ring-white/10" icon={<Check />} title={gain} />
           ))}
           chips={GAINS.map((g) => <span key={g} className="rounded-full bg-white/[0.08] px-3.5 py-1.5 text-mist">{g}</span>)}
           total={
             <>
-              <span className="text-[0.9375rem] text-mist">من {sar(PLAN)} ريال في الشهر، والفريق كامل</span>
-              <strong className="block bg-(image:--gradient) bg-clip-text text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-transparent">بأقل من تكلفة واحد منهم</strong>
+              <span className="text-[0.9375rem] text-mist">كل شهر، أقل من تكلفة واحد منهم</span>
+              <strong className="block text-[clamp(1.75rem,3vw,2.5rem)] leading-tight">{sar(PLAN)} ريال</strong>
             </>
           }
         />
@@ -135,7 +142,7 @@ export function Compare() {
         >
           <span ref={cost} className="tabular-nums">{sar(TOTAL)}</span> ريال/شهر
         </span>
-        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-(--p) w-[3px] -translate-x-1/2 bg-[linear-gradient(#7c5cff,#d946ef,#ffa94d)]" />
+        <span aria-hidden className="pointer-events-none absolute inset-y-0 left-(--p) w-[3px] -translate-x-1/2 bg-white shadow-[0_0_0_1px_rgb(17_19_24/0.15)]" />
         <button
           ref={knob}
           type="button"
@@ -161,7 +168,7 @@ export function Compare() {
 function Layer({ className, end = false, label, tiles, chips, total }: { className: string; end?: boolean; label: ReactNode; tiles: ReactNode; chips: ReactNode; total: ReactNode }) {
   return (
     <div className={`flex flex-col gap-6 p-5 [grid-area:1/1] sm:p-8 lg:p-10 ${className}`}>
-      <div className={`flex text-[1rem] font-semibold ${end ? "justify-end" : ""}`}>{label}</div>
+      <div className={`flex h-9 items-center text-[1rem] font-semibold ${end ? "justify-end" : ""}`}>{label}</div>
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">{tiles}</ul>
       {/* في الجوال عمود في جهة الطبقة، ومن 1024 صف: المجموع في جهتها والمميزات في الثانية */}
       <div className={`mt-auto flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between lg:gap-8 ${end ? "items-end text-end" : "items-start lg:flex-row-reverse"}`}>
@@ -196,7 +203,7 @@ function Person() {
 
 function Check() {
   return (
-    <span className="grid size-9 shrink-0 place-items-center rounded-full bg-(image:--gradient) text-white">
+    <span className="grid size-9 shrink-0 place-items-center rounded-full text-white ring-1 ring-white/25">
       <svg viewBox="0 0 16 16" aria-hidden className="size-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
         <path d="m3.5 8.5 3 3 6-7" />
       </svg>
