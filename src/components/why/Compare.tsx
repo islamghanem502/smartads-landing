@@ -10,12 +10,13 @@ import { gsap, reduced } from "../../lib/gsap";
  * في اللابتوب في صف الأسماء فوق (فاضي في النص)، وفي الجوال فوق المقبض.
  * الأسعار تقريبية لمستقلين في السوق السعودي (شهرياً). موظفين بدوام كامل أغلى بكثير، فما نبالغ.
  */
+// كل دور «بدون» (شخص رمادي وسعره) يقابله في «مع» شخصيتنا شايلة أداة الدور (نفس صور فريق الهيرو)
 const ROLES = [
-  { role: "مسوّق إعلانات", salary: 2500, gain: "إعلانات تتحسّن لحظة بلحظة" },
-  { role: "مصمم", salary: 1500, gain: "تصاميم بهويتك" },
-  { role: "مونتير", salary: 1500, gain: "فيديوهات جاهزة للنشر" },
-  { role: "مسؤول سوشال", salary: 1800, gain: "نشر منتظم في حساباتك" },
-  { role: "مختص سيو", salary: 1500, gain: "متجرك أول في قوقل" },
+  { role: "مسوّق إعلانات", salary: 2200, gain: "إعلانات تتحسّن لحظة بلحظة", crew: "مدير الحملات", img: "/team/ads.webp" },
+  { role: "مصمم ومونتير", salary: 2200, gain: "صور وفيديوهات بهويتك", crew: "المصمم", img: "/team/design.webp" },
+  { role: "مسؤول سوشال", salary: 1600, gain: "نشر منتظم في حساباتك", crew: "الناشر", img: "/team/publishing.webp" },
+  { role: "مختص سيو", salary: 1400, gain: "متجرك أول في قوقل", crew: "مختص السيو", img: "/team/seo.webp" },
+  { role: "محلل بيانات", salary: 1400, gain: "تقريرك كل يوم على واتساب", crew: "المحلل", img: "/team/reports.webp" },
 ];
 const TOTAL = ROLES.reduce((sum, r) => sum + r.salary, 0);
 /** أرخص باقة (المبتدئ) في المنصة، وفيها كل الخدمات. لو تغيّر السعر هناك غيّره هنا */
@@ -123,14 +124,22 @@ export function Compare() {
               مع مسوّقك الذكي
             </span>
           }
-          tiles={ROLES.map(({ role, gain }) => (
-            <Tile key={role} className="bg-white/[0.06] ring-1 ring-white/10" icon={<Check />} title={gain} />
+          tiles={ROLES.map(({ role, gain, crew, img }) => (
+            <Tile
+              key={role}
+              className="bg-white/[0.06] ring-1 ring-white/10"
+              icon={<img src={img} alt="" width={44} height={44} loading="lazy" className="size-11 shrink-0 rounded-[14px] bg-night-3 object-cover lg:size-14 lg:rounded-[16px]" />}
+              title={gain}
+              sub={<span className="text-mist">{crew}</span>}
+            />
           ))}
           chips={GAINS.map((g) => <span key={g} className="rounded-full bg-white/[0.08] px-3.5 py-1.5 text-mist">{g}</span>)}
           total={
             <>
               <span className="text-[0.9375rem] text-mist">كل شهر، أقل من تكلفة واحد منهم</span>
-              <strong className="block text-[clamp(1.75rem,3vw,2.5rem)] leading-tight">{sar(PLAN)} ريال</strong>
+              <strong className="mt-2 block text-[clamp(1.75rem,3vw,2.5rem)] leading-tight">
+                <span className="chip">{sar(PLAN)} ريال</span>
+              </strong>
             </>
           }
         />
@@ -181,7 +190,7 @@ function Layer({ className, end = false, label, tiles, chips, total }: { classNa
 
 function Tile({ className, icon, title, sub }: { className: string; icon: ReactNode; title: string; sub?: ReactNode }) {
   return (
-    <li className={`flex h-20 items-center gap-3 rounded-2xl p-4 lg:h-36 lg:flex-col lg:items-start lg:justify-between ${className}`}>
+    <li className={`flex h-20 items-center gap-3 rounded-2xl p-4 lg:h-40 lg:flex-col lg:items-start lg:justify-between ${className}`}>
       {icon}
       <span>
         <span className="block text-[1rem] font-semibold leading-[1.5]">{title}</span>
@@ -196,16 +205,6 @@ function Person() {
     <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#e3e5ea] text-[#8a8f9c]">
       <svg viewBox="0 0 24 24" aria-hidden className="size-5" fill="currentColor">
         <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm-7 8a7 7 0 0 1 14 0z" />
-      </svg>
-    </span>
-  );
-}
-
-function Check() {
-  return (
-    <span className="grid size-9 shrink-0 place-items-center rounded-full text-white ring-1 ring-white/25">
-      <svg viewBox="0 0 16 16" aria-hidden className="size-4" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
-        <path d="m3.5 8.5 3 3 6-7" />
       </svg>
     </span>
   );
