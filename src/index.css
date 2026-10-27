@@ -267,3 +267,15 @@ body {
 .faq[open]::details-content {
   block-size: auto;
 }
+
+/* صفحة الدخول: الشخصية تهز راسها لما يصير خطأ */
+.oops {
+  animation: oops 0.5s var(--ease-lift);
+  transform-origin: 50% 64%;
+}
+
+@keyframes oops {
+  20% { rotate: -5deg; }
+  45% { rotate: 4deg; }
+  70% { rotate: -2deg; }
+}
