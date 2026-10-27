@@ -272,7 +272,7 @@ body {
 .oops {
   animation: oops 0.5s var(--ease-lift);
   /* تهز من مكان ما هي قاعدة (نص جسمها على الحافة) */
-  transform-origin: 36% 83%;
+  transform-origin: 38% 80%;
 }
 
 @keyframes oops {
