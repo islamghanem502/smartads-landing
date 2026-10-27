@@ -109,7 +109,7 @@ export function Compare() {
           chips={PAINS.map((p) => <span key={p} className="rounded-full bg-cloud px-3.5 py-1.5 text-ink-soft">{p}</span>)}
           total={
             <>
-              <span className="text-[0.9375rem] text-ink-soft">كل شهر تقريباً، بأسعار المستقلين</span>
+              <span className="text-[0.9375rem] text-ink-soft">رواتبهم كل شهر تقريباً</span>
               <strong className="block text-[clamp(1.75rem,3vw,2.5rem)] leading-tight text-[#c2410c]">{sar(TOTAL)} ريال</strong>
             </>
           }
