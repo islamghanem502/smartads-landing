@@ -271,7 +271,8 @@ body {
 /* صفحة الدخول: الشخصية تهز راسها لما يصير خطأ */
 .oops {
   animation: oops 0.5s var(--ease-lift);
-  transform-origin: 50% 64%;
+  /* تهز من مكان ما هي قاعدة (نص جسمها على الحافة) */
+  transform-origin: 36% 83%;
 }
 
 @keyframes oops {

@@ -22,8 +22,9 @@ npm run check    # TypeScript
 - `src/components/Nav.tsx`: النافبار.
 - `src/components/hero/Hero.tsx`: الهيرو والتخطيط (التعليق فوقه يشرح كل مقاس).
 - `src/components/hero/Team.tsx`: كرت «فريقك التسويقي» وحركته.
-- `src/components/hero/Mascot.tsx`: الشخصية ووجهها المرسوم بالكود (ثابت ويرمش).
-- `src/login/`: صفحة الدخول (سلة، زد، موقعك الخاص) والشخصية القاعدة على الكرت (`Sitter.tsx`).
+- `src/components/hero/Mascot.tsx`: الشخصية في الهيرو.
+- `src/components/MascotFace.tsx`: وجه الشخصية المرسوم بالكود فوق شاشتها (ثابت ويرمش)، نفسه في الهيرو وصفحة الدخول.
+- `src/login/`: صفحة الدخول (سلة، زد، موقعك الخاص) والشخصية الصغيرة القاعدة على الكرت (`Sitter.tsx`).
 - `src/components/logos.tsx`: شعارات المنصات.
 - `src/index.css`: الألوان (`@theme`) وكم كلاس ما تنكتب بـ Tailwind.
 

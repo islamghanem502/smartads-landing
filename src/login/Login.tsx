@@ -2,7 +2,7 @@ import { useEffect, useState, type ComponentProps, type FormEvent, type ReactNod
 import { Salla, Website, ZidMark, type Logo } from "../components/logos";
 import { API_URL, APP_URL, LOGIN_URL, SIGNUP_URL } from "../lib/links";
 import { Field } from "./Field";
-import { Sitter, type Mood } from "./Sitter";
+import { Sitter } from "./Sitter";
 
 /*
  * صفحة الدخول: نفس طرق المنصة بالضبط، بتصميمنا.
@@ -11,14 +11,16 @@ import { Sitter, type Mood } from "./Sitter";
  *   بنفس الخانات والشروط اللي في صفحة المنصة (custom-signup): كلمة المرور 8 أحرف، والواتساب أرقام بس.
  * الشخصية فوق الكرت هي اللي ترحّب وتقول وش صار (الأخطاء كلها في فقاعتها).
  * fresh: صفحة /signup/ (أزرار «اربط متجرك»): نفس الصفحة، بس العنوان «اربط متجرك» وموقعك الخاص يفتح على حساب جديد.
+ * في اللابتوب الكرت عريض عشان ما يحتاج تمرير: الطرق الثلاث جنب بعض، والخانات كل ثنتين في صف،
+ * ورابط «عندك حساب؟» جنب العنوان. في الجوال كل شي تحت بعض.
  */
 type View = "stores" | "login" | "signup";
-type Say = { text: string; mood: Mood };
+type Say = { text: string; oops?: boolean };
 
 const HELLO: Record<View, Say> = {
-  stores: { text: "هلا والله! متجرك على وين؟", mood: "wave" },
-  login: { text: "حيّاك! دخّل إيميلك وكلمة المرور", mood: "calm" },
-  signup: { text: "حيّاك! عرّفنا على موقعك", mood: "calm" },
+  stores: { text: "هلا والله! متجرك على وين؟" },
+  login: { text: "حيّاك! دخّل إيميلك وكلمة المرور" },
+  signup: { text: "حيّاك! عرّفنا على موقعك" },
 };
 
 const STORES: { id: "salla" | "zid"; L: Logo; name: string }[] = [
@@ -32,12 +34,6 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
   const [view, setView] = useState<View>("stores");
   const [say, setSay] = useState<Say>(HELLO.stores);
   const [busy, setBusy] = useState(false);
-
-  // بعد الترحيب تنزّل يدها
-  useEffect(() => {
-    const t = setTimeout(() => setSay((s) => (s === HELLO.stores ? { ...s, mood: "calm" } : s)), 2600);
-    return () => clearTimeout(t);
-  }, []);
 
   // لو رجع للصفحة بزر الرجوع (بعد ما راح لسلة مثلاً) نرجّعها زي ما كانت
   useEffect(() => {
@@ -57,12 +53,12 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
   };
   const oops = (text: string) => {
     setBusy(false);
-    setSay({ text, mood: "sad" });
+    setSay({ text, oops: true });
   };
 
   const store = (id: "salla" | "zid", name: string) => {
     setBusy(true);
-    setSay({ text: `يلا، نوديك لـ${name}…`, mood: "wave" });
+    setSay({ text: `يلا، نوديك لـ${name}…` });
     location.href = `${API_URL}/api/auth/${id}/install?redirect_to=/merchant`;
   };
 
@@ -86,7 +82,7 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
     }
 
     setBusy(true);
-    setSay({ text: "لحظة…", mood: "calm" });
+    setSay({ text: "لحظة…" });
     try {
       const res = await fetch(`${API_URL}/api/auth/${signup ? "register" : "login"}`, {
         method: "POST",
@@ -96,7 +92,7 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
       });
       if (res.ok) {
         // حساب جديد: إيميله مو مؤكد، فنوديه لصفحة التأكيد في المنصة على طول (مثل صفحتها)
-        setSay(signup ? { text: "تم! باقي تأكد إيميلك", mood: "wave" } : { text: "هلا فيك! نوديك للوحتك", mood: "wave" });
+        setSay({ text: signup ? "تم! باقي تأكد إيميلك" : "هلا فيك! نوديك للوحتك" });
         location.href = `${APP_URL}${signup ? "/auth/verify-required" : "/merchant"}`;
         return;
       }
@@ -107,9 +103,41 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
     }
   }
 
+  // رابط الصفحة الثانية: «عندك حساب؟» أو «جديد عندنا؟». في اللابتوب جنب العنوان، وفي الجوال تحت الكرت
+  const other =
+    view === "stores" ? (
+      <Switch ask={fresh ? "عندك حساب؟" : "جديد عندنا؟"}>
+        <a href={fresh ? LOGIN_URL : SIGNUP_URL}>{fresh ? "سجّل دخولك" : "اربط متجرك"}</a>
+      </Switch>
+    ) : (
+      <Switch ask={view === "login" ? "ما عندك حساب؟" : "عندك حساب؟"}>
+        <button type="button" onClick={() => open(view === "login" ? "signup" : "login")}>{view === "login" ? "سجّل موقعك" : "سجّل دخولك"}</button>
+      </Switch>
+    );
+
+  const title = view === "stores" ? (fresh ? "اربط متجرك" : "سجّل دخولك") : view === "login" ? "دخول بموقعك الخاص" : "اربط موقعك الخاص";
+  const sub = view === "stores" ? "اختر وين متجرك، ونكمّل من هناك." : view === "signup" ? "حط رابط موقعك، ونبدأ نفهم نشاطك ونجهّز خطتك. ما تحتاج بطاقة." : null;
+  const back = (
+    <button type="button" onClick={() => open("stores")} className="-ms-1 inline-flex items-center gap-1.5 text-[0.9375rem] text-fog transition-colors hover:text-white">
+      <svg viewBox="0 0 24 24" aria-hidden className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m9 6 6 6-6 6" />
+      </svg>
+      سلة أو زد
+    </button>
+  );
+  // في اللابتوب: العنوان وجنبه «سلة أو زد»، وتحته الوصف وجنبه «عندك حساب؟»
+  const head = (
+    <div className="grid gap-x-8 lg:grid-cols-[1fr_auto] lg:items-baseline">
+      <h1 className="text-[1.75rem] font-bold leading-[1.3]">{title}</h1>
+      <div className="hidden lg:block">{view !== "stores" && back}</div>
+      {sub ? <p className="mt-2 text-[1rem] text-mist">{sub}</p> : <span />}
+      <div className="hidden lg:mt-2 lg:block">{other}</div>
+    </div>
+  );
+
   return (
-    <div className="flex min-h-svh flex-col">
-      <header className="mx-auto flex w-full max-w-page items-center justify-between px-(--gutter) py-5">
+    <div className="relative flex min-h-svh flex-col">
+      <header className="absolute inset-x-0 top-0 mx-auto flex w-full max-w-page items-center justify-between px-(--gutter) py-5">
         <a href="/" className="flex items-center gap-2.5 text-[1.0625rem] font-bold">
           <span className="grid size-9 place-items-center overflow-hidden rounded-full bg-night-3 ring-1 ring-line">
             <img src="/mascot-head.png" alt="" width={36} height={36} className="mt-1 size-8 object-contain" />
@@ -119,44 +147,32 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
         <a href="/" className="text-[0.9375rem] text-fog transition-colors hover:text-white">الرئيسية</a>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center px-(--gutter) pb-16 pt-36">
-        <div className="relative w-full max-w-[27rem]">
-          <Sitter mood={say.mood} say={say.text} />
+      {/* فوق: مكان الهيدر والشخصية (قاعدة على الكرت، وأغلبها فوقه) */}
+      <main className="flex flex-1 flex-col items-center justify-center px-(--gutter) pb-6 pt-44 sm:pt-48 lg:pt-36">
+        <div className="relative w-full max-w-[27rem] lg:max-w-[50rem]">
+          <Sitter say={say.text} oops={!!say.oops} />
 
-          <div className="rounded-[28px] bg-night-2 px-5 pb-6 pt-14 ring-1 ring-line shadow-[0_40px_80px_-40px_rgb(0_0_0/0.8)] sm:px-8 sm:pb-8 sm:pt-16">
+          <div className="rounded-[28px] bg-night-2 px-5 pb-6 pt-10 ring-1 ring-line shadow-[0_40px_80px_-40px_rgb(0_0_0/0.8)] sm:px-8 sm:pb-8 lg:px-10 lg:pt-8">
             {view === "stores" ? (
               <>
-                <h1 className="text-[1.75rem] font-bold leading-[1.3]">{fresh ? "اربط متجرك" : "سجّل دخولك"}</h1>
-                <p className="mt-2 text-[1rem] text-mist">اختر وين متجرك، ونكمّل من هناك.</p>
-                <ul className="mt-7 grid gap-3">
+                {head}
+                <ul className="mt-7 grid gap-3 lg:grid-cols-3">
                   {STORES.map(({ id, L, name }) => (
                     <li key={id}>
-                      <Choice L={L} title={name} sub={`بحساب متجرك في ${name}`} disabled={busy} onClick={() => store(id, name)} />
+                      <Choice L={L} title={name} sub="بحساب متجرك" disabled={busy} onClick={() => store(id, name)} />
                     </li>
                   ))}
                   <li>
                     <Choice L={Website} title="موقعك الخاص" sub="بالإيميل وكلمة المرور" disabled={busy} onClick={() => open(fresh ? "signup" : "login")} />
                   </li>
                 </ul>
-                <p className="mt-6 border-t border-line pt-5 text-center text-[0.9375rem] text-mist">
-                  {fresh ? "عندك حساب؟ " : "جديد عندنا؟ "}
-                  <a href={fresh ? LOGIN_URL : SIGNUP_URL} className="font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
-                    {fresh ? "سجّل دخولك" : "اربط متجرك"}
-                  </a>
-                </p>
               </>
             ) : (
-              <form noValidate onSubmit={submit} onInput={() => say.mood === "sad" && setSay(HELLO[view])}>
-                <button type="button" onClick={() => open("stores")} className="-ms-1 mb-4 inline-flex items-center gap-1.5 text-[0.9375rem] text-fog transition-colors hover:text-white">
-                  <svg viewBox="0 0 24 24" aria-hidden className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="m9 6 6 6-6 6" />
-                  </svg>
-                  سلة أو زد
-                </button>
-                <h1 className="text-[1.75rem] font-bold leading-[1.3]">{view === "login" ? "دخول بموقعك الخاص" : "اربط موقعك الخاص"}</h1>
-                {view === "signup" && <p className="mt-2 text-[1rem] text-mist">حط رابط موقعك، ونبدأ نفهم نشاطك ونجهّز خطتك.</p>}
+              <form noValidate onSubmit={submit} onInput={() => say.oops && setSay(HELLO[view])}>
+                <div className="mb-3 lg:hidden">{back}</div>
+                {head}
 
-                <div className="mt-7 grid grid-cols-1 gap-5">
+                <div className="mt-7 grid grid-cols-1 gap-5 lg:mt-6 lg:grid-cols-2 lg:gap-x-6 lg:gap-y-3.5">
                   {view === "signup" && (
                     <>
                       <Field label="اسم الموقع" name="store" autoComplete="organization" placeholder="مثال: متجر لمتي" disabled={busy} />
@@ -172,34 +188,40 @@ export function Login({ fresh = false }: { fresh?: boolean }) {
                     dir="ltr"
                     autoComplete={view === "login" ? "current-password" : "new-password"}
                     placeholder="••••••••"
-                    hint={view === "signup" ? "8 أحرف على الأقل" : undefined}
+                    hint={
+                      view === "signup" ? (
+                        "8 أحرف على الأقل"
+                      ) : (
+                        <a href={`${APP_URL}/auth/forgot-password`} className="underline decoration-white/20 underline-offset-4 transition-colors hover:text-white">نسيت كلمة المرور؟</a>
+                      )
+                    }
                     disabled={busy}
                   />
-                </div>
-
-                {view === "login" && (
-                  <a href={`${APP_URL}/auth/forgot-password`} className="mt-3 inline-block text-[0.875rem] text-fog underline decoration-white/20 underline-offset-4 transition-colors hover:text-white">
-                    نسيت كلمة المرور؟
-                  </a>
-                )}
-
-                <button type="submit" disabled={busy} className="mt-7 inline-flex h-13 w-full items-center justify-center rounded-[14px] bg-white text-[1rem] font-semibold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.98] disabled:opacity-60">
-                  {busy ? "لحظة…" : view === "login" ? "دخول" : "أنشئ حسابك"}
-                </button>
-                {view === "signup" && <p className="mt-3 text-center text-[0.8125rem] text-fog">ما تحتاج بطاقة، والخطوة الجاية تأكيد إيميلك.</p>}
-
-                <p className="mt-6 border-t border-line pt-5 text-center text-[0.9375rem] text-mist">
-                  {view === "login" ? "ما عندك حساب؟ " : "عندك حساب؟ "}
-                  <button type="button" onClick={() => open(view === "login" ? "signup" : "login")} className="font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
-                    {view === "login" ? "سجّل موقعك" : "سجّل دخولك"}
+                  {/* حساب جديد: الزر جنب كلمة المرور في اللابتوب. الدخول: تحت الخانتين */}
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className={`mt-2 inline-flex h-13 w-full items-center justify-center self-end rounded-[14px] bg-white text-[1rem] font-semibold text-night transition-[background-color,scale] hover:bg-[#e9eaee] active:scale-[0.98] disabled:opacity-60 lg:mt-0 lg:h-12 ${view === "login" ? "lg:col-span-2 lg:mt-3" : ""}`}
+                  >
+                    {busy ? "لحظة…" : view === "login" ? "دخول" : "أنشئ حسابك"}
                   </button>
-                </p>
+                </div>
               </form>
             )}
+            <div className="mt-6 border-t border-line pt-5 text-center lg:hidden">{other}</div>
           </div>
         </div>
       </main>
     </div>
+  );
+}
+
+/** «عندك حساب؟ سجّل دخولك»: سؤال، وجنبه الرابط (أو زر يبدّل الشكل) */
+function Switch({ ask, children }: { ask: string; children: ReactNode }) {
+  return (
+    <p className="text-[0.9375rem] text-mist [&>a,&>button]:font-semibold [&>a,&>button]:text-white [&>a,&>button]:underline [&>a,&>button]:decoration-white/30 [&>a,&>button]:underline-offset-4 [&>a:hover,&>button:hover]:decoration-white">
+      {ask} {children}
+    </p>
   );
 }
 
