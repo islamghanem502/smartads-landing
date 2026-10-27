@@ -1,6 +1,6 @@
 import { useEffect, useState, type ComponentProps, type FormEvent, type ReactNode } from "react";
 import { Salla, Website, ZidMark, type Logo } from "../components/logos";
-import { API_URL, APP_URL } from "../lib/links";
+import { API_URL, APP_URL, LOGIN_URL, SIGNUP_URL } from "../lib/links";
 import { Field } from "./Field";
 import { Sitter, type Mood } from "./Sitter";
 
@@ -10,6 +10,7 @@ import { Sitter, type Mood } from "./Sitter";
  *   موقعك الخاص: دخول بالإيميل وكلمة المرور (/api/auth/login)، أو حساب جديد (/api/auth/register)
  *   بنفس الخانات والشروط اللي في صفحة المنصة (custom-signup): كلمة المرور 8 أحرف، والواتساب أرقام بس.
  * الشخصية فوق الكرت هي اللي ترحّب وتقول وش صار (الأخطاء كلها في فقاعتها).
+ * fresh: صفحة /signup/ (أزرار «اربط متجرك»): نفس الصفحة، بس العنوان «اربط متجرك» وموقعك الخاص يفتح على حساب جديد.
  */
 type View = "stores" | "login" | "signup";
 type Say = { text: string; mood: Mood };
@@ -27,7 +28,7 @@ const STORES: { id: "salla" | "zid"; L: Logo; name: string }[] = [
 
 const WHATSAPP = /^\+?\d{7,15}$/;
 
-export function Login() {
+export function Login({ fresh = false }: { fresh?: boolean }) {
   const [view, setView] = useState<View>("stores");
   const [say, setSay] = useState<Say>(HELLO.stores);
   const [busy, setBusy] = useState(false);
@@ -125,7 +126,7 @@ export function Login() {
           <div className="rounded-[28px] bg-night-2 px-5 pb-6 pt-14 ring-1 ring-line shadow-[0_40px_80px_-40px_rgb(0_0_0/0.8)] sm:px-8 sm:pb-8 sm:pt-16">
             {view === "stores" ? (
               <>
-                <h1 className="text-[1.75rem] font-bold leading-[1.3]">سجّل دخولك</h1>
+                <h1 className="text-[1.75rem] font-bold leading-[1.3]">{fresh ? "اربط متجرك" : "سجّل دخولك"}</h1>
                 <p className="mt-2 text-[1rem] text-mist">اختر وين متجرك، ونكمّل من هناك.</p>
                 <ul className="mt-7 grid gap-3">
                   {STORES.map(({ id, L, name }) => (
@@ -134,9 +135,15 @@ export function Login() {
                     </li>
                   ))}
                   <li>
-                    <Choice L={Website} title="موقعك الخاص" sub="بالإيميل وكلمة المرور" disabled={busy} onClick={() => open("login")} />
+                    <Choice L={Website} title="موقعك الخاص" sub="بالإيميل وكلمة المرور" disabled={busy} onClick={() => open(fresh ? "signup" : "login")} />
                   </li>
                 </ul>
+                <p className="mt-6 border-t border-line pt-5 text-center text-[0.9375rem] text-mist">
+                  {fresh ? "عندك حساب؟ " : "جديد عندنا؟ "}
+                  <a href={fresh ? LOGIN_URL : SIGNUP_URL} className="font-semibold text-white underline decoration-white/30 underline-offset-4 hover:decoration-white">
+                    {fresh ? "سجّل دخولك" : "اربط متجرك"}
+                  </a>
+                </p>
               </>
             ) : (
               <form noValidate onSubmit={submit} onInput={() => say.mood === "sad" && setSay(HELLO[view])}>

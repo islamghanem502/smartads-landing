@@ -6,4 +6,5 @@ import { Login } from "./login/Login";
 export const pages: Record<string, () => string> = {
   "index.html": () => renderToString(<App />),
   "login/index.html": () => renderToString(<Login />),
+  "signup/index.html": () => renderToString(<Login fresh />),
 };

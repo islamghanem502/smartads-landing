@@ -12,7 +12,7 @@ npm run check    # TypeScript
 
 ## كيف يشتغل البناء
 
-فيه صفحتين: الرئيسية (`index.html`) وصفحة الدخول (`login/index.html`، على `/login/`).
+فيه ثلاث صفحات: الرئيسية (`index.html`)، والدخول (`login/index.html`)، وحساب جديد (`signup/index.html`، نفس صفحة الدخول بعنوان «اربط متجرك»).
 `npm run build` يبنيهم، وبعدها يرسم كل صفحة HTML جاهز (`scripts/prerender.mjs`، والصفحات في `src/entry-server.tsx`)،
 عشان قوقل ومعاينة الروابط يشوفون الكلام بدون جافاسكربت. في المتصفح React يكمّل على نفس الـ HTML.
 يعني أي كود يلمس `window` أو `document` لازم يكون داخل `useEffect` أو `useGSAP`، مو وقت الرسم.
