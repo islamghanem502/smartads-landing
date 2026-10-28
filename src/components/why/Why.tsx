@@ -13,18 +13,17 @@ export function Why() {
   return (
     <section id="why" className="overflow-x-clip bg-cloud py-(--section-y) text-night [--ink-base:var(--color-night)]">
       <Container>
-        {/* في الجوال الشخصية بفنجالها أول (صغيرة)، وتحتها «إنت تقهوى، وإحنا نسوّق» */}
-        <div className="grid items-center gap-x-12 gap-y-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-y-14">
+        <div className="grid items-center gap-x-12 gap-y-14 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <div>
             <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.3]">
               <Ink>إنت تقهوى،</Ink> <span className="chip text-white">وإحنا نسوّق</span>
             </h2>
-            <p className="mt-5 max-w-[34rem] text-[1.0625rem] leading-[1.85] text-ink-soft lg:mt-6 lg:text-[1.125rem] lg:leading-[1.9]">
+            <p className="mt-6 max-w-[34rem] text-[1.125rem] leading-[1.9] text-ink-soft">
               بنينا مسوّقك الذكي على خبرة تسويق كبيرة، وهدفنا مو بس ندير حملاتك. هدفنا نكون فريقك التسويقي الكامل: نطلق لك
               <strong className="font-semibold text-night"> حملات قوية تجيب مبيعات</strong>، ونبني لعلامتك
               <strong className="font-semibold text-night"> جمهور يعرفها ويرجع لها</strong>، ونتابع 24 ساعة… حتى وإنت نايم.
             </p>
-            <p className="mt-4 text-[1.25rem] font-bold leading-[1.6] lg:mt-5 lg:text-[1.375rem]">
+            <p className="mt-5 text-[1.375rem] font-bold leading-[1.6]">
               وهمّنا الأول؟ <mark className="hl [--hl:#ddd2ff]">مبيعاتك</mark>، وجمهورك، وهويتك.
             </p>
           </div>
@@ -47,7 +46,7 @@ export function Why() {
  */
 function Coffee() {
   return (
-    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[17rem] max-lg:order-first sm:max-w-[20rem] lg:me-0 lg:max-w-[27rem] lg:-translate-x-[2%]">
+    <div className="relative mx-auto aspect-[1000/893] w-full max-w-[24rem] lg:me-0 lg:max-w-[27rem] lg:-translate-x-[2%]">
       <div aria-hidden className="absolute inset-x-[2%] bottom-0 top-[52%] overflow-hidden rounded-[32px] bg-night ring-1 ring-white/10">
         <span className="absolute inset-x-[15%] -bottom-1/2 h-full rounded-full bg-[#7c5cff]/50 blur-3xl" />
       </div>
