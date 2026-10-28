@@ -36,7 +36,7 @@ export function Footer() {
           <h2 className="text-[clamp(2rem,3.6vw,3rem)] font-bold leading-[1.3]">
             <Ink>لا تضيّع وقت،</Ink> <span className="chip">ابدأ اليوم</span>
           </h2>
-          <p className="mx-auto mt-5 max-w-[30rem] text-balance text-[1.125rem] leading-[1.8] text-mist">
+          <p className="mx-auto mt-4 max-w-[30rem] text-balance text-[1.0625rem] leading-[1.8] text-mist sm:mt-5 sm:text-[1.125rem]">
             كل يوم يفوت، فيه طلبات تروح لمنافسينك. وأول أسبوع على حسابنا.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
@@ -58,7 +58,7 @@ export function Footer() {
         <Portal />
 
         {/* الروابط وبيانات المؤسسة */}
-        <div className="mt-20 grid gap-12 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-20">
+        <div className="mt-14 grid gap-12 sm:mt-20 lg:mt-24 lg:grid-cols-[minmax(0,1fr)_auto] lg:gap-20">
           <div className="max-w-[24rem]">
             <a href="/" className="inline-flex items-center gap-2.5 text-[1.125rem] font-bold">
               <span className="grid size-10 place-items-center overflow-hidden rounded-full bg-night-3 ring-1 ring-line">
@@ -136,7 +136,7 @@ function Portal() {
         className="absolute inset-x-0 h-px bg-[linear-gradient(90deg,transparent,rgb(255_255_255/0.16)_18%,rgb(255_255_255/0.16)_82%,transparent)]"
         style={{ top: `${(cy / VIEW_H) * 100}%` }}
       />
-      <svg viewBox={`0 0 ${HOLE.w} ${VIEW_H}`} role="img" aria-label="مسوّقك الذكي يأشّر على ساعته" className="relative mx-auto block w-[min(36rem,96vw)] overflow-visible">
+      <svg viewBox={`0 0 ${HOLE.w} ${VIEW_H}`} role="img" aria-label="مسوّقك الذكي يأشّر على ساعته" className="relative mx-auto block w-[min(36rem,84vw)] overflow-visible">
         <defs>
           <linearGradient id="rim" x1="0" x2="1">
             <stop offset="0" stopColor="#7c5cff" />

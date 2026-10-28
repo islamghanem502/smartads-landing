@@ -12,7 +12,7 @@ import { Team } from "./Team";
  * المسافة فوقه نفس اللي تحته، على أي ارتفاع.
  *
  * التخطيط حسب العرض الفعلي (يعني بعد الزوم):
- *   الجوال: الكلام، بعده الشخصية، بعدها كرت الفريق.
+ *   الجوال: الكلام، وتحته كرت الفريق والشخصية صغيرة واقفة على حافته فوق تأشّر عليه (عشان الاثنين يبانون في شاشة وحدة).
  *   من 640: تحت الكلام كرت الفريق يمين والشخصية يسار تأشّر عليه.
  *   من 1024: الكلام يمين بعرضه، والفريق مع الشخصية في نص اللي باقي.
  * السطر الثاني مقسوم سطرين عن قصد: يخلّي عمود الكلام ضيق، فتلقى الشخصية مكان حتى على 1024.
@@ -66,9 +66,9 @@ export function Hero() {
           </div>
         </div>
 
-        <div className="flex flex-col items-start gap-10 sm:flex-row sm:items-center sm:justify-between lg:justify-end lg:gap-4">
+        <div className="relative flex flex-col items-start gap-10 max-sm:pt-[7.25rem] sm:flex-row sm:items-center sm:justify-between lg:justify-end lg:gap-4">
           <Team />
-          <Mascot className="w-[min(15rem,62vw)] self-center max-sm:order-first sm:w-[min(20rem,38vw)] lg:w-[min(24rem,26vw,62vh)]" />
+          <Mascot className="w-[8.5rem] max-sm:absolute max-sm:end-5 max-sm:top-0 sm:w-[min(20rem,38vw)] lg:w-[min(24rem,26vw,62vh)]" />
         </div>
       </Container>
     </section>

@@ -40,21 +40,24 @@ export function Pricing() {
           </p>
         </div>
 
-        <ul className="mt-12 grid gap-5 lg:mt-16 lg:grid-cols-3 lg:gap-6">
+        <ul className="mt-10 grid gap-4 lg:mt-16 lg:grid-cols-3 lg:gap-6">
           {PLANS.map((plan) => (
             <li key={plan.name} className={`rounded-[30px] p-px ${plan.popular ? "bg-(image:--gradient)" : "bg-line"}`}>
-              <div className="flex h-full flex-col rounded-[29px] bg-night-2 p-7 sm:p-8">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-[1.125rem] font-semibold text-mist">{plan.name}</h3>
-                  {plan.popular && <span className="rounded-full bg-(image:--gradient) px-3 py-1 text-[0.8125rem] font-semibold">الأكثر طلباً</span>}
+              <div className="flex h-full flex-col rounded-[29px] bg-night-2 p-6 sm:p-8">
+                {/* في الجوال الاسم والسعر في سطر واحد عشان الكرت يقصر */}
+                <div className="flex items-center justify-between gap-4 sm:block">
+                  <div className="flex items-center gap-2.5 sm:justify-between">
+                    <h3 className="text-[1.125rem] font-semibold text-mist">{plan.name}</h3>
+                    {plan.popular && <span className="rounded-full bg-(image:--gradient) px-3 py-1 text-[0.8125rem] font-semibold">الأكثر طلباً</span>}
+                  </div>
+                  <p className="flex items-baseline gap-2 sm:mt-5">
+                    <span className="text-[2.5rem] font-bold leading-none tabular-nums sm:text-[3.25rem]">{plan.price.toLocaleString("en-US")}</span>
+                    <span className="text-[0.9375rem] text-mist sm:text-[1rem]">ريال/شهر</span>
+                  </p>
                 </div>
-                <p className="mt-5 flex items-baseline gap-2">
-                  <span className="text-[3.25rem] font-bold leading-none tabular-nums">{plan.price.toLocaleString("en-US")}</span>
-                  <span className="text-[1rem] text-mist">ريال/شهر</span>
-                </p>
 
                 {/* ميزانيتك الإعلانية: الفرق الوحيد بين الباقات */}
-                <div className="mt-7">
+                <div className="mt-5 sm:mt-7">
                   <div className="flex items-baseline justify-between gap-3 text-[0.9375rem]">
                     <span className="text-mist">ميزانيتك الإعلانية</span>
                     <span className="font-semibold">{plan.budget}</span>
@@ -66,7 +69,7 @@ export function Pricing() {
 
                 <a
                   href={SIGNUP_URL}
-                  className={`mt-8 inline-flex h-13 items-center justify-center rounded-[14px] text-[1rem] font-semibold transition-[background-color,scale] active:scale-[0.97] ${
+                  className={`mt-6 inline-flex h-12 items-center justify-center rounded-[14px] text-[1rem] font-semibold transition-[background-color,scale] active:scale-[0.97] sm:mt-8 sm:h-13 ${
                     plan.popular ? "bg-white text-night hover:bg-[#e9eaee]" : "bg-white/[0.08] text-white hover:bg-white/[0.14]"
                   }`}
                 >
@@ -78,9 +81,9 @@ export function Pricing() {
         </ul>
 
         {/* الخدمات: نفسها في الثلاث */}
-        <div className="mt-5 rounded-[30px] bg-night-2 p-7 ring-1 ring-line sm:p-8 lg:mt-6 lg:p-10">
+        <div className="mt-4 rounded-[30px] bg-night-2 p-6 ring-1 ring-line sm:p-8 lg:mt-6 lg:p-10">
           <h3 className="text-[1.25rem] font-bold">في كل الباقات</h3>
-          <ul className="mt-6 grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-5 grid gap-x-8 gap-y-3.5 sm:mt-6 sm:grid-cols-2 sm:gap-y-4 lg:grid-cols-3">
             {INCLUDED.map((item) => (
               <li key={item} className="flex items-start gap-3 text-[1rem] leading-[1.6] text-mist">
                 <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-(image:--gradient) text-white">

@@ -14,7 +14,8 @@ export function Mascot({ className = "" }: { className?: string }) {
         className="h-auto w-full select-none"
       />
       <MascotFace />
-      <p data-a="hello" data-reveal className="absolute left-[-6%] top-[-3%] whitespace-nowrap rounded-[16px] rounded-br-[4px] bg-white px-4 py-2 text-[0.9375rem] font-semibold text-night sm:text-[1.0625rem]">
+      {/* في الجوال الشخصية صغيرة، فالفقاعة جنب راسها (فوق يدها) بدل ما تغطي وجهها */}
+      <p data-a="hello" data-reveal className="absolute left-[70%] top-[-4%] whitespace-nowrap rounded-[16px] rounded-bl-[4px] bg-white px-4 py-2 text-[0.9375rem] font-semibold text-night sm:left-[-6%] sm:top-[-3%] sm:rounded-bl-[16px] sm:rounded-br-[4px] sm:text-[1.0625rem]">
         هلا والله!
       </p>
     </div>
