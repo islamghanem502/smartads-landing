@@ -280,3 +280,15 @@ body {
   45% { rotate: 4deg; }
   70% { rotate: -2deg; }
 }
+
+/* الأسعار في الجوال: الباقة تتبدّل بحركة خفيفة لما يختار ميزانية ثانية */
+.swap {
+  animation: swap 0.35s var(--ease-lift);
+}
+
+@keyframes swap {
+  from {
+    opacity: 0;
+    translate: 0 8px;
+  }
+}
