@@ -2,12 +2,14 @@ import { useState } from "react";
 import { LOGIN_URL, SIGNUP_URL } from "../lib/links";
 import { Container } from "./layout";
 
+// أقسام الرئيسية بـ /# عشان تشتغل من أي صفحة (المدونة مثلاً)، وفي الرئيسية نفسها تنزل للقسم بدون تحميل
 export const LINKS = [
-  { href: "#services", label: "خدماتنا" },
-  { href: "#how", label: "كيف نشتغل" },
-  { href: "#why", label: "ليش إحنا" },
-  { href: "#pricing", label: "الأسعار" },
-  { href: "#faq", label: "الأسئلة" },
+  { href: "/#services", label: "خدماتنا" },
+  { href: "/#how", label: "كيف نشتغل" },
+  { href: "/#why", label: "ليش إحنا" },
+  { href: "/#pricing", label: "الأسعار" },
+  { href: "/#faq", label: "الأسئلة" },
+  { href: "/blog/", label: "المدونة" },
 ];
 
 export function Nav() {

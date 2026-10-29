@@ -292,3 +292,112 @@ body {
     translate: 0 8px;
   }
 }
+
+/*
+ * نص المقال في المدونة (HTML جاي من قاعدة البيانات): قراءة مريحة على الخلفية الفاتحة.
+ * العناوين كحلي عريض، والفقرات رمادي غامق بسطور واسعة، والروابط بنفسجي بخط تحتها،
+ * والقوائم علاماتها بنفسجي، والاقتباس بخط ملوّن على الجنب.
+ */
+.article {
+  color: #2f333d;
+  font-size: 1.0625rem;
+  line-height: 1.95;
+}
+
+.article > * + * {
+  margin-top: 1.15em;
+}
+
+.article h2 {
+  margin-top: 2.2em;
+  color: var(--color-night);
+  font-size: clamp(1.5rem, 2.4vw, 1.875rem);
+  font-weight: 700;
+  line-height: 1.4;
+  scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+}
+
+.article h3 {
+  margin-top: 1.9em;
+  color: var(--color-night);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.5;
+  scroll-margin-top: calc(var(--nav-h) + 1.5rem);
+}
+
+.article h2 + *,
+.article h3 + * {
+  margin-top: 0.6em;
+}
+
+.article a {
+  color: #6a4cf5;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: rgb(106 76 245 / 0.3);
+  text-underline-offset: 4px;
+}
+
+.article a:hover {
+  text-decoration-color: currentColor;
+}
+
+.article strong {
+  color: var(--color-night);
+  font-weight: 700;
+}
+
+.article ul,
+.article ol {
+  display: grid;
+  gap: 0.5em;
+  padding-inline-start: 1.4em;
+}
+
+.article ul {
+  list-style: disc;
+}
+
+.article ol {
+  list-style: decimal;
+}
+
+.article li::marker {
+  color: #7c5cff;
+  font-weight: 700;
+}
+
+.article blockquote {
+  border-inline-start: 4px solid #7c5cff;
+  border-radius: 4px;
+  padding: 0.25em 1.1em;
+  color: var(--color-night);
+  font-weight: 500;
+}
+
+.article img {
+  border-radius: 20px;
+}
+
+.article hr {
+  border-color: rgb(17 19 24 / 0.08);
+}
+
+.article table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+}
+
+.article th,
+.article td {
+  border-bottom: 1px solid rgb(17 19 24 / 0.08);
+  padding: 0.6em 0.8em;
+  text-align: start;
+}
+
+.article th {
+  color: var(--color-night);
+  font-weight: 700;
+}

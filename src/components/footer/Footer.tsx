@@ -21,10 +21,7 @@ const GROUPS = [
   // آخر وحدة: في الجوال تاخذ سطر كامل عشان الإيميل ما يطلع برّا الشاشة
   {
     title: "تواصل",
-    links: [
-      { href: "mailto:support@ilanakdhaki.com", label: "support@ilanakdhaki.com" },
-      { href: `${APP_URL}/blog`, label: "المدونة" },
-    ],
+    links: [{ href: "mailto:support@ilanakdhaki.com", label: "support@ilanakdhaki.com" }],
   },
 ];
 
